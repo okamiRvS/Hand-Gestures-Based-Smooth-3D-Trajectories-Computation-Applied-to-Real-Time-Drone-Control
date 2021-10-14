@@ -1,0 +1,48 @@
+__pycache__/
+altro
+
+src/known_faces
+src/unknown_faces
+TF Object Detection/tfod
+TF Object Detection/Tensorflow
+TF Object Detection/.ipynb_checkpoints
+TF Object Detection/ipynb_checkpoints
+TF Object Detection.ipynb_checkpoints
+
+# STS #
+######################
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+.vs
+
+# Latex #
+######################
+*.out
+*.aux
+*.gz
+*.log
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Compiled source #
+###################
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+*.tmp
