@@ -2,8 +2,7 @@
 APPUNTI
 Quando installi tensorflow su win7 il comando di cmd "tar -xf protoc-3.15.6-win64.zip" non funziona, perciò estrai noramlmente. 
 
-Aggiungi --user all'installazione cioè: "!pip install tensorflow --upgrade --user"
-per evitare problemi di path troppo lunghi. 
+Quando installi tensorflow su win7, non farlo se la dir ha un path troppo lungo
 
 Euando esegui il comando per fare il training attenzione che il modulo "gin" di python deve corrispondere con la versione di tensorflow
 	pip install gin-config==0.1.1
