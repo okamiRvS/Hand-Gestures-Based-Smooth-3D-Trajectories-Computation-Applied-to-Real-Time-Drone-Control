@@ -3,11 +3,10 @@ altro
 
 src/known_faces
 src/unknown_faces
-TF Object Detection/tfod
-TF Object Detection/Tensorflow
-TF Object Detection/.ipynb_checkpoints
-TF Object Detection/ipynb_checkpoints
-TF Object Detection.ipynb_checkpoints
+tfod
+Tensorflow
+.ipynb_checkpoints
+ipynb_checkpoints
 
 # STS #
 ######################
