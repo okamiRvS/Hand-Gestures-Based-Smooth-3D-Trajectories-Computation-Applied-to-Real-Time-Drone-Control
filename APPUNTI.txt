@@ -6,3 +6,5 @@ Quando installi tensorflow su win7, non farlo se la dir ha un path troppo lungo
 
 Euando esegui il comando per fare il training attenzione che il modulo "gin" di python deve corrispondere con la versione di tensorflow
 	pip install gin-config==0.1.1
+
+Elimina i checkpoint per runnare il codice G:\Bicocca\_Universita\Laurea Magistrale\Tesi magistrale\Tensorflow\workspace\models\my_ssd_mobnet
