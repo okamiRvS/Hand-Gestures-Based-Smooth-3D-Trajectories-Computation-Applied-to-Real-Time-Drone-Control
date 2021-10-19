@@ -1,1 +1,1 @@
-# Master thesis - working in progress
+# Master thesis - work in progress
