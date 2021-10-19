@@ -34,7 +34,7 @@ if not os.path.exists(CSV_DIR_PATH):
 STATE_PATH = os.path.join(CSV_DIR_PATH, 'state.json')
 
 nAttempt = 0
-label = 0
+nLabel = 0
 nImg = 0
 CSV_PATH = os.path.join(CSV_DIR_PATH, f"file_{nAttempt}.csv")
 
@@ -46,7 +46,7 @@ if os.path.exists(STATE_PATH):
         data = json.load(json_file)
 
     nAttempt = data["nAttempt"]
-    label = data["label"]
+    nLabel = data["nLabel"]
     nImg = data["nImg"]
 
     CSV_PATH = os.path.join(CSV_DIR_PATH, f"file_{nAttempt}.csv")
@@ -69,7 +69,7 @@ else:
     with open(STATE_PATH, 'w', encoding='utf-8') as f:
         data = {
             "nAttempt": nAttempt,
-            "label": label,
+            "nLabel": nLabel,
             "nImg": nImg,
         }
         json.dump(data, f, ensure_ascii=False, indent=4)
@@ -78,14 +78,14 @@ print(np_array)
 
 try:
     np_array[1,2] = 1
-    raise ValueError('An error occurred.')
+    raise ValueError('An error occurred.') # just for test
 except:
     print("An error occurred")
 
 with open(STATE_PATH, 'w', encoding='utf-8') as f:
     data = {
         "nAttempt": nAttempt,
-        "label": label,
+        "nLabel": nLabel,
         "nImg": nImg,
     }
     json.dump(data, f, ensure_ascii=False, indent=4)
