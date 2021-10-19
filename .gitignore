@@ -1,8 +1,9 @@
 __pycache__/
 altro
 
-src/known_faces
-src/unknown_faces
+src/known_faces/*
+src/unknown_faces/*
+src/tello_screenshots/*
 tfod
 Tensorflow
 .ipynb_checkpoints
