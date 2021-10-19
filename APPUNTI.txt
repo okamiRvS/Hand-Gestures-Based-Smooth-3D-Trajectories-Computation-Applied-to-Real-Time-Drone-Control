@@ -10,3 +10,6 @@ Euando esegui il comando per fare il training attenzione che il modulo "gin" di 
 Elimina i checkpoint per runnare il codice G:\Bicocca\_Universita\Laurea Magistrale\Tesi magistrale\Tensorflow\workspace\models\my_ssd_mobnet
 
 https://mediapipe.dev/
+
+hand-gesture-recognition-using-mediapipe:
+https://awesomeopensource.com/project/Kazuhito00/hand-gesture-recognition-using-mediapipe
