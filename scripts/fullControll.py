@@ -40,6 +40,12 @@ def getKeyboardInput():
 
     return [lr, fb, ud, yv]
 
+def drawLog(img, color, checkTollerance, mean, val, state):
+    scale = 2
+    cv2.putText(img, f"checkTollerance: {checkTollerance}", (200,40), cv2.FONT_HERSHEY_PLAIN, scale, color, 3)
+    cv2.putText(img, f"mean: {mean}", (200,100), cv2.FONT_HERSHEY_PLAIN, scale, color, 3)
+    cv2.putText(img, f"val: {val}", (200,200), cv2.FONT_HERSHEY_PLAIN, scale, color, 3)
+    cv2.putText(img, f"{state}", (200,300), cv2.FONT_HERSHEY_PLAIN, scale, color, 3)
 
 BEGIN = 0
 START = 1
@@ -60,8 +66,9 @@ cTime = 0
 
 while True:
     vals = getKeyboardInput()
-    me.send_rc_control(vals[0], vals[1], vals[2], vals[3])
-    time.sleep(0.05)
+    if not (vals[0] == vals[1] == vals[2] == vals[3] == 0):
+        me.send_rc_control(vals[0], vals[1], vals[2], vals[3])
+        time.sleep(0.05)
 
     img = me.get_frame_read().frame
     #img = cv2.resize(img, (360, 240)) # comment to get bigger frames
@@ -75,9 +82,7 @@ while True:
         # fill all the queue before start the mean
         if indexQueue < lenMaxQueue and isQueueNotMaxLimit:
             queue.append(val)
-            cv2.putText(img, f"{0}", (200,40), cv2.FONT_HERSHEY_PLAIN, 2, (0,0,255), 3)
-            cv2.putText(img, f"{mean}", (200,100), cv2.FONT_HERSHEY_PLAIN, 2, (0,0,255), 3)
-            cv2.putText(img, f"{val}", (200,200), cv2.FONT_HERSHEY_PLAIN, 2, (0,0,255), 3)
+            drawLog(img, (0,0,255), 0, mean, val, "INIZIALIZATION")
             indexQueue+=1
         else:
             isQueueNotMaxLimit = False
@@ -91,17 +96,11 @@ while True:
                 checkStart = int(abs(mean - val))
 
                 if checkStart < tolleranceSTART:
-                    cv2.putText(img, f"{checkStart}", (200,40), cv2.FONT_HERSHEY_PLAIN, 1, (0,255,0), 3)
-                    cv2.putText(img, f"{mean}", (200,100), cv2.FONT_HERSHEY_PLAIN, 1, (0,255,0), 3)
-                    cv2.putText(img, f"{val}", (200,200), cv2.FONT_HERSHEY_PLAIN, 1, (0,255,0), 3)
-                    cv2.putText(img, f"START", (200,300), cv2.FONT_HERSHEY_PLAIN, 1, (0,255,0), 3)
+                    drawLog(img, (0,255,0), checkStart, mean, val, "START")
                     state = START
                     startingPoint = (lmList[0][1], lmList[0][2])
                 else:
-                    cv2.putText(img, f"{checkStart}", (200,40), cv2.FONT_HERSHEY_PLAIN, 1, (0,0,255), 3)
-                    cv2.putText(img, f"{mean}", (200,100), cv2.FONT_HERSHEY_PLAIN, 1, (0,0,255), 3)
-                    cv2.putText(img, f"{val}", (200,200), cv2.FONT_HERSHEY_PLAIN, 1, (0,0,255), 3)
-                    cv2.putText(img, f"BEGIN", (200,300), cv2.FONT_HERSHEY_PLAIN, 1, (0,0,255), 3)
+                    drawLog(img, (0,0,255), checkStart, mean, val, "BEGIN")
             
             if state == START:
                 nlastMovements = 5
@@ -120,17 +119,11 @@ while True:
                 cv2.circle(img, startingPoint, radius=0, color=(0,255,0), thickness=-1)
 
                 if checkStartTracking < tolleranceTRACKING:
-                    cv2.putText(img, f"{checkStartTracking}", (200,40), cv2.FONT_HERSHEY_PLAIN, 1, (255,0,0), 3)
-                    cv2.putText(img, f"{mean}", (200,100), cv2.FONT_HERSHEY_PLAIN, 1, (255,0,0), 3)
-                    cv2.putText(img, f"{val}", (200,200), cv2.FONT_HERSHEY_PLAIN, 1, (255,0,0), 3)
-                    cv2.putText(img, f"START", (200,300), cv2.FONT_HERSHEY_PLAIN, 1, (255,0,0), 3)
+                    drawLog(img, (255,0,0), checkStartTracking, mean, val, "START")
                     cv2.circle(img, endingPoint, radius=0, color=(0,255,0), thickness=-1)
                     cv2.line(img, startingPoint, endingPoint, (255,255,0), thickness=2)
                 else:
-                    cv2.putText(img, f"{checkStartTracking}", (200,40), cv2.FONT_HERSHEY_PLAIN, 1, (0,0,255), 3)
-                    cv2.putText(img, f"{mean}", (200,100), cv2.FONT_HERSHEY_PLAIN, 1, (0,0,255), 3)
-                    cv2.putText(img, f"{val}", (200,200), cv2.FONT_HERSHEY_PLAIN, 1, (0,0,255), 3)
-                    cv2.putText(img, f"BEGIN", (200,300), cv2.FONT_HERSHEY_PLAIN, 1, (0,0,255), 3)
+                    drawLog(img, (0,0,255), checkStartTracking, mean, val, "BEGIN")
                     state = BEGIN      
 
             if indexQueue < lenMaxQueue:
