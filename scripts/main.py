@@ -13,6 +13,7 @@ face = frm.faceRecognition()
 cv2.namedWindow("preview")
 cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
 
+# OPEN WEBCAM
 if cap.isOpened(): # try to get the first frame
     success, img = cap.read()
     img = detector.findHands(img)

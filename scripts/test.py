@@ -6,14 +6,18 @@ import pandas as pd
 import os
 import json
 
-'''
+
 lo = [1,3,60,34,12,11]
 tmp = lo[:2]
 print(tmp)
 print(lo[-2:])
 tmp = tmp + lo[-2::]
 print(tmp)
-'''
+
+num_arr = np.array(tmp)
+print(num_arr)
+
+print(np.sum(num_arr[0:2]))
 
 '''
 lo = [1,3,60,34,12,11]
@@ -24,6 +28,7 @@ lo[-1] = 34
 print(lo)
 '''
 
+'''
 CSV_DIR_PATH = os.path.join('src', 'dataHandGesture')
 if not os.path.exists(CSV_DIR_PATH):
     if os.name == 'posix': # if linux system
@@ -92,3 +97,5 @@ with open(STATE_PATH, 'w', encoding='utf-8') as f:
 
 
 pd.DataFrame(np_array).to_csv(CSV_PATH, index=False, header=None)
+'''
+
