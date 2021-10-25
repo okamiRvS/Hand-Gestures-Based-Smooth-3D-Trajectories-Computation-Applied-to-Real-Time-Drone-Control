@@ -68,7 +68,7 @@ def main():
     pTime = 0
     cTime = 0
 
-    resize = True
+    resize = False
     getFromWebcam = True
 
 
@@ -103,6 +103,7 @@ def main():
         if resize:
             img = cv2.resize(img, (360, 240)) # comment to get bigger frames
 
+        
         img = detector.findHands(img)
         lmList = detector.findPosition(img, draw=False)
 

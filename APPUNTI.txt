@@ -13,3 +13,6 @@ https://mediapipe.dev/
 
 hand-gesture-recognition-using-mediapipe:
 https://awesomeopensource.com/project/Kazuhito00/hand-gesture-recognition-using-mediapipe
+
+
+i dati in ingresso devono essere maneggiati in modo tale che non soffrano dello scale e della posizione
