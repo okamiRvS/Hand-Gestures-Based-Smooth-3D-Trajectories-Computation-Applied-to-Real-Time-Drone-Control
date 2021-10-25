@@ -105,6 +105,7 @@ def main():
         if resize:
             img = cv2.resize(img, (360, 240)) # comment to get bigger frames
 
+        img = cv2.flip(img, 1)
         
         img = detector.findHands(img)
         lmList = detector.findPosition(img, draw=False)
