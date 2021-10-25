@@ -3,6 +3,7 @@ import keyPressModule as kp
 import time
 import cv2
 import handTrackingModule as htm
+import handGestureModule as hgm
 from numba import jit
 import numpy as np
 import pdb
@@ -50,6 +51,7 @@ def main():
     global img
 
     detector = htm.handDetector()
+    gestureDetector = hgm.handGestureRecognition()
 
     START = 0
     TRACKING = 1
@@ -108,6 +110,9 @@ def main():
         lmList = detector.findPosition(img, draw=False)
 
         if len(lmList) != 0:
+            # hand gesture recognition
+            img = gestureDetector.processHands(img, lmList)
+
             #print(lmList[0])
             val = lmList[0][1] + lmList[0][2] # I'LL DO MEAN FOR X AND MEAN FOR Y, THIS IS JUST TRY
 
