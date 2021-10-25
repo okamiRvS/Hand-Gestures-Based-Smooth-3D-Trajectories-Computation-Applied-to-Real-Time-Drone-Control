@@ -7,9 +7,8 @@ from numba import jit
 import numpy as np
 import pdb
 
-@jit(nopython=True)
 def getKeyboardInput(me):
-    #left-right, foward-back, up-down, yaw veloity
+    #left-right, foward-back, up-down, yaw velocity
     lr, fb, ud, yv = 0, 0, 0, 0
     speed = 30
 
@@ -52,24 +51,24 @@ def main():
 
     detector = htm.handDetector()
 
-    BEGIN = 0
-    START = 1
-    TRACKING = 2
+    START = 0
+    TRACKING = 1
 
-    state = BEGIN
+    state = START
 
     lenMaxQueue = 35
     queue = np.zeros(lenMaxQueue, dtype=np.int32)
     indexQueue = 0
-    isQueueNotMaxLimit = True
+    INIZIALIZATION = True
     mean = 0
     tolleranceSTART = 2
     tolleranceTRACKING = 40
+    nlastMovements = 5
 
     pTime = 0
     cTime = 0
 
-    resize = False
+    resize = True
     getFromWebcam = True
 
 
@@ -112,34 +111,35 @@ def main():
             val = lmList[0][1] + lmList[0][2] # I'LL DO MEAN FOR X AND MEAN FOR Y, THIS IS JUST TRY
 
             # fill all the queue before start the mean
-            if indexQueue < lenMaxQueue and isQueueNotMaxLimit:
+            if indexQueue < lenMaxQueue and INIZIALIZATION:
                 queue[indexQueue] = val
-                drawLog(img, (0,0,255), 0, mean, val, "INIZIALIZATION")
                 indexQueue+=1
+                drawLog(img, (0,0,255), 0, mean, val, "INIZIALIZATION")
             else:
-                isQueueNotMaxLimit = False
+                INIZIALIZATION = False # exit from INIZIALIZATION mode
+
                 if indexQueue == lenMaxQueue:
                     indexQueue = 0
 
                 queue[indexQueue] = val 
                 
-                if state == BEGIN:
+                if state == START:
                     mean = np.mean(queue)
                     checkStart = int(abs(mean - val))
 
                     if checkStart < tolleranceSTART:
-                        drawLog(img, (0,255,0), checkStart, mean, val, "START")
-                        state = START
+                        state = TRACKING
                         startingPoint = (lmList[0][1], lmList[0][2])
+                        drawLog(img, (0,255,0), checkStart, mean, val, "TRACKING")
                     else:
-                        drawLog(img, (0,0,255), checkStart, mean, val, "BEGIN")
+                        drawLog(img, (0,0,255), checkStart, mean, val, "START")
                 
-                if state == START:
+                if state == TRACKING:
                     # il vantaggio di mediare sugli ultimi valori è perché in questo modo se viene perso il flusso lo si può riprendere molto velocemente
                     # se si riparte dallo stesso punto in cui si è perso il tracking, diversamente bisognerà riacquisire tante nuove posizioni finchè 
                     # la nuova media non sia sotto la tolleranza
-                    nlastMovements = 5
-                    tmpList = []
+
+                    tmpList = np.zeros(nlastMovements) # create array with only the last n points inserted into the queue
                     if indexQueue < nlastMovements:
                         nElementFromEnd = nlastMovements - indexQueue
                         tmpList = queue[(lenMaxQueue - nElementFromEnd)::]
@@ -151,16 +151,16 @@ def main():
                     checkStartTracking = int(abs(mean - val))
                     endingPoint = (lmList[0][1], lmList[0][2])
 
-                    # draw the begin of the trajectory
-                    cv2.circle(img, startingPoint, radius=0, color=(0,255,0), thickness=-1)
-
                     if checkStartTracking < tolleranceTRACKING:
-                        drawLog(img, (255,0,0), checkStartTracking, mean, val, "START")
+                        # draw the the trajectory
+                        cv2.circle(img, startingPoint, radius=0, color=(0,255,0), thickness=-1)
                         cv2.circle(img, endingPoint, radius=0, color=(0,255,0), thickness=-1)
                         cv2.line(img, startingPoint, endingPoint, (255,255,0), thickness=2)
+
+                        drawLog(img, (255,0,0), checkStartTracking, mean, val, "TRACKING")
                     else:
-                        drawLog(img, (0,0,255), checkStartTracking, mean, val, "BEGIN")
-                        state = BEGIN      
+                        drawLog(img, (0,0,255), checkStartTracking, mean, val, "START")
+                        state = START      
 
                 if indexQueue < lenMaxQueue:
                     indexQueue+=1
