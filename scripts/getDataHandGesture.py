@@ -8,29 +8,44 @@ import os
 import json
 import pdb
 
-me = tello.Tello()
-me.connect()
-print(me.get_battery())
 global img
+getFromWebcam = True
+
+# define images to collect
+labels = ['stop', 'indexup', 'twofingerup', 'punch', 'thumbsup']
+number_imgs = 30
+np_array = np.zeros((len(labels)*number_imgs, 21*2 + 1), dtype=np.int32)
 
 detector = htm.handDetector()
 
-# define images to collect
-labels = ['thumbsup', 'thumbsdown', 'thankyou', 'livelong']
-number_imgs = 10
-
-np_array = np.zeros((len(labels)*number_imgs, 21*2 + 1), dtype=np.int32)
-
-me.streamon() # to get the stream image
+# HERE MAYBE COULD BE USEFUL USE A FACTORY FUNCTION (FROM SOFTWARE ENGENEERING)
+if getFromWebcam:
+    # OPEN WEBCAM
+    cv2.namedWindow("Image")
+    cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
+    if cap.isOpened(): # try to get the first frame
+        success, img = cap.read()
+    else:
+        success = False
+else:
+    me = tello.Tello()
+    me.connect()
+    print(me.get_battery())
+    me.streamon() # to get the stream image
 
 def getReadyForTheNextAction(action):
     #This will run for 15 s
     t_end = time.time() + 15.0
     while time.time() < t_end:
-        img = me.get_frame_read().frame
-        cv2.imshow("Image", img)
+
+        if getFromWebcam:
+            success, img = cap.read()
+        else:
+            img = me.get_frame_read().frame
+
         secondLeft = int(t_end-time.time())
-        cv2.putText(img, f"PHOTO about {action} TAKE in: {secondLeft}s", (10,40), cv2.FONT_HERSHEY_PLAIN, 2, (255,0,255), 3) # print fps
+        cv2.putText(img, f"PHOTO about {action} TAKE in: {secondLeft}s", (10,40), cv2.FONT_HERSHEY_PLAIN, 1, (255,0,255), 3) # print fps
+        cv2.imshow("Image", img)
         cv2.waitKey(1)
 
 CSV_DIR_PATH = os.path.join('src', 'dataHandGesture')
@@ -98,7 +113,11 @@ try:
                     print(f"Collecting image {imgnum}")
                     time.sleep(3)
 
-                    img = me.get_frame_read().frame
+                    if getFromWebcam:
+                        success, img = cap.read()
+                    else:
+                        img = me.get_frame_read().frame
+                    
                     #img = cv2.resize(img, (360, 240)) # comment to get bigger frames
 
                     img = detector.findHands(img)
@@ -113,13 +132,19 @@ try:
                             np_array[index, j*2] = val[1]
                             np_array[index, j*2+1] = val[2]
 
+                        #for val in np_array[:-1]:
+
+
+
                         np_array[index, -1] = nLabel # put label on last column
 
                         isLmListEmpty = False
 
                         print(lmList)
-                        print(f"battery is: {me.get_battery()}")
-                        print("\n\n")
+
+                        if not getFromWebcam:
+                            print(f"battery is: {me.get_battery()}")
+                            print("\n\n")
 
                     
                     cv2.putText(img, f"Collecting images for: {label}", (10,40), cv2.FONT_HERSHEY_PLAIN, 2, (255,0,255), 3)
@@ -149,5 +174,6 @@ with open(STATE_PATH, 'w', encoding='utf-8') as f:
     json.dump(data, f, ensure_ascii=False, indent=4)
 
 pd.DataFrame(np_array).to_csv(CSV_PATH, index=False, header=None)
-me.streamoff() # to close stream
+if not getFromWebcam:
+    me.streamoff() # to close stream
 cv2.destroyAllWindows()
