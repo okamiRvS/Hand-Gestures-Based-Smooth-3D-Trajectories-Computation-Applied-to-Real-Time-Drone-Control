@@ -18,3 +18,5 @@ https://awesomeopensource.com/project/Kazuhito00/hand-gesture-recognition-using-
 i dati in ingresso devono essere maneggiati in modo tale che non soffrano dello scale e della posizione
 
 il pugno come gesture non è buono
+
+https://www.tecnobabele.com/android-non-si-connette-a-windows-tramite-adb-risolvilo-in-3-semplici-passaggi/2019-11-19/
