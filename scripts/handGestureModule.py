@@ -8,9 +8,9 @@ import pdb
 
 class handGestureRecognition():
 
-    lastModel = "1636127582" # COPY THE FOLDER NAME OF Tensorflow/workspace/models/my_hand_gesture_model
+    lastModel = "1636134306" # COPY THE FOLDER NAME OF Tensorflow/workspace/models/my_hand_gesture_model
     export_path = str.encode(os.path.join("Tensorflow","workspace", "models", "my_hand_gesture_model", lastModel)) # must be in bytes
-    SPECIES = ['stop', 'indexup', 'twofingerup', 'punch', 'thumbsup']
+    SPECIES = ['stop', 'onefingerup', 'twofingerup', 'thumbsup']
     FRAME_THICKNESS = 3
     FONT_THICKNESS = 2
 
@@ -21,16 +21,28 @@ class handGestureRecognition():
     def processHands(self, img, handPoints):
         np_array = np.zeros((1, 21*2), dtype=np.int32)
 
+        x_sum = y_sum = 0
         for j, val in enumerate(handPoints):
             np_array[0, j*2] = val[1]
+            x_sum += val[1]
             np_array[0, j*2+1] = val[2]
+            y_sum += val[2]
 
+        x_mean = x_sum / 21
+        y_mean = y_sum / 21
+
+        # translate all values to the origin
+        for j in range(42):
+            if j%2 == 0:
+                np_array[0, j] = np_array[0, j] - x_mean
+            else:
+                np_array[0, j] = np_array[0, j] - y_mean
 
         CSV_COLUMN_NAMES = np.arange(42)
         CSV_COLUMN_NAMES = [str(item) for item in CSV_COLUMN_NAMES]
 
         self.POINTS = pd.DataFrame(np_array, columns=CSV_COLUMN_NAMES)
-        predictions = self.getPredictions()
+        predictions = self.getPredictions()      
 
         for idx, resultPred in enumerate(predictions["class_ids"]):
             class_id = resultPred[0]

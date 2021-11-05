@@ -12,8 +12,8 @@ global img
 getFromWebcam = True
 
 # define images to collect
-labels = ['stop', 'indexup', 'twofingerup', 'punch', 'thumbsup']
-number_imgs = 30
+labels = ['stop', 'onefingerup', 'twofingerup', 'thumbsup']
+number_imgs = 10
 np_array = np.zeros((len(labels)*number_imgs, 21*2 + 1), dtype=np.int32)
 
 detector = htm.handDetector()
@@ -44,7 +44,7 @@ def getReadyForTheNextAction(action):
             img = me.get_frame_read().frame
 
         secondLeft = int(t_end-time.time())
-        cv2.putText(img, f"PHOTO about {action} TAKE in: {secondLeft}s", (10,40), cv2.FONT_HERSHEY_PLAIN, 1, (255,0,255), 3) # print fps
+        cv2.putText(img, f"PHOTO about {action} TAKE in: {secondLeft}s", (10,40), cv2.FONT_HERSHEY_PLAIN, 2, (255,0,255), 3) # print fps
         cv2.imshow("Image", img)
         cv2.waitKey(1)
 
@@ -125,22 +125,32 @@ try:
                     
                     if len(lmList) != 0:
 
-                        index = nLabel*number_imgs + imgnum #row
+                        index = nLabel*number_imgs + imgnum # current_row
 
+                        x_sum = y_sum = 0
                         # insert values, except for the last element for each row because it is the label that we set after this iteration
-                        for j, val in enumerate(lmList[:-1]):
+                        for j, val in enumerate(lmList):
                             np_array[index, j*2] = val[1]
+                            x_sum += val[1]
                             np_array[index, j*2+1] = val[2]
+                            y_sum += val[2]
 
-                        #for val in np_array[:-1]:
+                        x_mean = x_sum / 21
+                        y_mean = y_sum / 21
 
-
+                        # translate all values to the origin
+                        for j in range(42):
+                            if j%2 == 0:
+                                np_array[index, j] = np_array[index, j] - x_mean
+                            else:
+                                np_array[index, j] = np_array[index, j] - y_mean
 
                         np_array[index, -1] = nLabel # put label on last column
 
                         isLmListEmpty = False
 
-                        print(lmList)
+                        #print(lmList)
+                        print(np_array[index])
 
                         if not getFromWebcam:
                             print(f"battery is: {me.get_battery()}")
