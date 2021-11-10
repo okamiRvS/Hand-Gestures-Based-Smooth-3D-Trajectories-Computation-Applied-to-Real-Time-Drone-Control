@@ -42,12 +42,7 @@ def drawLog(img, color, checkTollerance, mean, val, state):
     cv2.putText(img, f"{state}", (200,300), cv2.FONT_HERSHEY_PLAIN, scale, color, 3)
 
 def main():
-    ################################################################
-    ################################################################
-    # THIS FILE SHOULD BE TESTED
-    ################################################################
-    ################################################################
-    
+   
     global img
 
     detector = htm.handDetector()

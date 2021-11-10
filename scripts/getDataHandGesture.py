@@ -13,7 +13,7 @@ getFromWebcam = True
 
 # define images to collect
 labels = ['stop', 'onefingerup', 'twofingerup', 'thumbsup']
-number_imgs = 10
+number_imgs = 50
 np_array = np.zeros((len(labels)*number_imgs, 21*2 + 1), dtype=np.int32)
 
 detector = htm.handDetector()
@@ -44,7 +44,7 @@ def getReadyForTheNextAction(action):
             img = me.get_frame_read().frame
 
         secondLeft = int(t_end-time.time())
-        cv2.putText(img, f"PHOTO about {action} TAKE in: {secondLeft}s", (10,40), cv2.FONT_HERSHEY_PLAIN, 2, (255,0,255), 3) # print fps
+        cv2.putText(img, f"\"{action}\" in: {secondLeft}s", (10,40), cv2.FONT_HERSHEY_PLAIN, 2, (255,0,255), 3) # print fps
         cv2.imshow("Image", img)
         cv2.waitKey(1)
 

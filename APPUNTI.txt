@@ -20,3 +20,74 @@ i dati in ingresso devono essere maneggiati in modo tale che non soffrano dello 
 il pugno come gesture non è buono
 
 https://www.tecnobabele.com/android-non-si-connette-a-windows-tramite-adb-risolvilo-in-3-semplici-passaggi/2019-11-19/
+
+
+
+moduloPrincipale = fullControll.py
+	composto da:
+	- def getKeyboardInput(me)
+		che sfrutta keyPressModule con il quale ho un interfaccia di test per comandare il drone
+
+	- main
+
+		per eseguire il tracking:
+			c'è una coda queue di lunghezza lenMaxQueue, + è grande + è chiaro il punto di partenza della sequenza di azioni, di contro + tempo nel partire a eseguire il tracciamento
+
+			Quando la coda queue è piena dove a ogni cella troviamo (per ora...***) la somma delle coordinate x e y del palmo (key 0: WRIST) di lmList, ovvero la lista che contiene tutti gli hand landmark (mostrare immagine), allora si passa dallo stato INIZIALIZATION allo stato START. Si esegue la media m su tutti i valori della coda queue. Se m non è troppo lontano dal nuovo valore del palmo (tolleranceSTART) allora si passa allo stato TRACKING. 
+
+			Nella fase di tracking eseguo la media m2, ma questa volta non su tutti gli elementi della coda, ma solo sugli ultimi n elementi (nlastMovements, attualmente settato a 5). Il perché è dovuto al fatto che ci stiamo muovendo e vogliamo che il movimento sia fatto piano di una certa tolleranza (tolleranceTRACKING), se così non fosse ritorniamo allo stato START. 
+
+			Stavo pensando di implementare uno stato in caso di una momentanea perdita del tracciamento, di recuperare il tracking + velocemente. Attualmente ho come l'impressione che certe volte lo faccia, presumo per via dei punti vicini.
+
+			***Penso di migliorare tale sistema facendolo per tutti o quasi tutti i riferimenti della mano, ed eventualmente fare media x e media y, non media della somma delle coordinate. 
+
+		riconoscimento gesture:
+			getDataHandGesture.py, modulo dinamico per poter creare modelli con cui riconoscere più gesti
+				gesti attualmente riconosciuti = ['stop', 'onefingerup', 'twofingerup', 'thumbsup']
+
+			number_imgs = 50, + è grande + dati per ogni categoria
+
+			possiamo recuperare i dati sia con il tello che tramite webcam. Il tello però ha un problema, in quanto si spegne dopo un utilizzo solo di camera senza decollo. Ho gestito tale problema con un state.json
+
+			se individuata una mano si recuperano i punti di riferimento, 42 (21 per le coordinate x e altri 21 per le coordinate y). Questi vengono poi traslati all'origine, (mediando sui punti e sottraendo tale media a ciascun riferimento rispettivamente per coordinate x e y). Ho intenzione anche di mediare tutto su 1, attualmente non viene fatto, ma funziona bene lo stesso. 
+
+			handgesturerecognition.ipynb
+			qui viene passato il csv che ho generato al passo precedente. Viene creato un classificatore DNN (quindi, deep neural network). Mi sono limitato a due layer nascosti di 30 e 10 nodi rispettivamente, con 4 classi
+
+			Con 10 imgs di training per categoria mi era uscito 0.85 di accurancy. Spostando a 50 imgs accurancy = 1.
+				global step 5000: accuracy = 1.0, average_loss = 0.018036956, global_step = 5000, loss = 0.018036956
+
+
+			con handGestureRecognition.py recupero il modello sviluppato nel passo precedente e lo uso in fullControll.py.
+			eseguo anche il drawHandGesture() che si adatta alla mano e riporta il nome del gesto visualmente.
+
+
+Approfondimenti:
+- in traininganddetection.ipynb ho creato un modulo per eseguire object_detection in real time. Sfrutto un pretrained model: ssd_mobilenet_v2. Allo stato attuale potrebbe non servire.
+
+-numba: Python code 1000x Faster
+
+handTrackingBasics.py, test.py, tello.py, main.py sono moduli di test da sistemare/cancellare
+
+
+Sviluppi futuri:
+- testare il tutto sul drone
+
+- unreal engine o unity per creare applicazione? oppure kivy? Preferirei forse unity perché ho già esperienza, e magari chissà riesco a collegarci google arcore per creare un ambiente virtuale. Creazione di un server o calcolo computazionale su smartphone?
+
+- prelevare le traettorie tramite app
+
+- aggiungere più gesti di cattura
+
+Step:
+1) specifica/documento di quello che voglio ottenere. 
+2) acquisizione traettorie limitata 2d e/o 3d (forse si può ottenere un coefficiente di scalatura dal frame A al frame B)
+3) disegnare la trajectory, con un certo profilo di velocità (colori a indicare la variazione della velocità nel tempo t). 
+4) Raggiungere il risultato di almeno una simulazione (persona e drone) su Gazebo. Racconto una traettoria. 
+TELLO ha i suoi nodi su ros. Verificare che queste repo per il tello in ros siano validi. http://wiki.ros.org/tello_driver
+Col franca abbiamo più esperienza. Una via di mezzo tra algoritmo di controllo standard e algo di trajectory? Non mi aspetto che venga seguita alla perfezione la traettoria.
+
+Impo:
+Iniziare a scrivere le implementazioni.
+Questa parte della generazione delle traettorie 3d, mediapipe e riconoscimento dei gesti si può iniziare a scrivere.
+E' più interessante fare una buona simulazione (ed eventalmente una presentazione pratica) che tante cose a metà.
