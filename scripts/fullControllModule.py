@@ -10,6 +10,9 @@ from numba import jit
 import numpy as np
 import pdb
 
+from mpl_toolkits import mplot3d
+import matplotlib.pyplot as plt
+
 def getKeyboardInput(me):
     #left-right, foward-back, up-down, yaw velocity
     lr, fb, ud, yv = 0, 0, 0, 0
@@ -37,7 +40,6 @@ def getKeyboardInput(me):
     return [lr, fb, ud, yv]
 
 def main():
-   
     global img
 
     detector = htm.handDetector()

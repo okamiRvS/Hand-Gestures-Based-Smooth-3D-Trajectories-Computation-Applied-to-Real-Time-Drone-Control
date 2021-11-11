@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import pdb
 import math
+import dynamic3dDrawTrajectory as d3dT
 
 class tracking():
 
@@ -13,6 +14,11 @@ class tracking():
         self.nlastMovements = 5
         self.scale = 0
         self.mean_distance = 0
+        self.drawTraj = d3dT.dynamic3dDrawTrajectory()
+
+        self.trajPointsX = []
+        self.trajPointsY = []
+        self.trajPointsZ = []
 
     def drawLog(self, img, color, checkTollerance, val):
         scale = 2
@@ -22,6 +28,8 @@ class tracking():
         cv2.putText(img, f"{self.currentState}", (200,200), cv2.FONT_HERSHEY_PLAIN, scale, color, 3)
 
     def run(self, img, lmList):
+        height, width, _ = img.shape
+
 
         # mean x and y of all hand leandmark
         x_sum = y_sum = 0
@@ -60,6 +68,10 @@ class tracking():
 
                 self.mean_distance = sum_distances / 21
 
+                self.trajPointsX.append(val[0] / height)
+                self.trajPointsY.append(self.scale / 60)
+                self.trajPointsZ.append(val[1] / width)
+
                 self.drawLog(img, (0,255,0), checkStart, val)
             else:
                 self.drawLog(img, (0,0,255), checkStart, val)
@@ -94,15 +106,24 @@ class tracking():
                 self.mean_distance = tmp_mean_dist
 
                 # draw the the trajectory
+                '''
                 cv2.circle(img, self.startingPoint, radius=0, color=(0,255,0), thickness=-1)
                 cv2.circle(img, endingPoint, radius=0, color=(0,255,0), thickness=-1)
                 cv2.line(img, self.startingPoint, endingPoint, (255,255,0), thickness=2)
+                '''
+                self.trajPointsX.append(val[0] / height)
+                self.trajPointsY.append(self.scale / 60)
+                self.trajPointsZ.append(val[1] / width)
+                self.drawTraj.run(self.trajPointsX, self.trajPointsY, self.trajPointsZ)
 
                 self.drawLog(img, (255,0,0), checkStartTracking, val)
             else:
                 self.drawLog(img, (0,0,255), checkStartTracking, val)
                 self.scale = 0
                 self.mean_distance = 0
+                self.trajPointsX = []
+                self.trajPointsY = []
+                self.trajPointsZ = []
                 self.currentState = "START"
 
         self.queueObj.add(val)
