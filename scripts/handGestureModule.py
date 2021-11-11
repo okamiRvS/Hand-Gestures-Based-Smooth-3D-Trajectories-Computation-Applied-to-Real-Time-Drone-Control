@@ -47,7 +47,7 @@ class handGestureRecognition():
         for idx, resultPred in enumerate(predictions["class_ids"]):
             class_id = resultPred[0]
             probability = predictions['probabilities'][idx][class_id]
-            print(f"\tPrediction is {self.SPECIES[class_id]} {100 * probability :.2f}%")
+            #print(f"\tPrediction is {self.SPECIES[class_id]} {100 * probability :.2f}%")
 
         self.drawHandGesture(img, handPoints, self.SPECIES[class_id])
 

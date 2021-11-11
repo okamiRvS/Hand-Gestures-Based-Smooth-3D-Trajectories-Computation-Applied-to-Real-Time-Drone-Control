@@ -109,8 +109,8 @@ def main():
             # hand gesture recognition
             img = gestureDetector.processHands(img, lmList)
 
-            print(lmList[0])
-            val = lmList[0][1] + lmList[0][2] # I'LL DO MEAN FOR X AND MEAN FOR Y, THIS IS JUST TRY
+            print(lmList[8])
+            val = lmList[8][1] + lmList[8][2] # I'LL DO MEAN FOR X AND MEAN FOR Y, THIS IS JUST TRY
 
             # fill all the queue before start the mean
             if indexQueue < lenMaxQueue and INIZIALIZATION:
@@ -131,7 +131,7 @@ def main():
 
                     if checkStart < tolleranceSTART:
                         state = TRACKING
-                        startingPoint = (lmList[0][1], lmList[0][2])
+                        startingPoint = (lmList[8][1], lmList[8][2])
                         drawLog(img, (0,255,0), checkStart, mean, val, "TRACKING")
                     else:
                         drawLog(img, (0,0,255), checkStart, mean, val, "START")
@@ -151,7 +151,7 @@ def main():
                     
                     mean = np.mean(tmpList)
                     checkStartTracking = int(abs(mean - val))
-                    endingPoint = (lmList[0][1], lmList[0][2])
+                    endingPoint = (lmList[8][1], lmList[8][2])
 
                     if checkStartTracking < tolleranceTRACKING:
                         # draw the the trajectory
