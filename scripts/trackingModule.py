@@ -11,7 +11,7 @@ class tracking():
         self.queueObj = queueObj 
         self.currentState = "INIZIALIZATION"
         self.tolleranceSTART = 2
-        self.tolleranceTRACKING = 100
+        self.tolleranceTRACKING = 500 # 100 before
         self.nlastMovements = 5
         self.scale = 0
         self.mean_distance = 0
@@ -72,7 +72,7 @@ class tracking():
                 self.mean_distance = sum_distances / 21
 
                 self.trajPointsX.append(val[0] / height)
-                self.trajPointsY.append(self.scale / 100)
+                self.trajPointsY.append(self.scale / 50)
                 self.trajPointsZ.append(val[1] / width)
                 self.trajSpeed.append(0) # speed is zero at the beginning
 
@@ -116,18 +116,22 @@ class tracking():
                 cv2.line(img, self.startingPoint, endingPoint, (255,255,0), thickness=2)
                 '''
                 self.trajPointsX.append(val[0] / height)
-                self.trajPointsY.append(self.scale / 100)
+                self.trajPointsY.append(self.scale / 50)
                 self.trajPointsZ.append(1- (val[1] / width) )
 
                 # compute istant speed
-                deltaTime = time.time() - self.previousTime
+                tmpTime = time.time()
+                deltaTime = tmpTime - self.previousTime
+                self.previousTime = tmpTime
                 distanceSpaceBetweenTwoLast3dPoints = math.sqrt( 
                     ( self.trajPointsX[-2] - self.trajPointsX[-1] )**2 +
                     ( self.trajPointsY[-2] - self.trajPointsY[-1] )**2 +
                     ( self.trajPointsZ[-2] - self.trajPointsZ[-1] )**2
                 )
-                factor = 200000
-                self.trajSpeed.append(factor * distanceSpaceBetweenTwoLast3dPoints/deltaTime)
+                factorScale = 10
+                currentSpeed = int(factorScale * distanceSpaceBetweenTwoLast3dPoints/deltaTime)
+                print(currentSpeed)
+                self.trajSpeed.append(currentSpeed)
                 self.drawTraj.run(self.trajPointsX, self.trajPointsY, self.trajPointsZ, self.trajSpeed)
 
                 self.drawLog(img, (255,0,0), checkStartTracking, val)
