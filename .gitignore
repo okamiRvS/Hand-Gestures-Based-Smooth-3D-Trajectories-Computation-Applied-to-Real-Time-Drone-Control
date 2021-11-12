@@ -1,9 +1,11 @@
 __pycache__/
 altro
+backup
 
 src/known_faces/*
 src/unknown_faces/*
 src/tello_screenshots/*
+src/dataHandGesture/imgData/*
 tfod
 Tensorflow
 .ipynb_checkpoints

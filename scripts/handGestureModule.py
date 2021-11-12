@@ -8,7 +8,7 @@ import pdb
 
 class handGestureRecognition():
 
-    lastModel = "1636548219" # COPY THE FOLDER NAME OF Tensorflow/workspace/models/my_hand_gesture_model
+    lastModel = "1636740556" # COPY THE FOLDER NAME OF Tensorflow/workspace/models/my_hand_gesture_model
     export_path = str.encode(os.path.join("Tensorflow","workspace", "models", "my_hand_gesture_model", lastModel)) # must be in bytes
     SPECIES = ['stop', 'onefingerup', 'twofingerup', 'thumbsup']
     FRAME_THICKNESS = 3

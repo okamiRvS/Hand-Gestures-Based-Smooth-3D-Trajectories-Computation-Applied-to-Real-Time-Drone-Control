@@ -11,6 +11,13 @@ import pdb
 global img
 getFromWebcam = True
 
+# if true you can save all picture of the data and decide the currentPicture, if false you'll use that data that can
+# be uncorrect (could be useful for real application?)
+takeControl = True
+
+# wait from a frame and another
+timeDelay = 1
+
 # define images to collect
 labels = ['stop', 'onefingerup', 'twofingerup', 'thumbsup']
 number_imgs = 50
@@ -35,16 +42,23 @@ else:
 
 def getReadyForTheNextAction(action):
     #This will run for 15 s
-    t_end = time.time() + 15.0
+    t_end = time.time() + 10.0
     while time.time() < t_end:
 
         if getFromWebcam:
             success, img = cap.read()
         else:
             img = me.get_frame_read().frame
+        
+        img = cv2.flip(img, 1)
 
         secondLeft = int(t_end-time.time())
-        cv2.putText(img, f"\"{action}\" in: {secondLeft}s", (10,40), cv2.FONT_HERSHEY_PLAIN, 2, (255,0,255), 3) # print fps
+        cv2.putText(img, f"\"{action}\" in: {secondLeft}s", (10,40), cv2.FONT_HERSHEY_DUPLEX, 1, (0,255,0), 2)
+
+        if takeControl:
+            cv2.putText(img, f"click ESC to delete the picture", (10,70), cv2.FONT_HERSHEY_DUPLEX, 1, (0,255,0), 2)
+            cv2.putText(img, f"click BACKSPACE to continue", (10,100), cv2.FONT_HERSHEY_DUPLEX, 1, (0,255,0), 2)
+
         cv2.imshow("Image", img)
         cv2.waitKey(1)
 
@@ -96,9 +110,29 @@ else:
             "nImg": nImg,
         }
         json.dump(data, f, ensure_ascii=False, indent=4)
-    
+
+# MAYBE THIS PART IT'S NOT REALLY USEFUL, MAYBE IT WORKS JUST WITH THE FOLLOW CODE TO CREATE FOLDER FOR EACH LABEL
+# create if not exist label folders in imgData 
+'''
+IMGDATA_DIR_PATH = os.path.join('src', 'dataHandGesture', 'imgData')
+if not os.path.exists(IMGDATA_DIR_PATH):
+    if os.name == 'posix': # if linux system
+        os.system(f"mkdir -p {IMGDATA_DIR_PATH}")
+    if os.name == 'nt': # if windows system
+        os.system(f"mkdir {IMGDATA_DIR_PATH}")
+'''
+
 try:
     for label in labels[nLabel:]:
+
+        if takeControl:
+            # create label folder
+            LABEL_DIR_PATH = os.path.join('src', 'dataHandGesture', 'imgData', label)
+            if not os.path.exists(LABEL_DIR_PATH):
+                if os.name == 'posix': # if linux system
+                    os.system(f"mkdir -p {LABEL_DIR_PATH}")
+                if os.name == 'nt': # if windows system
+                    os.system(f"mkdir {LABEL_DIR_PATH}")
 
         print(f"Collecting images for {label}")
         getReadyForTheNextAction(label)
@@ -111,7 +145,7 @@ try:
                 while isLmListEmpty:
 
                     print(f"Collecting image {imgnum}")
-                    time.sleep(3)
+                    time.sleep(timeDelay)
 
                     if getFromWebcam:
                         success, img = cap.read()
@@ -119,6 +153,7 @@ try:
                         img = me.get_frame_read().frame
                     
                     #img = cv2.resize(img, (360, 240)) # comment to get bigger frames
+                    img = cv2.flip(img, 1) # this is important
 
                     img = detector.findHands(img)
                     lmList = detector.findPosition(img, draw=False)
@@ -161,7 +196,13 @@ try:
                     cv2.putText(img, f"photo number: {imgnum+1}/{number_imgs}", (30,100), cv2.FONT_HERSHEY_PLAIN, 2, (255,0,255), 3)
 
                     cv2.imshow("Image", img)
-                    cv2.waitKey(1)
+                    key = cv2.waitKey(0)
+
+                    if takeControl:
+                        if key == 32: # backspace
+                            cv2.imwrite(os.path.join(LABEL_DIR_PATH, f"{imgnum}.jpeg"), img)
+                        elif key == 27: # exit
+                            isLmListEmpty = True # this means that the picture wans't good, so skip that
 
                 if nImg+1 < number_imgs:
                     nImg+=1
