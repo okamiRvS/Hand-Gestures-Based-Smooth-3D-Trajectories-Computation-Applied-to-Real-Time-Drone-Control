@@ -52,12 +52,16 @@ def getReadyForTheNextAction(action):
         
         img = cv2.flip(img, 1)
 
+        fontScale = 1
+        font = cv2.FONT_HERSHEY_DUPLEX
+        thickness = 2
+
         secondLeft = int(t_end-time.time())
-        cv2.putText(img, f"\"{action}\" in: {secondLeft}s", (10,40), cv2.FONT_HERSHEY_DUPLEX, 1, (0,255,0), 2)
+        cv2.putText(img, f"\"{action}\" in: {secondLeft}s", (10,40), font, fontScale, (0,255,0), thickness)
 
         if takeControl:
-            cv2.putText(img, f"click ESC to delete the picture", (10,70), cv2.FONT_HERSHEY_DUPLEX, 1, (0,255,0), 2)
-            cv2.putText(img, f"click BACKSPACE to continue", (10,100), cv2.FONT_HERSHEY_DUPLEX, 1, (0,255,0), 2)
+            cv2.putText(img, f"click ESC to delete the picture", (10,70), font, fontScale, (0,255,0), thickness)
+            cv2.putText(img, f"click BACKSPACE to continue", (10,100), font, fontScale, (0,255,0), thickness)
 
         cv2.imshow("Image", img)
         cv2.waitKey(1)

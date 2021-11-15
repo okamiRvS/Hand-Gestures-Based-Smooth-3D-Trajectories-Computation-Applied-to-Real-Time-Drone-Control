@@ -101,7 +101,11 @@ def main():
         cTime = time.time()
         fps = 1/(cTime-pTime)
         pTime = cTime
-        cv2.putText(img, f"FPS: {int(fps)}", (10,40), cv2.FONT_HERSHEY_PLAIN, 2, (255,0,255), 3) # print fps
+
+        fontScale = 1
+        font = cv2.FONT_HERSHEY_DUPLEX
+        thickness = 1
+        cv2.putText(img, f"FPS: {int(fps)}", (10,40), font, fontScale, (255,0,255), thickness) # print fps
 
         cv2.imshow("Image", img)
         key = cv2.waitKey(1)

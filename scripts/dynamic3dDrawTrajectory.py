@@ -10,7 +10,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 class dynamic3dDrawTrajectory():
 
-    def __init__(self, skipEveryNpoints=2):
+    def __init__(self, skipEveryNpoints):
         plt.ion()
         self.fig = plt.figure()
         self.ax = self.fig.add_subplot(111, projection='3d')
