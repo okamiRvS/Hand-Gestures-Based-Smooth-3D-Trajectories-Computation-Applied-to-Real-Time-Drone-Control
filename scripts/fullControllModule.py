@@ -46,13 +46,16 @@ def main():
     gestureDetector = hgm.handGestureRecognition()
 
     queue = qm.queueObj(lenMaxQueue=35)
-    tracking = tm.tracking(queue)
+    tracking = tm.tracking(queue, skipEveryNpoints=4)
 
 
     pTime = 0
     cTime = 0
 
     resize = False
+    xResize = 360
+    yResize = 240
+    
     getFromWebcam = True
 
     # HERE MAYBE COULD BE USEFUL USE A FACTORY FUNCTION (FROM SOFTWARE ENGENEERING)
@@ -62,6 +65,13 @@ def main():
         cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
         if cap.isOpened(): # try to get the first frame
             success, img = cap.read()
+
+            # set size
+            if resize:
+                tracking.setSize(xResize, yResize)
+            else:
+                height, width, _ = img.shape
+                tracking.setSize(height, width)
         else:
             success = False
     else:
@@ -70,6 +80,14 @@ def main():
         me.connect()
         print(me.get_battery())
         me.streamon() # to get the stream image
+
+        # set size
+        img = me.get_frame_read().frame
+        if resize:
+            tracking.setSize(xResize, yResize)
+        else:
+            height, width, _ = img.shape
+            tracking.setSize(height, width)
 
 
     while True:
@@ -85,7 +103,7 @@ def main():
             img = me.get_frame_read().frame
 
         if resize:
-            img = cv2.resize(img, (360, 240)) # comment to get bigger frames
+            img = cv2.resize(img, (xResize, yResize)) # comment to get bigger frames
 
         img = cv2.flip(img, 1)
         

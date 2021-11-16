@@ -10,14 +10,13 @@ from mpl_toolkits.mplot3d import Axes3D
 
 class dynamic3dDrawTrajectory():
 
-    def __init__(self, skipEveryNpoints):
+    def __init__(self):
         plt.ion()
         self.fig = plt.figure()
         self.ax = self.fig.add_subplot(111, projection='3d')
     
         self.clean()
-
-        self.skipEveryNpoints = skipEveryNpoints
+        
         self.nextTime = time.time()
 
         # initializaztion of cbar
@@ -35,12 +34,6 @@ class dynamic3dDrawTrajectory():
         
         if currentTime > self.nextTime:
             self.nextTime = currentTime + 2
-
-            # skip each n points, to have a better view of data
-            xdata = xdata[::self.skipEveryNpoints]
-            ydata = ydata[::self.skipEveryNpoints]
-            zdata = zdata[::self.skipEveryNpoints]
-            speed = speed[::self.skipEveryNpoints]
 
             #print(xdata, ydata, zdata)
             #print(speed)

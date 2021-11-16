@@ -4,10 +4,11 @@ import pdb
 import math
 import time
 import dynamic3dDrawTrajectory as d3dT
+import trajectory as traj
 
 class tracking():
 
-    def __init__(self, queueObj):
+    def __init__(self, queueObj, skipEveryNpoints):
         self.queueObj = queueObj 
         self.currentState = "INIZIALIZATION"
         self.tolleranceSTART = 2
@@ -15,14 +16,12 @@ class tracking():
         self.nlastMovements = 5
         self.scale = 0
         self.mean_distance = 0
-        self.drawTraj = d3dT.dynamic3dDrawTrajectory(skipEveryNpoints=2)
+        self.drawTraj = d3dT.dynamic3dDrawTrajectory()
 
-        self.trajPointsX = []
-        self.trajPointsY = []
-        self.trajPointsZ = []
+        self.traj = traj.trajectory(skipEveryNpoints)
 
-        self.previousTime = time.time()
-        self.trajSpeed = []
+        self.height = 0
+        self.width = 0
 
     def drawLog(self, img, color, checkTollerance, val):
         fontScale = 1
@@ -33,27 +32,30 @@ class tracking():
         cv2.putText(img, f"scale: {self.scale}", (10,130), font, fontScale, color, thickness)
         cv2.putText(img, f"{self.currentState}", (10,160), font, fontScale, color, thickness)
 
-    def draw2dTraj(self, img, height, width):
-        numberOfPoints = len(self.trajPointsX)
+    def draw2dTraj(self, img, xdata, zdata):
+        numberOfPoints = len(xdata)
 
         count = 3
         if numberOfPoints == 2:
-            self.startingPoint = ( int(self.trajPointsX[1] * height), int( (1-self.trajPointsZ[1]) * width) )
+            self.startingPoint = ( int(xdata[1] * self.height), int( (1-zdata[1]) * self.width) )
             cv2.circle(img, self.startingPoint, radius=0, color=(0,255,0), thickness=-1)
         elif numberOfPoints > 2:
-            for x, y in zip(self.trajPointsX[1:], self.trajPointsZ[1:]):
-                self.endingPoint = ( int(x * height), int( (1-y) * width) )
+            for i in range(1,numberOfPoints):
+                self.endingPoint = ( int(xdata[i] * self.height), int( (1-zdata[i]) * self.width) )
                 cv2.circle(img, self.startingPoint, radius=0, color=(0,255,0), thickness=-1)
                 cv2.circle(img, self.endingPoint, radius=0, color=(0,255,0), thickness=-1)
                 
-                #if numberOfPoints - count == 1:
-                cv2.line(img, self.startingPoint, self.endingPoint, (255,255,0), thickness=1)
+                if i != 1:
+                    cv2.line(img, self.startingPoint, self.endingPoint, (255,255,0), thickness=1)
+                
                 self.startingPoint = self.endingPoint
                 count+=1
 
+    def setSize(self, height, width):
+        self.height = height
+        self.width = width
 
     def run(self, img, lmList):
-        height, width, _ = img.shape
 
         # mean x and y of all hand leandmark
         x_sum = y_sum = 0
@@ -91,10 +93,8 @@ class tracking():
 
                 self.mean_distance = sum_distances / 21
 
-                self.trajPointsX.append(val[0] / height)
-                self.trajPointsY.append(self.scale / 50)
-                self.trajPointsZ.append(1 - (val[1] / width) )
-                self.trajSpeed.append(0) # speed is zero at the beginning
+                self.traj.addPoint(val[0] / self.height, self.scale / 50, 1 - (val[1] / self.width))
+                self.traj.setSpeed(0) # speed is zero at the beginning
 
                 self.drawLog(img, (0,255,0), checkStart, val)
             else:
@@ -129,25 +129,15 @@ class tracking():
 
                 # collect data to draw the 3d trajectory
                 # scale X,Z data from 0 to 1; about scale factor I consider 50 values, but maybe it requires some major details...
-                self.trajPointsX.append(val[0] / height)
-                self.trajPointsY.append(self.scale / 50)
-                self.trajPointsZ.append(1 - (val[1] / width) )
-
+                self.traj.addPoint(val[0] / self.height, self.scale / 50, 1 - (val[1] / self.width) )
+                
                 # compute istant speed
-                tmpTime = time.time()
-                deltaTime = tmpTime - self.previousTime
-                self.previousTime = tmpTime
-                distanceSpaceBetweenTwoLast3dPoints = math.sqrt( 
-                    ( self.trajPointsX[-2] - self.trajPointsX[-1] )**2 +
-                    ( self.trajPointsY[-2] - self.trajPointsY[-1] )**2 +
-                    ( self.trajPointsZ[-2] - self.trajPointsZ[-1] )**2
-                )
-                factorScale = 10
-                currentSpeed = int(factorScale * distanceSpaceBetweenTwoLast3dPoints/deltaTime)
-                print(currentSpeed)
-                self.trajSpeed.append(currentSpeed)
-                self.draw2dTraj(img, height, width)
-                self.drawTraj.run(self.trajPointsX, self.trajPointsY, self.trajPointsZ, self.trajSpeed)
+                currentSpeed = self.traj.computeIstantSpeed()
+                self.traj.setSpeed(currentSpeed) # speed is zero at the beginning
+                
+                xdata, ydata, zdata, speed = self.traj.skipEveryNpointsFunc()
+                self.draw2dTraj(img, xdata, zdata)
+                self.drawTraj.run(xdata, ydata, zdata, speed)
 
                 self.drawLog(img, (255,0,0), checkStartTracking, val)
             else:
@@ -155,10 +145,7 @@ class tracking():
                 self.drawLog(img, (0,0,255), checkStartTracking, val)
                 self.scale = 0
                 self.mean_distance = 0
-                self.trajPointsX = []
-                self.trajPointsY = []
-                self.trajPointsZ = []
-                self.trajSpeed = []
+                self.traj.reset()
                 self.drawTraj.clean()
                 self.currentState = "START"
 
