@@ -114,6 +114,8 @@ def main():
             # hand gesture recognition
             img = gestureDetector.processHands(img, lmList)
             tracking.run(img, lmList)
+        else:
+            tracking.justDrawLast2dTraj(img)
 
 
         cTime = time.time()

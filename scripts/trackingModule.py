@@ -55,6 +55,10 @@ class tracking():
         self.height = height
         self.width = width
 
+    def justDrawLast2dTraj(self, img):
+        xdata, ydata, zdata, speed = self.traj.skipEveryNpointsFunc()
+        self.draw2dTraj(img, xdata, zdata)
+
     def run(self, img, lmList):
 
         # mean x and y of all hand leandmark
@@ -70,7 +74,7 @@ class tracking():
         cv2.circle(img, val_mean_point, radius=3, color=(0,255,0), thickness=3)
 
         if "INIZIALIZATION" == self.currentState:
-            # fill all the queue before start state
+            # fill all the queue before START state
             if self.queueObj.isFullQueue():
                 self.currentState = "START" #exit from INIZIALIZATION mode
 
