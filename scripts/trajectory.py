@@ -16,7 +16,7 @@ class trajectory():
 
         self.skipEveryNpoints = skipEveryNpoints
 
-        self.startTimeTraj = time.time()
+        self.startTimeTraj = 0 # set when start tracking
         self.previousTime = self.startTimeTraj
         self.trajTimeDuration = trajTimeDuration
 
@@ -61,6 +61,25 @@ class trajectory():
         zdata = self.trajPointsZ[::self.skipEveryNpoints]
         speed = self.trajSpeed[::self.skipEveryNpoints]
         return xdata, ydata, zdata, speed
+
+    def saveLastNValues(self, nPoints):
+        lenTraj = len(self.trajPointsX) - 1
+        takeOnly = lenTraj - nPoints 
+
+        if takeOnly < 0:
+            takeOnly = 0
+
+        self.trajPointsX = self.trajPointsX[takeOnly:]
+        self.trajPointsY = self.trajPointsY[takeOnly:]
+        self.trajPointsZ = self.trajPointsZ[takeOnly:]
+        self.trajSpeed = self.trajSpeed[takeOnly:]
+
+    def thumbsUpFix(self, numberKeyPoints):
+        # remove last n keypoint because the movemente to thumbup
+        self.trajPointsX = self.trajPointsX[:-numberKeyPoints]
+        self.trajPointsY = self.trajPointsY[:-numberKeyPoints]
+        self.trajPointsZ = self.trajPointsZ[:-numberKeyPoints]
+        self.trajSpeed = self.trajSpeed[:-numberKeyPoints]
 
 
 def main():

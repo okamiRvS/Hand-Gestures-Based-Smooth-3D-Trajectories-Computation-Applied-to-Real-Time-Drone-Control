@@ -20,7 +20,7 @@ class queueObj():
 
     def addMeanAndMatch(self, val, match, prob):
         self.queue[self.indexQueue] = val
-        
+
         self.outputClasses[self.indexQueue] = match
         self.probabilities[self.indexQueue] = prob
         
@@ -32,6 +32,21 @@ class queueObj():
     def get(self, val, idx):
         return self.queue[idx]
 
+    def checkGesture(self, gesture):
+        count = 0
+
+        for i in range(self.lenMaxQueue):
+            if self.outputClasses[i] == gesture:
+                count+=1 * self.probabilities[i] # we use probabilities as a weight
+
+        # minCount is the 75% of the queue length, a good quantity to be sure that is the right gesture
+        minCount = self.lenMaxQueue * 0.75
+        
+        if count > minCount:
+            return True
+        else:
+            print("NOTE: could be that in handgesturemodule.py you called the gesture in another way")
+            return False
 
     def mean(self):
         x_mean, y_mean = self.queue.mean(axis=0)
