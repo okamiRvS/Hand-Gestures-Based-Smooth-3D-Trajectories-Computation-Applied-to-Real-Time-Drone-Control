@@ -45,7 +45,7 @@ class queueObj():
         if count > minCount:
             return True
         else:
-            print("NOTE: could be that in handgesturemodule.py you called the gesture in another way")
+            # print("NOTE: could be that in handgesturemodule.py you called the gesture in another way")
             return False
 
     def mean(self):

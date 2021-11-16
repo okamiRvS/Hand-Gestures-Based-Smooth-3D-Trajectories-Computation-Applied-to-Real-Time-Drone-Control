@@ -48,7 +48,6 @@ def main():
     queue = qm.queueObj(lenMaxQueue=35)
     tracking = tm.tracking(queue, skipEveryNpoints=4, trajTimeDuration=40) # trajTimeDuration is in seconds
 
-
     pTime = 0
     cTime = 0
 

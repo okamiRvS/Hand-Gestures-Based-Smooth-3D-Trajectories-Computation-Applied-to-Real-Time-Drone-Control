@@ -5,6 +5,7 @@ import math
 import time
 import dynamic3dDrawTrajectory as d3dT
 import trajectory as traj
+import copy
 
 class tracking():
 
@@ -24,6 +25,12 @@ class tracking():
         self.height = 0
         self.width = 0
 
+        self.timeToCatchAnotherTraj = 5
+
+        self.idxPoint = 0
+        self.delayToExecuteTrajectory = 50
+        self.previousTmpTime = 0
+
     def drawLog(self, img, color, checkTollerance, val):
         fontScale = 1
         font = cv2.FONT_HERSHEY_DUPLEX
@@ -36,21 +43,15 @@ class tracking():
     def draw2dTraj(self, img, xdata, zdata):
         numberOfPoints = len(xdata)
 
-        count = 3
-        if numberOfPoints == 2:
-            self.startingPoint = ( int(xdata[1] * self.height), int( (1-zdata[1]) * self.width) )
+        for i in range(1, numberOfPoints):
+            self.endingPoint = ( int(xdata[i] * self.height), int( (1-zdata[i]) * self.width) )
             cv2.circle(img, self.startingPoint, radius=0, color=(0,255,0), thickness=-1)
-        elif numberOfPoints > 2:
-            for i in range(1,numberOfPoints):
-                self.endingPoint = ( int(xdata[i] * self.height), int( (1-zdata[i]) * self.width) )
-                cv2.circle(img, self.startingPoint, radius=0, color=(0,255,0), thickness=-1)
-                cv2.circle(img, self.endingPoint, radius=0, color=(0,255,0), thickness=-1)
-                
-                if i != 1:
-                    cv2.line(img, self.startingPoint, self.endingPoint, (255,255,0), thickness=1)
-                
-                self.startingPoint = self.endingPoint
-                count+=1
+            cv2.circle(img, self.endingPoint, radius=0, color=(0,255,0), thickness=-1)
+            
+            if i != 1:
+                cv2.line(img, self.startingPoint, self.endingPoint, (255,255,0), thickness=1)
+            
+            self.startingPoint = self.endingPoint
 
     def setSize(self, height, width):
         self.height = height
@@ -58,7 +59,7 @@ class tracking():
 
     def justDrawLast2dTraj(self, img):
         xdata, ydata, zdata, speed = self.traj.skipEveryNpointsFunc()
-        #self.draw2dTraj(img, xdata, zdata)
+        self.draw2dTraj(img, xdata, zdata)
 
     def distanceFromMeanPoint(self, lmList, val):
         # mean of all distances from mean point val and hand landmark in lmList to gain 3d scale factor
@@ -86,6 +87,30 @@ class tracking():
         currentSpeed = self.traj.computeIstantSpeed() # compute istant speed
         self.traj.setSpeed(currentSpeed)
 
+    def cleanTraj(self):
+        # clean everything
+        self.scale = 0
+        self.previous_mean_distance = 0
+        self.traj.reset()
+        self.drawTraj.clean()
+        self.currentState = "START"
+
+    def executeTrajectory(self, img, xdata, zdata):
+        numberOfPoints = len(xdata)
+
+        for i in range(1, numberOfPoints):
+            self.endingPoint = ( int(xdata[i] * self.height), int( (1-zdata[i]) * self.width) )
+            cv2.circle(img, self.startingPoint, radius=0, color=(0,255,0), thickness=-1)
+            cv2.circle(img, self.endingPoint, radius=0, color=(0,255,0), thickness=-1)
+            
+            if i != 1:
+                cv2.line(img, self.startingPoint, self.endingPoint, (255,255,0), thickness=1)
+            
+            self.startingPoint = self.endingPoint
+
+        positionDrone = ( int(xdata[self.idxPoint] * self.height), int( (1-zdata[self.idxPoint]) * self.width) )
+        cv2.circle(img, positionDrone, radius=10, color=(0,0,255), thickness=10)
+
     def run(self, img, lmList, outputClass, probability):
 
         # mean x and y of all hand leandmark
@@ -111,10 +136,11 @@ class tracking():
             cv2.circle(img, (x_mean,y_mean), radius=3, color=(255,0,0), thickness=3)
             checkStart = math.sqrt( (x_mean - val[0] )**2 + (y_mean - val[1])**2 )
 
-            cv2.circle(img, (val[0], val[1]), radius=self.tolleranceSTART, color=(0,0,255), thickness=1) # draw the tollerance inside 
-            cv2.circle(img, (val[0], val[1]), radius=self.tolleranceSTART+100, color=(0,255,0), thickness=1) # draw the tollerance outside 
-
             if checkStart < self.tolleranceSTART and self.queueObj.checkGesture("stop"):
+                self.idxPoint = 0
+                cv2.circle(img, (val[0], val[1]), radius=self.tolleranceSTART, color=(0,0,255), thickness=1) # draw the tollerance inside 
+                cv2.circle(img, (val[0], val[1]), radius=self.tolleranceSTART+100, color=(0,255,0), thickness=1) # draw the tollerance outside 
+                
                 if len(self.traj.trajSpeed) == 0:
                     # mean of all distances from mean point val and hand landmark in lmList
                     self.previous_mean_distance = self.distanceFromMeanPoint(lmList, val)
@@ -126,10 +152,34 @@ class tracking():
 
                 self.traj.startTimeTraj = self.traj.previousTime # update the startTimeTraj until tracking state
 
-            elif self.tolleranceSTART < checkStart < self.tolleranceSTART+100 and self.queueObj.checkGesture("stop"):
-                self.currentState = "TRACKING"
+            elif checkStart < self.tolleranceSTART and self.queueObj.checkGesture("thumbsup"): # execute last trajectory
+                
+                if len(self.trajCOMPLETE) > 0:
 
-                self.traj.saveLastNValues(nPoints = 10) # take only the last 10 points
+                    xdata, ydata, zdata, speed = self.trajCOMPLETE[-1].skipEveryNpointsFunc()
+
+                    self.startingPoint = ( int( xdata[1] * self.height),
+                                           int( (1- zdata[1]) * self.width) )
+                    self.executeTrajectory(img, xdata, zdata)
+
+                    tmpTime = time.time()
+                    if tmpTime > self.previousTmpTime + self.delayToExecuteTrajectory and self.idxPoint < len(xdata)-1:
+                        self.idxPoint += 1
+                        self.previousTime = tmpTime
+
+                else:
+                    # there is no trajectory in queue...
+                    self.cleanTraj()
+                    self.currentState = "INIZIALIZATION"
+
+            elif self.tolleranceSTART < checkStart < self.tolleranceSTART+100 and self.queueObj.checkGesture("stop"):
+                self.traj.saveLastNValues(nPoints = 20) # take only the last 10 points
+                xdata, ydata, zdata, speed = self.traj.skipEveryNpointsFunc()
+
+                if len(xdata) > 0: # because otherwise could give index out of range
+                    self.currentState = "TRACKING"
+                    self.startingPoint = ( int( xdata[1] * self.height),
+                                           int( (1- zdata[1]) * self.width) )
 
                 self.addTrajectoryPointAndSpeed(lmList, val)
 
@@ -152,7 +202,11 @@ class tracking():
                 # remove last n keypoint because the movemente to thumbup
                 self.traj.thumbsUpFix(numberKeyPoints=30)
 
-                self.trajCOMPLETE.append(self.traj)
+                currentTraj = copy.deepcopy(self.traj)
+                self.trajCOMPLETE.append(currentTraj)
+
+                # wait at least n seconds to catch another trajectory
+                self.waitForNewTraj = time.time() + self.timeToCatchAnotherTraj
 
             elif checkStartTracking < self.tolleranceTRACKING and self.queueObj.checkGesture("stop"):
                 # mean of all distances from mean point val and hand landmark in lmList
@@ -175,24 +229,23 @@ class tracking():
                     currentSpeed = self.traj.computeIstantSpeed()
                     self.traj.setSpeed(currentSpeed) # speed is zero at the beginning
                 
-                xdata, ydata, zdata, speed = self.traj.skipEveryNpointsFunc()
-                #self.draw2dTraj(img, xdata, zdata)
-                self.drawTraj.run(xdata, ydata, zdata, speed)
+            xdata, ydata, zdata, speed = self.traj.skipEveryNpointsFunc()
+            self.draw2dTraj(img, xdata, zdata)
+            self.drawTraj.run(xdata, ydata, zdata, speed)
 
-                self.drawLog(img, (255,0,0), checkStartTracking, val)
-            else:
-                # clean everything
-                self.drawLog(img, (0,0,255), checkStartTracking, val)
-                self.scale = 0
-                self.previous_mean_distance = 0
-                self.traj.reset()
-                self.drawTraj.clean()
-                self.currentState = "START"
+            self.drawLog(img, (255,0,0), checkStartTracking, val)
+
 
         elif "EXIT" == self.currentState:
+            currentTime = time.time()
+            if self.waitForNewTraj < currentTime and self.queueObj.checkGesture("stop"):
+                self.cleanTraj()
+                self.currentState = "INIZIALIZATION"
+            
             xdata, ydata, zdata, speed = self.trajCOMPLETE[-1].skipEveryNpointsFunc()
-            #self.draw2dTraj(img, xdata, zdata)
+            self.draw2dTraj(img, xdata, zdata)
             self.drawTraj.run(xdata, ydata, zdata, speed)
+            self.drawLog(img, (0,0,255), 0, val)
 
         self.queueObj.addMeanAndMatch(val, outputClass, probability)
 
