@@ -46,7 +46,7 @@ def main():
     gestureDetector = hgm.handGestureRecognition()
 
     queue = qm.queueObj(lenMaxQueue=35)
-    tracking = tm.tracking(queue, skipEveryNpoints=4)
+    tracking = tm.tracking(queue, skipEveryNpoints=4, trajTimeDuration=40) # trajTimeDuration is in seconds
 
 
     pTime = 0
@@ -112,8 +112,8 @@ def main():
 
         if len(lmList) != 0:
             # hand gesture recognition
-            img = gestureDetector.processHands(img, lmList)
-            tracking.run(img, lmList)
+            img, outputClass, probability = gestureDetector.processHands(img, lmList)
+            tracking.run(img, lmList, outputClass, probability)
         else:
             tracking.justDrawLast2dTraj(img)
 

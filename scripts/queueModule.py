@@ -8,14 +8,21 @@ class queueObj():
         self.indexQueue = 0
         self.queue = np.zeros((lenMaxQueue,2), dtype=np.int32)
 
+        # this is to check if it's the same gesture, we need to analyze the past
+        self.outputClasses = np.zeros((lenMaxQueue), dtype=object)
+        self.probabilities = np.zeros((lenMaxQueue), dtype=np.float32)
+
     def isFullQueue(self):
         if self.indexQueue < self.lenMaxQueue - 1:
             return False
         else:
             return True
 
-    def add(self, val):
+    def addMeanAndMatch(self, val, match, prob):
         self.queue[self.indexQueue] = val
+        
+        self.outputClasses[self.indexQueue] = match
+        self.probabilities[self.indexQueue] = prob
         
         if self.isFullQueue():
             self.indexQueue = 0

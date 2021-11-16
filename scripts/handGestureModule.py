@@ -47,11 +47,13 @@ class handGestureRecognition():
         for idx, resultPred in enumerate(predictions["class_ids"]):
             class_id = resultPred[0]
             probability = predictions['probabilities'][idx][class_id]
-            #print(f"\tPrediction is {self.SPECIES[class_id]} {100 * probability :.2f}%")
+            outputClass = self.SPECIES[class_id]
 
-        self.drawHandGesture(img, handPoints, self.SPECIES[class_id])
+            #print(f"\tPrediction is {outputClass} {100 * probability :.2f}%")
 
-        return img
+        self.drawHandGesture(img, handPoints, outputClass, probability)
+
+        return img, outputClass, probability
 
     def getPredictions(self):
         # Convert input data into serialized Example strings.
@@ -83,7 +85,7 @@ class handGestureRecognition():
         color = [(ord(c.lower())-97)*8 for c in name[:3]]
         return color
 
-    def drawHandGesture(self, img, handPoints, match):
+    def drawHandGesture(self, img, handPoints, match, prob):
         arr = np.matrix(handPoints)
         max_val = arr.max(0)
         min_val = arr.min(0)
@@ -92,7 +94,7 @@ class handGestureRecognition():
         top_left = (min_val[0,1], max_val[0,2])
         bottom_right = (max_val[0,1], min_val[0,2])
 
-        # Get color by name using our fancy function
+        # Get color by name using a fancy function
         color = self.name_to_color(match)
 
         # Paint frame
@@ -108,6 +110,9 @@ class handGestureRecognition():
 
         # Wite a name
         cv2.putText(img, match, (min_val[0,1] + 10, min_val[0,2] + 15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (200, 200, 200), self.FONT_THICKNESS)
+
+        # Write probability
+        cv2.putText(img, f"{100 * prob :.2f}%", (min_val[0,1] + 100, min_val[0,2] + 15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (200, 200, 200), self.FONT_THICKNESS)
 
 def main():
     print("hello")

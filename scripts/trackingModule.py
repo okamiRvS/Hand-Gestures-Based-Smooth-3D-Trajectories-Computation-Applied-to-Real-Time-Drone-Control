@@ -8,17 +8,17 @@ import trajectory as traj
 
 class tracking():
 
-    def __init__(self, queueObj, skipEveryNpoints):
+    def __init__(self, queueObj, skipEveryNpoints, trajTimeDuration):
         self.queueObj = queueObj 
         self.currentState = "INIZIALIZATION"
         self.tolleranceSTART = 2
         self.tolleranceTRACKING = 500 # 100 before
         self.nlastMovements = 5
         self.scale = 0
-        self.mean_distance = 0
+        self.previous_mean_distance = 0
         self.drawTraj = d3dT.dynamic3dDrawTrajectory()
 
-        self.traj = traj.trajectory(skipEveryNpoints)
+        self.traj = traj.trajectory(skipEveryNpoints, trajTimeDuration)
 
         self.height = 0
         self.width = 0
@@ -59,7 +59,17 @@ class tracking():
         xdata, ydata, zdata, speed = self.traj.skipEveryNpointsFunc()
         self.draw2dTraj(img, xdata, zdata)
 
-    def run(self, img, lmList):
+    def distanceFromMeanPoint(self, lmList, val):
+        # mean of all distances from mean point val and hand landmark in lmList to gain 3d scale factor
+        # if it's greater respect of the previous istance than the hand is closer to the camera, otherwise is farther
+        # the hand should be totally stopped
+        sum_distances = 0
+        for hand_land in lmList:
+            sum_distances += math.sqrt( (val[0] - hand_land[1] )**2 + (val[1] - hand_land[2])**2 )
+
+        return sum_distances / 21
+
+    def run(self, img, lmList, outputClass, probability):
 
         # mean x and y of all hand leandmark
         x_sum = y_sum = 0
@@ -70,8 +80,7 @@ class tracking():
         x_mean = x_sum / 21
         y_mean = y_sum / 21
         val = np.array([x_mean, y_mean], dtype=np.int32)
-        val_mean_point = (val[0], val[1])
-        cv2.circle(img, val_mean_point, radius=3, color=(0,255,0), thickness=3)
+        cv2.circle(img, (val[0], val[1]), radius=3, color=(0,255,0), thickness=3)
 
         if "INIZIALIZATION" == self.currentState:
             # fill all the queue before START state
@@ -88,17 +97,12 @@ class tracking():
             if checkStart < self.tolleranceSTART:
                 self.currentState = "TRACKING"
 
-                # mean of all distances from mean point val and hand landmark in lmList to gain 3d scale factor
-                # if it's greater respect of the previous istance than the hand is closer to the camera, otherwise is farther
-                # the hand should be totally stopped
-                sum_distances = 0
-                for hand_land in lmList:
-                    sum_distances += math.sqrt( (val[0] - hand_land[1] )**2 + (val[1] - hand_land[2])**2 )
+                # mean of all distances from mean point val and hand landmark in lmList
+                self.previous_mean_distance = self.distanceFromMeanPoint(lmList, val)
 
-                self.mean_distance = sum_distances / 21
-
-                self.traj.addPoint(val[0] / self.height, self.scale / 50, 1 - (val[1] / self.width))
-                self.traj.setSpeed(0) # speed is zero at the beginning
+                if self.traj.checkTrajTimeDuration():
+                    self.traj.addPoint(val[0] / self.height, self.scale / 50, 1 - (val[1] / self.width))
+                    self.traj.setSpeed(0) # speed is zero at the beginning
 
                 self.drawLog(img, (0,255,0), checkStart, val)
             else:
@@ -115,29 +119,25 @@ class tracking():
 
             if checkStartTracking < self.tolleranceTRACKING:
 
-                # mean of all distances from mean point val and hand landmark in lmList to gain 3d scale factor
-                # if it's greater respect of the previous istance than the hand is closer to the camera, otherwise is farther
-                # the hand should be totally stopped
-                sum_distances = 0
-                for hand_land in lmList:
-                    sum_distances += math.sqrt( (val[0] - hand_land[1] )**2 + (val[1] - hand_land[2])**2 )
+                # mean of all distances from mean point val and hand landmark in lmList
+                current_mean_dist = self.distanceFromMeanPoint(lmList, val)
 
-                tmp_mean_dist = sum_distances / 21
-
-                if tmp_mean_dist > self.mean_distance:
-                    self.scale+=1
+                if current_mean_dist > self.previous_mean_distance:
+                    self.scale += 1 * abs(current_mean_dist - self.previous_mean_distance) # greater if the difference is high
                 else:
-                    self.scale-=1
+                    self.scale -= 1 * abs(current_mean_dist - self.previous_mean_distance) # same
 
-                self.mean_distance = tmp_mean_dist
+                print(self.scale)
+                self.previous_mean_distance = current_mean_dist
 
-                # collect data to draw the 3d trajectory
-                # scale X,Z data from 0 to 1; about scale factor I consider 50 values, but maybe it requires some major details...
-                self.traj.addPoint(val[0] / self.height, self.scale / 50, 1 - (val[1] / self.width) )
-                
-                # compute istant speed
-                currentSpeed = self.traj.computeIstantSpeed()
-                self.traj.setSpeed(currentSpeed) # speed is zero at the beginning
+                if self.traj.checkTrajTimeDuration():
+                    # collect data to draw the 3d trajectory
+                    # scale X,Z data from 0 to 1; about scale factor I consider 50 values, but maybe it requires some major details...
+                    self.traj.addPoint(val[0] / self.height, self.scale / 50, 1 - (val[1] / self.width) )
+                    
+                    # compute istant speed
+                    currentSpeed = self.traj.computeIstantSpeed()
+                    self.traj.setSpeed(currentSpeed) # speed is zero at the beginning
                 
                 xdata, ydata, zdata, speed = self.traj.skipEveryNpointsFunc()
                 self.draw2dTraj(img, xdata, zdata)
@@ -148,12 +148,12 @@ class tracking():
                 # clean everything
                 self.drawLog(img, (0,0,255), checkStartTracking, val)
                 self.scale = 0
-                self.mean_distance = 0
+                self.previous_mean_distance = 0
                 self.traj.reset()
                 self.drawTraj.clean()
                 self.currentState = "START"
 
-        self.queueObj.add(val)
+        self.queueObj.addMeanAndMatch(val, outputClass, probability)
 
 
 def main():

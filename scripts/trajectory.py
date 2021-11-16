@@ -7,7 +7,7 @@ import dynamic3dDrawTrajectory as d3dT
 
 class trajectory():
 
-    def __init__(self, skipEveryNpoints):
+    def __init__(self, skipEveryNpoints, trajTimeDuration):
 
         self.trajPointsX = []
         self.trajPointsY = []
@@ -15,7 +15,17 @@ class trajectory():
         self.trajSpeed = []
 
         self.skipEveryNpoints = skipEveryNpoints
-        self.previousTime = time.time()
+
+        self.startTimeTraj = time.time()
+        self.previousTime = self.startTimeTraj
+        self.trajTimeDuration = trajTimeDuration
+
+    def checkTrajTimeDuration(self):
+        currentTime = time.time()
+        if self.startTimeTraj + self.trajTimeDuration > currentTime:
+            return True
+        else:
+            return False
 
     def addPoint(self, x, y, z):
         self.trajPointsX.append(x)
@@ -26,9 +36,9 @@ class trajectory():
         self.trajSpeed.append(speed)
 
     def computeIstantSpeed(self):
-        tmpTime = time.time()
-        deltaTime = tmpTime - self.previousTime
-        self.previousTime = tmpTime
+        currentTime = time.time()
+        deltaTime = currentTime - self.previousTime
+        self.previousTime = currentTime
         distanceSpaceBetweenTwoLast3dPoints = math.sqrt( 
             ( self.trajPointsX[-2] - self.trajPointsX[-1] )**2 +
             ( self.trajPointsY[-2] - self.trajPointsY[-1] )**2 +
@@ -36,7 +46,6 @@ class trajectory():
         )
         factorScale = 10
         currentSpeed = int(factorScale * distanceSpaceBetweenTwoLast3dPoints/deltaTime)
-        print(currentSpeed)
         return currentSpeed
     
     def reset(self):
