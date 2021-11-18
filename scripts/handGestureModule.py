@@ -8,9 +8,10 @@ import pdb
 
 class handGestureRecognition():
 
-    lastModel = "1636740556" # COPY THE FOLDER NAME OF Tensorflow/workspace/models/my_hand_gesture_model
+    lastModel = "1637194301" # COPY THE FOLDER NAME OF Tensorflow/workspace/models/my_hand_gesture_model
     export_path = str.encode(os.path.join("Tensorflow","workspace", "models", "my_hand_gesture_model", lastModel)) # must be in bytes
-    SPECIES = ['stop', 'onefingerup', 'twofingerup', 'thumbsup']
+    #SPECIES = ['stop', 'onefingerup', 'twofingerup', 'thumbsup']
+    SPECIES = ['back_left', 'back_center', 'back_right', 'center_left', 'center_center', 'center_right', 'front_left', 'front_center', 'front_right']
     FRAME_THICKNESS = 3
     FONT_THICKNESS = 2
 
@@ -51,7 +52,7 @@ class handGestureRecognition():
 
             #print(f"\tPrediction is {outputClass} {100 * probability :.2f}%")
 
-        self.drawHandGesture(img, handPoints, outputClass, probability)
+        #self.drawHandGesture(img, handPoints, outputClass, probability)
 
         return img, outputClass, probability
 

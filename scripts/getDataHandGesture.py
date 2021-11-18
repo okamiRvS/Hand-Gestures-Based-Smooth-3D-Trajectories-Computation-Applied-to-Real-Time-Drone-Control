@@ -13,14 +13,18 @@ getFromWebcam = True
 
 # if true you can save all picture of the data and decide the currentPicture, if false you'll use that data that can
 # be uncorrect (could be useful for real application?)
-takeControl = True
+takeControl = False
 
 # wait from a frame and another
-timeDelay = 1
+timeDelay = 0
 
 # define images to collect
-labels = ['stop', 'onefingerup', 'twofingerup', 'thumbsup']
-number_imgs = 50
+#labels = ['stop', 'onefingerup', 'twofingerup', 'thumbsup'] # da migliorare con movimenti avanti e indietro
+#number_imgs = 50
+
+labels = ['back_left', 'back_center', 'back_right', 'center_left', 'center_center', 'center_right', 'front_left', 'front_center', 'front_right']
+number_imgs = 300
+
 np_array = np.zeros((len(labels)*number_imgs, 21*2 + 1), dtype=np.int32)
 
 detector = htm.handDetector()

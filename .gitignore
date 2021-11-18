@@ -6,8 +6,10 @@ src/known_faces/*
 src/unknown_faces/*
 src/tello_screenshots/*
 src/dataHandGesture/imgData/*
+scripts/test.py
 tfod
 Tensorflow
+
 .ipynb_checkpoints
 ipynb_checkpoints
 

@@ -111,6 +111,100 @@ class tracking():
         positionDrone = ( int(xdata[self.idxPoint] * self.height), int( (1-zdata[self.idxPoint]) * self.width) )
         cv2.circle(img, positionDrone, radius=10, color=(0,0,255), thickness=10)
 
+    def orientationTest(self, p, q, r, tollerance):
+        #testOnThisPhalanges = [[5,6,7], [6,7,8], [9,10,11], [10,11,12], [13,14,15], [14,15,16], [17,18,19], [18,19,20]]
+
+        tmp = np.vstack((p,q))
+        tmp = np.vstack((tmp,r))
+        ones = np.ones(3)
+        tmp[:,0] = ones
+        tmp[:,2] = self.height - tmp[:,2] # to move the origin from top left to bottom left 
+
+        res = np.linalg.det(tmp)
+
+        # this is my version of orientation test with a tollerance
+        orientation = None
+        if res > 60:
+            orientation = "back" #COUNTERclockwise
+        elif res < -80:
+            orientation = "front" #clockwise
+        else:
+            orientation = "center" #colinear
+
+        return orientation
+
+    def computeRoll(self, lmList):
+        wrist = np.array(lmList[0], dtype=np.int32) # palmo
+        middle_finger_tip = np.array(lmList[12], dtype=np.int32) # punta medio
+
+        # compute the vector that pass at the center
+        centerVector = middle_finger_tip - wrist
+        
+        # compute the vector that is perpendicular to the x axis and passes in wrist point
+        # vec = np.array([wrist[1] + 100, wrist[2]], dtype=np.int32)
+        # cv2.arrowedLine(img, centerVectorStart, (vec[0], vec[1]), (220, 25, 6), thickness=2, line_type=cv2.LINE_AA, shift=0, tipLength=0.3)
+        
+        # compute the inner product to know if orientation is left or right
+        rightVector = np.array([1,0], dtype=np.int32)
+
+        centerVectorNormalized = centerVector[1:] / np.sqrt(centerVector[1]**2 + centerVector[2]**2)
+        res = np.inner(centerVectorNormalized, rightVector)
+
+        # this is my version of inner product geometric interpretation with a tollerance
+        roll = None
+        if res > 0.3: # inner product 
+            roll = "right"
+        elif res < -0.3:
+            roll = "left"
+        else:
+            roll = "center"s
+        
+        print(res)
+        return roll
+
+    def computePitch(self, lmList, pitch):
+
+        if pitch == "right":
+            tollerance = 0
+            p = np.array(lmList[9], dtype=np.int32) 
+            q = np.array(lmList[10], dtype=np.int32)
+            r = np.array(lmList[11], dtype=np.int32)
+
+            return self.orientationTest(p, q, r, tollerance)
+
+        elif pitch == "left":
+            tollerance = 1
+            p = np.array(lmList[9], dtype=np.int32) 
+            q = np.array(lmList[10], dtype=np.int32)
+            r = np.array(lmList[11], dtype=np.int32)
+
+            return self.orientationTest(r, q, p, tollerance)
+
+        elif pitch == "center":
+            if lmList[4][2] < lmList[6][2]:
+                return "back"
+            elif lmList[4][2] > lmList[5][2]:
+                return "front"
+            else:
+                return "center"
+
+    def drawOrientationVector(self, img, lmList, pitch, roll):
+        wrist = np.array(lmList[0], dtype=np.int32) # palmo
+        middle_finger_tip = np.array(lmList[12], dtype=np.int32) # punta medio
+
+        # compute the vector that pass at the center
+        centerVector = 1.2 * ( middle_finger_tip - wrist )
+
+        centerVectorEnd = wrist + centerVector
+        centerVectorEnd = ( int(centerVectorEnd[1]), int(centerVectorEnd[2]) )
+        centerVectorStart = (wrist[1], wrist[2])
+        cv2.arrowedLine(img, centerVectorStart, centerVectorEnd, (220, 25, 6), thickness=2, line_type=cv2.LINE_AA, shift=0, tipLength=0.3)
+
+        fontScale = 0.6
+        font = cv2.FONT_HERSHEY_DUPLEX
+        thickness = 2
+        cv2.putText(img, f"Roll: {roll}, Pitch: {pitch}", (centerVectorEnd[0]+20,centerVectorEnd[1]), font, fontScale, (0, 225, 0), thickness)
+
     def run(self, img, lmList, outputClass, probability):
 
         # mean x and y of all hand leandmark
@@ -123,6 +217,10 @@ class tracking():
         y_mean = y_sum / 21
         val = np.array([x_mean, y_mean], dtype=np.int32)
         cv2.circle(img, (val[0], val[1]), radius=3, color=(0,255,0), thickness=3)
+
+        roll = self.computeRoll(lmList)
+        pitch = self.computePitch(lmList, roll)
+        self.drawOrientationVector(img, lmList, pitch, roll)
 
         if "INIZIALIZATION" == self.currentState:
             # fill all the queue before START state
