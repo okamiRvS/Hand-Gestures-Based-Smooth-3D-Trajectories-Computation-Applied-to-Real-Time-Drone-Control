@@ -19,11 +19,53 @@ takeControl = False
 timeDelay = 0
 
 # define images to collect
-#labels = ['stop', 'onefingerup', 'twofingerup', 'thumbsup'] # da migliorare con movimenti avanti e indietro
-#number_imgs = 50
+labels = ['stop', 'onefingerup', 'twofingerup', 'thumbsup'] # da migliorare con movimenti avanti e indietro
+number_imgs = 621
 
-labels = ['back_left', 'back_center', 'back_right', 'center_left', 'center_center', 'center_right', 'front_left', 'front_center', 'front_right']
-number_imgs = 300
+# (207*3)
+
+# 0-206 z1 (background)
+    # (23*3)
+    # back
+        # right 0-22
+        # center 23-45
+        # left 46-68
+    # center
+        # right 68-91
+        # center 92-114
+        # left 115-137
+    # front
+        # right 138-160
+        # center 161-183
+        # left 184-206
+
+# 207-413 z2 (center)
+    # back
+        # right 207-229
+        # center 230-252
+        # left 253-275
+    # center
+        # right 276-298
+        # center 299-321
+        # left 322-344
+    # front
+        # right 345-367
+        # center 368-390
+        # left 391-413
+
+# 414-620 z3 (foreground)
+    # back
+        # right 414-436
+        # center 437-459
+        # left 460-482
+    # center
+        # right 483-505
+        # center 506-528
+        # left 529-551
+    # front
+        # right 552-574
+        # center 575-597
+        # left 598-620
 
 np_array = np.zeros((len(labels)*number_imgs, 21*2 + 1), dtype=np.int32)
 

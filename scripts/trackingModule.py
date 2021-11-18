@@ -148,7 +148,8 @@ class tracking():
         rightVector = np.array([1,0], dtype=np.int32)
 
         centerVectorNormalized = centerVector[1:] / np.sqrt(centerVector[1]**2 + centerVector[2]**2)
-        res = np.inner(centerVectorNormalized, rightVector)
+        res = np.inner(centerVectorNormalized, rightVector)      
+        #print(res)
 
         # this is my version of inner product geometric interpretation with a tollerance
         roll = None
@@ -157,9 +158,7 @@ class tracking():
         elif res < -0.3:
             roll = "left"
         else:
-            roll = "center"s
-        
-        print(res)
+            roll = "center"
         return roll
 
     def computePitch(self, lmList, pitch):
