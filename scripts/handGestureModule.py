@@ -10,8 +10,8 @@ class handGestureRecognition():
 
     lastModel = "1637194301" # COPY THE FOLDER NAME OF Tensorflow/workspace/models/my_hand_gesture_model
     export_path = str.encode(os.path.join("Tensorflow","workspace", "models", "my_hand_gesture_model", lastModel)) # must be in bytes
-    SPECIES = ['stop', 'onefingerup', 'twofingerup', 'thumbsup']
-    #SPECIES = ['back_left', 'back_center', 'back_right', 'center_left', 'center_center', 'center_right', 'front_left', 'front_center', 'front_right']
+    #SPECIES = ['stop', 'onefingerup', 'twofingerup', 'thumbsup']
+    SPECIES = ['back_left', 'back_center', 'back_right', 'center_left', 'center_center', 'center_right', 'front_left', 'front_center', 'front_right']
     FRAME_THICKNESS = 3
     FONT_THICKNESS = 2
 

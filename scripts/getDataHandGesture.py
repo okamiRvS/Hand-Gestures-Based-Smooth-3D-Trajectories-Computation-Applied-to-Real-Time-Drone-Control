@@ -23,7 +23,7 @@ labels = ['stop', 'onefingerup', 'twofingerup', 'thumbsup'] # da migliorare con 
 number_imgs = 621
 
 # (207*3)
-
+# IT'S REALLY IMPORTANT DIVERSIFY THE ORIENTATION THROUGH ROLL, PITCH AND YAW
 # 0-206 z1 (background)
     # (23*3)
     # back
