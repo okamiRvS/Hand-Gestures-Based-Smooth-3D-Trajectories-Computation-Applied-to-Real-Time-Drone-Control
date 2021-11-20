@@ -132,50 +132,12 @@ class tracking():
         tmp = tmp / maxModule
         tmp[:,0] = ones
 
-        # # normalize each vector to 1 (except firt column)
-        # #tmp[:,1:] = tmp[:,1:] / np.sqrt([tmp[:,1]**2 + tmp[:,2]**2]).T
-        # #res = np.linalg.det(tmp)
-        # #print(res*1000000)
-        
-        # res = np.linalg.det(tmp)
-
-        # # this is my version of orientation test with a tollerance
-        # orientation = None
-        # if res > 150 : #60
-        #     orientation = "-90" #COUNTERclockwise
-        # elif res < -250: #-80
-        #     orientation = "+90" #clockwise
-        # else:
-        #     orientation = "0" #colinear
-
-        # return orientation
-
         res = np.linalg.det(tmp)
         return -res*1125 # 1125 is empirically computed
 
     def computeRoll(self, lmList):
         wrist = np.array(lmList[0], dtype=np.int32) # palmo
         middle_finger_tip = np.array(lmList[12], dtype=np.int32) # punta medio
-
-        # # compute the vector that pass at the center
-        # centerVector = middle_finger_tip - wrist
-        
-        # # compute the inner product to know if orientation is left or right
-        # rightVector = np.array([1,0], dtype=np.int32)
-
-        # centerVectorNormalized = centerVector[1:] / np.sqrt(centerVector[1]**2 + centerVector[2]**2)
-        # res = np.inner(centerVectorNormalized, rightVector)      
-
-        # # this is my version of inner product geometric interpretation with a tollerance
-        # roll = None
-
-        # if res > 0.3: # inner product 
-        #     roll = "-90" # right
-        # elif res < -0.3:
-        #     roll = "+90" # left
-        # else:
-        #     roll = "0" # center
-        # return roll
 
         # to move the origin from top left to bottom left 
         middle_finger_tip[2] = self.height - middle_finger_tip[2] 
@@ -215,15 +177,13 @@ class tracking():
 
         return self.orientationTest(p, q, r, tol1, tol2, mean) / 3 # 3 is empirical, should be varied respect the distance
 
-    def computePitch(self, lmList, roll, yaw, mean):
-        # se la punta del pollice supera un punto della mano...
-        # if -5 < roll < 5: # "0"
-        #     if lmList[4][2] < lmList[6][2]: # HEY! HERE IS MINOR BECAUSE Y HAS DIFFERENT REFERENCE SYSTEM
-        #         return "+90" # fron
-        #     elif lmList[4][2] > lmList[5][2]:
-        #         return "-90" # back
-        #     else:
-        #         return "0" # center
+    def translate(self, x, y, listPoint): 
+        print("hello")
+
+    def rotation(self, theta, listPoint):
+        print("hello")
+
+    def computePitch(self, lmList, roll, yaw, mean, img):
 
         middle_finger_tip = np.array(lmList[12], dtype=np.int32)
         wrist = np.array(lmList[0], dtype=np.int32) 
@@ -239,7 +199,7 @@ class tracking():
         cos = middle_finger_tip[2] - wrist[2]
 
         theta = np.arctan2(sin, cos)       
-        print("\narctan2 value : \n", theta * 180 / np.pi)
+        #print("\narctan2 value : \n", theta * 180 / np.pi)
         
         Matrix2dRotation = np.array([[np.cos(theta), -np.sin(theta), 0], [np.sin(theta), np.cos(theta), 0], [0, 0, 1]])
 
@@ -248,25 +208,45 @@ class tracking():
         index_finger_mcp = np.array([lmList[5][1], self.height - lmList[5][2], 1], dtype=np.int32)
         index_finger_pip = np.array([lmList[6][1], self.height - lmList[6][2], 1], dtype=np.int32)
 
-        # apply the transformation to the vector
-        thumb_tip_tansf = Matrix2dRotation @ thumb_tip
-        index_finger_mcp_trans = Matrix2dRotation @ index_finger_mcp
-        index_finger_pip_trans = Matrix2dRotation @ index_finger_pip
-
-        # create array
-        tmp = np.array([thumb_tip_tansf, index_finger_mcp_trans, index_finger_pip_trans])
+        # create listPoint
+        tmp = np.array([thumb_tip, index_finger_mcp, index_finger_pip])
 
         # since mean point as anchor translate everything to the origin
         tmp[:,:-1] = tmp[:,:-1] - mean
+
+        # apply the transformation to the vector
+        tmp[0,:] = Matrix2dRotation @ tmp[0,:]
+        tmp[1,:] = Matrix2dRotation @ tmp[1,:]
+        tmp[2,:] = Matrix2dRotation @ tmp[2,:]
 
         # scale everything respect max distance
         maxModule = np.max( np.sqrt([tmp[:,0]**2 + tmp[:,1]**2]) )
         tmp = tmp / maxModule
         tmp[:,2] = np.ones(3) # I can delete this, it's not useful, but maybe elegant...
 
+        # save this and scale a bit to draw points on canvas
+        tmp2 = tmp * 100
+        tmp2 = tmp2[:,:-1] + mean + np.array([-300, 0])
+
+        # translate from origin to the mean and translate from there on left just a little bit
+        tmp[:,:-1] = tmp[:,:-1] + mean + np.array([-300, 0])
+
+        # drawPoint
+        fontScale = 0.3
+        font = cv2.FONT_HERSHEY_DUPLEX
+        thickness = 1
+        color = (255,255,0)
+        cv2.circle(img, ( int(tmp2[0,0]), int(self.height - tmp2[0,1])), radius=0, color=color, thickness=5)
+        cv2.putText(img, "thumb_tip", ( int(tmp2[0,0]) + 10, int(self.height - tmp2[0,1])), font, fontScale, color, thickness)
+        cv2.circle(img, ( int(tmp2[1,0]), int(self.height - tmp2[1,1])), radius=0, color=color, thickness=5)
+        cv2.putText(img, "index_finger_mcp", ( int(tmp2[1,0]) + 10, int(self.height - tmp2[1,1])), font, fontScale, color, thickness)
+        cv2.circle(img, ( int(tmp2[2,0]), int(self.height - tmp2[2,1])), radius=0, color=color, thickness=5)
+        cv2.putText(img, "index_finger_pip", ( int(tmp2[2,0]) + 10, int(self.height - tmp2[2,1])), font, fontScale, color, thickness)
+
         pointZero = (tmp[1,1] + tmp[2,1]) / 2
         factNormalized = pointZero - tmp[0,1]
-        return -factNormalized*112 # 112 is empirically computed
+
+        return -factNormalized*150 # 150 is empirically computed
 
     def drawOrientationVector(self, img, lmList, roll, yaw, pitch):
         wrist = np.array(lmList[0], dtype=np.int32) # palmo
@@ -302,7 +282,7 @@ class tracking():
 
         roll = self.computeRoll(lmList)
         yaw = self.computeYaw(lmList, roll, val) # ATTENTION REMEMBER THAT THERE IS ALSO THE YAW I NEED TO COMPUTE IT
-        pitch = self.computePitch(lmList, roll, yaw, val)
+        pitch = self.computePitch(lmList, roll, yaw, val, img)
         self.drawOrientationVector(img, lmList, roll, yaw, pitch)
 
         if "INIZIALIZATION" == self.currentState:
