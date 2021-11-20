@@ -58,7 +58,7 @@ class tracking():
         self.width = width
 
     def justDrawLast2dTraj(self, img):
-        xdata, ydata, zdata, speed = self.traj.skipEveryNpointsFunc()
+        xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed = self.traj.skipEveryNpointsFunc()
         self.draw2dTraj(img, xdata, zdata)
 
     def distanceFromMeanPoint(self, lmList, val):
@@ -71,7 +71,7 @@ class tracking():
 
         return sum_distances / 21
 
-    def addTrajectoryPointAndSpeed(self, lmList, val):
+    def addTrajectoryPointAndSpeed(self, lmList, val, roll, yaw, pitch):
         # mean of all distances from mean point val and hand landmark in lmList
         current_mean_dist = self.distanceFromMeanPoint(lmList, val)
 
@@ -83,7 +83,12 @@ class tracking():
         print(self.scale)
         self.previous_mean_distance = current_mean_dist
 
-        self.traj.addPoint(val[0] / self.height, self.scale / 50, 1 - (val[1] / self.width) )
+        self.traj.addPoint(x = val[0] / self.height,
+                           y = self.scale / 50,
+                           z = 1 - (val[1] / self.width),
+                           roll = roll,
+                           yaw = yaw,
+                           pitch = pitch)
         currentSpeed = self.traj.computeIstantSpeed() # compute istant speed
         self.traj.setSpeed(currentSpeed)
 
@@ -177,59 +182,85 @@ class tracking():
 
         return self.orientationTest(p, q, r, tol1, tol2, mean) / 3 # 3 is empirical, should be varied respect the distance
 
-    def findAngle(self, )
+    def convertOriginBottomLeft(self, vector):
+        # move the origin from top left to bottom left
+        vector[1] = self.height - vector[1]
+        return vector
 
-    def translate(self, x, y, listPoint): 
-        print("hello")
-
-    def rotation(self, theta, listPoint):
-        print("hello")
-
-    def computePitch(self, lmList, roll, yaw, mean, img):
-
-        middle_finger_tip = np.array(lmList[12], dtype=np.int32)
-        wrist = np.array(lmList[0], dtype=np.int32) 
-
-        # to move the origin from top left to bottom left 
-        middle_finger_tip[2] = self.height - middle_finger_tip[2] 
-        wrist[2] = self.height - wrist[2] 
-        mean = np.array([ [mean[0], self.height -  mean[1] ] ], dtype=np.float32)
-
-        # build matrix 2d rotation
-        # https://ncase.me/matrix/ 
-        sin = middle_finger_tip[1] - wrist[1]
-        cos = middle_finger_tip[2] - wrist[2]
+    def findAngle(self, vec1, vec2):
+ 
+        sin = vec1[0] - vec2[0]
+        cos = vec1[1] - vec2[1]
 
         theta = np.arctan2(sin, cos)       
         #print("\narctan2 value : \n", theta * 180 / np.pi)
+
+        return theta
+
+    def translate(self, vec, listPoint): 
+        print("hello")
         
+    def rotatate(self, tmp, theta):
+
+        # build matrix 2d rotation
+        # https://ncase.me/matrix/
         Matrix2dRotation = np.array([[np.cos(theta), -np.sin(theta), 0], [np.sin(theta), np.cos(theta), 0], [0, 0, 1]])
 
-        # manipultate the vector to do the correct transformation
-        thumb_tip = np.array([lmList[4][1], self.height - lmList[4][2], 1], dtype=np.int32)
-        index_finger_mcp = np.array([lmList[5][1], self.height - lmList[5][2], 1], dtype=np.int32)
-        index_finger_pip = np.array([lmList[6][1], self.height - lmList[6][2], 1], dtype=np.int32)
+        # apply the transformation to the vector
+        tmp = (Matrix2dRotation @ tmp.T).T
+
+        return tmp
+
+    def scaleMaxDistance(self, tmp):
+        distances = np.sqrt([tmp[:,0]**2 + tmp[:,1]**2])
+        maxDistance = np.max(distances)
+        tmp = tmp / maxDistance
+        tmp[:,2] = np.ones(3) # I can delete this, it's not useful, but maybe elegant...
+
+        return tmp
+
+    def computePitch(self, lmList, roll, yaw, mean, img):
+
+        middle_finger_tip = np.array(lmList[12][1:], dtype=np.int32)
+        wrist = np.array(lmList[0][1:], dtype=np.int32)
+
+        thumb_tip = np.array(lmList[4][1:], dtype=np.int32)
+        index_finger_mcp = np.array(lmList[5][1:], dtype=np.int32)
+        index_finger_pip = np.array(lmList[6][1:], dtype=np.int32)
+
+        mean = np.array([mean[0], mean[1]], dtype=np.float32)
+
+        # to move the origin from top left to bottom left 
+        middle_finger_tip = self.convertOriginBottomLeft(middle_finger_tip)
+        wrist = self.convertOriginBottomLeft(wrist)
+
+        thumb_tip = self.convertOriginBottomLeft(thumb_tip)
+        index_finger_mcp = self.convertOriginBottomLeft(index_finger_mcp)
+        index_finger_pip = self.convertOriginBottomLeft(index_finger_pip)
+
+        mean = self.convertOriginBottomLeft(mean)
+
+        # find angle
+        theta = self.findAngle(middle_finger_tip, wrist)
 
         # create listPoint
         tmp = np.array([thumb_tip, index_finger_mcp, index_finger_pip])
 
         # since mean point as anchor translate everything to the origin
-        tmp[:,:-1] = tmp[:,:-1] - mean
+        tmp = tmp - mean
 
-        # apply the transformation to the vector
-        tmp = (Matrix2dRotation @ tmp.T).T
+        # concatenate a column of ones at the end
+        tmp = np.hstack( (tmp, np.ones((3,1)) ))
+
+        # compute rotation
+        tmp = self.rotatate(tmp, theta)
 
         # scale everything respect max distance
-        maxModule = np.max( np.sqrt([tmp[:,0]**2 + tmp[:,1]**2]) )
-        tmp = tmp / maxModule
-        tmp[:,2] = np.ones(3) # I can delete this, it's not useful, but maybe elegant...
+        tmp = self.scaleMaxDistance(tmp)     
 
         # save this and scale a bit to draw points on canvas
         tmp2 = tmp * 100
         tmp2 = tmp2[:,:-1] + mean + np.array([-300, 0])
-
-        # translate from origin to the mean and translate from there on left just a little bit
-        tmp[:,:-1] = tmp[:,:-1] + mean + np.array([-300, 0])
 
         # drawPoint
         fontScale = 0.3
@@ -243,6 +274,7 @@ class tracking():
         cv2.circle(img, ( int(tmp2[2,0]), int(self.height - tmp2[2,1])), radius=0, color=color, thickness=5)
         cv2.putText(img, "index_finger_pip", ( int(tmp2[2,0]) + 10, int(self.height - tmp2[2,1])), font, fontScale, color, thickness)
 
+        # copmute the difference from the mean between index_finger_mcp and index_finger_pip with the thumb_tip y value
         pointZero = (tmp[1,1] + tmp[2,1]) / 2
         factNormalized = pointZero - tmp[0,1]
 
@@ -306,10 +338,16 @@ class tracking():
                     # mean of all distances from mean point val and hand landmark in lmList
                     self.previous_mean_distance = self.distanceFromMeanPoint(lmList, val)
 
-                    self.traj.addPoint(val[0] / self.height, self.scale / 50, 1 - (val[1] / self.width))
+                    self.traj.addPoint(x = val[0] / self.height,
+                                       y = self.scale / 50,
+                                       z = 1 - (val[1] / self.width),
+                                       roll = roll,
+                                       yaw = yaw,
+                                       pitch = pitch)
+                                       
                     self.traj.setSpeed(0) # speed is zero at the beginning
                 else:
-                    self.addTrajectoryPointAndSpeed(lmList, val)
+                    self.addTrajectoryPointAndSpeed(lmList, val, roll, yaw, pitch)
 
                 self.traj.startTimeTraj = self.traj.previousTime # update the startTimeTraj until tracking state
 
@@ -317,7 +355,7 @@ class tracking():
                 
                 if len(self.trajCOMPLETE) > 0:
 
-                    xdata, ydata, zdata, speed = self.trajCOMPLETE[-1].skipEveryNpointsFunc()
+                    xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed = self.trajCOMPLETE[-1].skipEveryNpointsFunc()
 
                     self.startingPoint = ( int( xdata[1] * self.height),
                                            int( (1- zdata[1]) * self.width) )
@@ -335,14 +373,14 @@ class tracking():
 
             elif self.tolleranceSTART < checkStart < self.tolleranceSTART+100 and self.queueObj.checkGesture("stop"):
                 self.traj.saveLastNValues(nPoints = 20) # take only the last 10 points
-                xdata, ydata, zdata, speed = self.traj.skipEveryNpointsFunc()
+                xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed = self.traj.skipEveryNpointsFunc()
 
                 if len(xdata) > 0: # because otherwise could give index out of range
                     self.currentState = "TRACKING"
                     self.startingPoint = ( int( xdata[1] * self.height),
                                            int( (1- zdata[1]) * self.width) )
 
-                self.addTrajectoryPointAndSpeed(lmList, val)
+                self.addTrajectoryPointAndSpeed(lmList, val, roll, yaw, pitch)
 
                 self.drawLog(img, (0,255,0), checkStart, val)
             else:
@@ -384,15 +422,20 @@ class tracking():
                 if self.traj.checkTrajTimeDuration():
                     # collect data to draw the 3d trajectory
                     # scale X,Z data from 0 to 1; about scale factor I consider 50 values, but maybe it requires some major details...
-                    self.traj.addPoint(val[0] / self.height, self.scale / 50, 1 - (val[1] / self.width) )
+                    self.traj.addPoint(x = val[0] / self.height,
+                                       y = self.scale / 50,
+                                       z = 1 - (val[1] / self.width),
+                                       roll = roll,
+                                       yaw = yaw,
+                                       pitch = pitch)
                     
                     # compute istant speed
                     currentSpeed = self.traj.computeIstantSpeed()
                     self.traj.setSpeed(currentSpeed) # speed is zero at the beginning
                 
-            xdata, ydata, zdata, speed = self.traj.skipEveryNpointsFunc()
+            xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed = self.traj.skipEveryNpointsFunc()
             self.draw2dTraj(img, xdata, zdata)
-            self.drawTraj.run(xdata, ydata, zdata, speed)
+            self.drawTraj.run(xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed)
 
             self.drawLog(img, (255,0,0), checkStartTracking, val)
 
@@ -403,9 +446,9 @@ class tracking():
                 self.cleanTraj()
                 self.currentState = "INIZIALIZATION"
             
-            xdata, ydata, zdata, speed = self.trajCOMPLETE[-1].skipEveryNpointsFunc()
+            xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed = self.trajCOMPLETE[-1].skipEveryNpointsFunc()
             self.draw2dTraj(img, xdata, zdata)
-            self.drawTraj.run(xdata, ydata, zdata, speed)
+            self.drawTraj.run(xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed)
             self.drawLog(img, (0,0,255), 0, val)
 
         self.queueObj.addMeanAndMatch(val, outputClass, probability)

@@ -12,6 +12,11 @@ class trajectory():
         self.trajPointsX = []
         self.trajPointsY = []
         self.trajPointsZ = []
+
+        self.roll = []
+        self.yaw = []
+        self.pitch = []
+
         self.trajSpeed = []
 
         self.skipEveryNpoints = skipEveryNpoints
@@ -27,11 +32,15 @@ class trajectory():
         else:
             return False
 
-    def addPoint(self, x, y, z):
+    def addPoint(self, x, y, z, roll, yaw, pitch):
         self.trajPointsX.append(x)
         self.trajPointsY.append(y)
         self.trajPointsZ.append(z)
     
+        self.roll.append(roll)
+        self.yaw.append(yaw)
+        self.pitch.append(pitch)
+
     def setSpeed(self, speed):
         self.trajSpeed.append(speed)
 
@@ -52,6 +61,11 @@ class trajectory():
         self.trajPointsX = []
         self.trajPointsY = []
         self.trajPointsZ = []
+
+        self.roll = []
+        self.yaw = []
+        self.pitch = []
+
         self.trajSpeed = []
 
     def skipEveryNpointsFunc(self):
@@ -59,8 +73,13 @@ class trajectory():
         xdata = self.trajPointsX[::self.skipEveryNpoints]
         ydata = self.trajPointsY[::self.skipEveryNpoints]
         zdata = self.trajPointsZ[::self.skipEveryNpoints]
+
+        rolldata = self.roll[::self.skipEveryNpoints]
+        yawdata = self.yaw[::self.skipEveryNpoints]
+        pitchdata = self.pitch[::self.skipEveryNpoints]
+
         speed = self.trajSpeed[::self.skipEveryNpoints]
-        return xdata, ydata, zdata, speed
+        return xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed
 
     def saveLastNValues(self, nPoints):
         lenTraj = len(self.trajPointsX) - 1
@@ -72,6 +91,11 @@ class trajectory():
         self.trajPointsX = self.trajPointsX[takeOnly:]
         self.trajPointsY = self.trajPointsY[takeOnly:]
         self.trajPointsZ = self.trajPointsZ[takeOnly:]
+
+        self.roll = self.roll[takeOnly:]
+        self.yaw = self.yaw[takeOnly:]
+        self.pitch = self.pitch[takeOnly:]
+
         self.trajSpeed = self.trajSpeed[takeOnly:]
 
     def thumbsUpFix(self, numberKeyPoints):
@@ -79,6 +103,11 @@ class trajectory():
         self.trajPointsX = self.trajPointsX[:-numberKeyPoints]
         self.trajPointsY = self.trajPointsY[:-numberKeyPoints]
         self.trajPointsZ = self.trajPointsZ[:-numberKeyPoints]
+
+        self.roll = self.roll[:-numberKeyPoints]
+        self.yaw = self.yaw[:-numberKeyPoints]
+        self.pitch = self.pitch[:-numberKeyPoints]
+
         self.trajSpeed = self.trajSpeed[:-numberKeyPoints]
 
 

@@ -28,7 +28,7 @@ class dynamic3dDrawTrajectory():
         self.start = self.ax.text3D(0, 0, 0, "", zdir='x', size=10, zorder=1, color='black') 
         self.end = self.ax.text3D(0, 0, 0, "", zdir='x', size=10, zorder=1, color='black') 
 
-    def run(self, xdata, ydata, zdata, speed):
+    def run(self, xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed):
 
         currentTime = time.time()
         
