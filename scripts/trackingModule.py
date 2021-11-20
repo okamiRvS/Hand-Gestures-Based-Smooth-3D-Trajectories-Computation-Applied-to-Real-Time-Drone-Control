@@ -177,6 +177,8 @@ class tracking():
 
         return self.orientationTest(p, q, r, tol1, tol2, mean) / 3 # 3 is empirical, should be varied respect the distance
 
+    def findAngle(self, )
+
     def translate(self, x, y, listPoint): 
         print("hello")
 
@@ -215,9 +217,7 @@ class tracking():
         tmp[:,:-1] = tmp[:,:-1] - mean
 
         # apply the transformation to the vector
-        tmp[0,:] = Matrix2dRotation @ tmp[0,:]
-        tmp[1,:] = Matrix2dRotation @ tmp[1,:]
-        tmp[2,:] = Matrix2dRotation @ tmp[2,:]
+        tmp = (Matrix2dRotation @ tmp.T).T
 
         # scale everything respect max distance
         maxModule = np.max( np.sqrt([tmp[:,0]**2 + tmp[:,1]**2]) )
