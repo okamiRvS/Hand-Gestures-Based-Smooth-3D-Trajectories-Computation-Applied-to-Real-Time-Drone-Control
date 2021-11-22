@@ -6,6 +6,7 @@ import os
 import cv2
 import pdb
 
+
 class handGestureRecognition():
 
     lastModel = "1637194301" # COPY THE FOLDER NAME OF Tensorflow/workspace/models/my_hand_gesture_model
@@ -15,11 +16,14 @@ class handGestureRecognition():
     FRAME_THICKNESS = 3
     FONT_THICKNESS = 2
 
-    def __init__(self):        
+    def __init__(self):
+
         # Loading the estimator
         self.predict_fn = tf.saved_model.load(self.export_path).signatures['predict']
 
+
     def processHands(self, img, handPoints):
+
         np_array = np.zeros((1, 21*2), dtype=np.int32)
 
         x_sum = y_sum = 0
@@ -56,7 +60,9 @@ class handGestureRecognition():
 
         return img, outputClass, probability
 
+
     def getPredictions(self):
+
         # Convert input data into serialized Example strings.
 
         examples = []
@@ -79,14 +85,19 @@ class handGestureRecognition():
 
         return predictions
 
+
     # Returns (R, G, B) from name
     def name_to_color(self, name):
+
         # Take 3 first letters, tolower()
         # lowercased character ord() value rage is 97 to 122, substract 97, multiply by 8
         color = [(ord(c.lower())-97)*8 for c in name[:3]]
+
         return color
 
+
     def drawHandGesture(self, img, handPoints, match, prob):
+
         arr = np.matrix(handPoints)
         max_val = arr.max(0)
         min_val = arr.min(0)
@@ -115,8 +126,12 @@ class handGestureRecognition():
         # Write probability
         cv2.putText(img, f"{100 * prob :.2f}%", (min_val[0,1] + 100, min_val[0,2] + 15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (200, 200, 200), self.FONT_THICKNESS)
 
+
 def main():
+
     print("hello")
 
+
 if __name__ == "__main__":
+    
     main()

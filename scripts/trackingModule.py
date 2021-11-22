@@ -142,7 +142,9 @@ class tracking():
         lmList = normalizedPoints.lmList
 
         roll, yaw, pitch = normalizedPoints.computeOrientation()
+        normalizedPoints.computeDistanceWristMiddleFingerTip(pitch)
         normalizedPoints.drawOrientationVector(img, roll, yaw, pitch)
+
 
         if "INIZIALIZATION" == self.currentState:
             # fill all the queue before START state

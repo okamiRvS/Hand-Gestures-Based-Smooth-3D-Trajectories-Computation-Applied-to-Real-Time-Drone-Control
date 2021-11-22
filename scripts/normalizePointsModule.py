@@ -19,6 +19,8 @@ class normalizePoints():
         self.height = 0
         self.width = 0
 
+        self.zcoord = 0
+
 
     def setSize(self, height, width):
 
@@ -71,6 +73,10 @@ class normalizePoints():
 
         # compute rotation
         tmp = self.transf.rotatate(tmp, theta)
+
+        # save this info to compute the z-coordinate
+        self.wrist = tmp[0]
+        self.middle_finger_tip = tmp[12]
 
         # scale everything respect max distance
         tmp = self.transf.scaleMaxDistance(tmp)     
@@ -191,9 +197,11 @@ class normalizePoints():
         cv2.putText(img, f"Roll: {roll}", (centerVectorEnd[0]+20,centerVectorEnd[1]), font, fontScale, (0, 225, 0), thickness)
         cv2.putText(img, f"Yaw: {yaw}", (centerVectorEnd[0]+20,centerVectorEnd[1]+40), font, fontScale, (0, 225, 0), thickness)
         cv2.putText(img, f"Pitch: {pitch}", (centerVectorEnd[0]+20,centerVectorEnd[1]+80), font, fontScale, (0, 225, 0), thickness)
+        cv2.putText(img, f"MODULE: {self.zcoord}", (centerVectorEnd[0]+20,centerVectorEnd[1]+120), font, fontScale, (0, 225, 0), thickness)
 
 
     def drawAllHandTransformed(self, img):
+
         # scale a bit to draw points on canvas
         tmp = self.tmp
         tmp[:,:-1] = tmp[:,:-1] * 100
@@ -248,4 +256,18 @@ class normalizePoints():
         cv2.line(img, tuple(tmp[18]), tuple(tmp[19]), color, thickness=1)
         cv2.line(img, tuple(tmp[19]), tuple(tmp[20]), color, thickness=1)
 
-        self.tmp = tmp
+        self.tmp = self.tmp[:,:-1]
+
+
+    def computeDistanceWristMiddleFingerTip(self, pitch):
+
+        # they have the same x cause rotation, so just diff y
+        diff = self.middle_finger_tip[1] - self.wrist[1]
+
+        middlePoint = diff/2
+
+        theta = pitch * np.pi / 180
+
+        vecModule = 2 * middlePoint / np.cos(theta)
+        self.zcoord = vecModule
+        #print(f"theta: {pitch}, first: {2*middlePoint}, after: {vecModule}")

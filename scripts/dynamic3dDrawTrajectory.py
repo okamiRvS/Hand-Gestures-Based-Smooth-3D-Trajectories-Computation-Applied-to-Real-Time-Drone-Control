@@ -8,9 +8,11 @@ from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
+
 class dynamic3dDrawTrajectory():
 
     def __init__(self):
+
         plt.ion()
         self.fig = plt.figure()
         self.ax = self.fig.add_subplot(111, projection='3d')
@@ -26,7 +28,8 @@ class dynamic3dDrawTrajectory():
         )
 
         self.start = self.ax.text3D(0, 0, 0, "", zdir='x', size=10, zorder=1, color='black') 
-        self.end = self.ax.text3D(0, 0, 0, "", zdir='x', size=10, zorder=1, color='black') 
+        self.end = self.ax.text3D(0, 0, 0, "", zdir='x', size=10, zorder=1, color='black')
+
 
     def run(self, xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed):
 
@@ -65,7 +68,9 @@ class dynamic3dDrawTrajectory():
             
             #print(xdata, ydata, zdata)
 
+
     def clean(self):
+
         # delete everything
         self.ax.clear()
 
@@ -79,7 +84,9 @@ class dynamic3dDrawTrajectory():
         self.ax.set_ylim3d([-1, 1])
         self.ax.set_zlim3d([0, 1])
 
+
 def main():
+
     '''
     https://matplotlib.org/2.0.2/mpl_toolkits/mplot3d/tutorial.html
     https://stackoverflow.com/questions/5179589/continuous-3d-plotting-i-e-figure-update-using-python-matplotlib
@@ -114,4 +121,5 @@ def main():
         ax.clear()
 
 if __name__ == "__main__":
+    
     main()
