@@ -138,7 +138,19 @@ class tracking():
         tmp[:,0] = ones
 
         res = np.linalg.det(tmp)
-        return -res*1125 # 1125 is empirically computed
+
+        # this is a quadratic form, more stable to zero
+        if res < 0:
+            res = -(res**2)*3500 #3500 is empirically computed
+        else:
+            res = (res**2)*3500 #3500 is empirically computed
+
+        # the part above 90 degrees scale a lot
+        if res < - 90:
+            res = -90 - (res + 90) * 0.1
+        elif res > 90:
+            res = 90 + (res - 90) * 0.1
+        return res
 
     def computeRoll(self, lmList):
         wrist = np.array(lmList[0], dtype=np.int32) # palmo
@@ -180,7 +192,7 @@ class tracking():
             q = np.array(lmList[10], dtype=np.float32)
             r = np.array(lmList[11], dtype=np.float32)
 
-        return self.orientationTest(p, q, r, tol1, tol2, mean) / 3 # 3 is empirical, should be varied respect the distance
+        return self.orientationTest(p, q, r, tol1, tol2, mean)  #  /3 is empirical, should be varied respect the distance
 
     def convertOriginBottomLeft(self, vector):
         # move the origin from top left to bottom left
@@ -256,29 +268,19 @@ class tracking():
         tmp = self.rotatate(tmp, theta)
 
         # scale everything respect max distance
-        tmp = self.scaleMaxDistance(tmp)     
-
-        # save this and scale a bit to draw points on canvas
-        tmp2 = tmp * 100
-        tmp2 = tmp2[:,:-1] + mean + np.array([-300, 0])
-
-        # drawPoint
-        fontScale = 0.3
-        font = cv2.FONT_HERSHEY_DUPLEX
-        thickness = 1
-        color = (255,255,0)
-        cv2.circle(img, ( int(tmp2[0,0]), int(self.height - tmp2[0,1])), radius=0, color=color, thickness=5)
-        cv2.putText(img, "thumb_tip", ( int(tmp2[0,0]) + 10, int(self.height - tmp2[0,1])), font, fontScale, color, thickness)
-        cv2.circle(img, ( int(tmp2[1,0]), int(self.height - tmp2[1,1])), radius=0, color=color, thickness=5)
-        cv2.putText(img, "index_finger_mcp", ( int(tmp2[1,0]) + 10, int(self.height - tmp2[1,1])), font, fontScale, color, thickness)
-        cv2.circle(img, ( int(tmp2[2,0]), int(self.height - tmp2[2,1])), radius=0, color=color, thickness=5)
-        cv2.putText(img, "index_finger_pip", ( int(tmp2[2,0]) + 10, int(self.height - tmp2[2,1])), font, fontScale, color, thickness)
+        tmp = self.scaleMaxDistance(tmp)    
 
         # copmute the difference from the mean between index_finger_mcp and index_finger_pip with the thumb_tip y value
         pointZero = (tmp[1,1] + tmp[2,1]) / 2
-        factNormalized = pointZero - tmp[0,1]
+        res = pointZero - tmp[0,1]
 
-        return -factNormalized*150 # 150 is empirically computed
+        # this is a quadratic form, more stable to zero
+        if res < 0:
+            res = (res**2)* 180 # 180 is empirically computed
+        else:
+            res = -(res**2) * 180
+
+        return res
 
     def drawOrientationVector(self, img, lmList, roll, yaw, pitch):
         wrist = np.array(lmList[0], dtype=np.int32) # palmo
@@ -345,6 +347,19 @@ class tracking():
             cv2.circle(img, position, radius=0, color=color, thickness=5)
             cv2.putText(img, str(i), (position[0]+10, position[1]), font, fontScale, color, thickness)
 
+        # put text on thumb_tip, index_finger_mcp and index_finger_pip
+        color = (0,255,0)
+        position = tuple(tmp[4])
+        cv2.circle(img, position, radius=0, color=color, thickness=5)
+        cv2.putText(img, "thumb_tip", ( position[0] + 10, position[1] ), font, fontScale, color, thickness)
+        position = tuple(tmp[5])
+        cv2.circle(img, position, radius=0, color=color, thickness=5)
+        cv2.putText(img, "index_finger_mcp", ( position[0] + 10, position[1] ), font, fontScale, color, thickness)
+        position = tuple(tmp[6])
+        cv2.circle(img, position, radius=0, color=color, thickness=5)
+        cv2.putText(img, "index_finger_pip", ( position[0] + 10, position[1] ), font, fontScale, color, thickness)
+
+        # connect points to get the hand shape
         color = (0,0,255)
         cv2.line(img, tuple(tmp[0]), tuple(tmp[1]), color, thickness=1)
         cv2.line(img, tuple(tmp[0]), tuple(tmp[5]), color, thickness=1)
