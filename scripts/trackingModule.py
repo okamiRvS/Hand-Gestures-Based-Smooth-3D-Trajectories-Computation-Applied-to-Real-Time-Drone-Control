@@ -10,6 +10,7 @@ import copy
 class tracking():
 
     def __init__(self, queueObj, skipEveryNpoints, trajTimeDuration):
+
         self.queueObj = queueObj 
         self.currentState = "INIZIALIZATION"
         self.tolleranceSTART = 80
@@ -31,7 +32,9 @@ class tracking():
         self.delayToExecuteTrajectory = 50
         self.previousTmpTime = 0
 
+
     def drawLog(self, img, color, checkTollerance, val):
+
         fontScale = 1
         font = cv2.FONT_HERSHEY_DUPLEX
         thickness = 1
@@ -40,7 +43,9 @@ class tracking():
         cv2.putText(img, f"scale: {self.scale}", (10,130), font, fontScale, color, thickness)
         cv2.putText(img, f"{self.currentState}", (10,160), font, fontScale, color, thickness)
 
+
     def draw2dTraj(self, img, xdata, zdata):
+
         numberOfPoints = len(xdata)
 
         for i in range(1, numberOfPoints):
@@ -53,15 +58,21 @@ class tracking():
             
             self.startingPoint = self.endingPoint
 
+
     def setSize(self, height, width):
+        
         self.height = height
         self.width = width
 
+
     def justDrawLast2dTraj(self, img):
+
         xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed = self.traj.skipEveryNpointsFunc()
         self.draw2dTraj(img, xdata, zdata)
 
+
     def distanceFromMeanPoint(self, lmList, val):
+
         # mean of all distances from mean point val and hand landmark in lmList to gain 3d scale factor
         # if it's greater respect of the previous istance than the hand is closer to the camera, otherwise is farther
         # the hand should be totally stopped
@@ -71,7 +82,9 @@ class tracking():
 
         return sum_distances / 21
 
+
     def addTrajectoryPointAndSpeed(self, lmList, val, roll, yaw, pitch):
+
         # mean of all distances from mean point val and hand landmark in lmList
         current_mean_dist = self.distanceFromMeanPoint(lmList, val)
 
@@ -92,7 +105,9 @@ class tracking():
         currentSpeed = self.traj.computeIstantSpeed() # compute istant speed
         self.traj.setSpeed(currentSpeed)
 
+
     def cleanTraj(self):
+
         # clean everything
         self.scale = 0
         self.previous_mean_distance = 0
@@ -100,7 +115,9 @@ class tracking():
         self.drawTraj.clean()
         self.currentState = "START"
 
+
     def executeTrajectory(self, img, xdata, zdata):
+
         numberOfPoints = len(xdata)
 
         for i in range(1, numberOfPoints):
@@ -116,291 +133,16 @@ class tracking():
         positionDrone = ( int(xdata[self.idxPoint] * self.height), int( (1-zdata[self.idxPoint]) * self.width) )
         cv2.circle(img, positionDrone, radius=10, color=(0,0,255), thickness=10)
 
-    def orientationTest(self, p, q, r, tol1, tol2, mean):
-        #testOnThisPhalanges = [[5,6,7], [6,7,8], [9,10,11], [10,11,12], [13,14,15], [14,15,16], [17,18,19], [18,19,20]]
 
-        tmp = np.vstack((p,q))
-        tmp = np.vstack((tmp,r))
-        
-        ones = np.ones(3)
-        tmp[:,0] = ones
+    def run(self, img, normalizedPoints, outputClass, probability):
 
-        # to move the origin from top left to bottom left
-        tmp[:,2] = self.height - tmp[:,2]  
-        mean = np.array([ [mean[0], self.height -  mean[1] ] ], dtype=np.float32)
-
-        # since mean point as anchor translate everything to the origin
-        tmp[:,1:] = tmp[:,1:] - mean
-
-        # scale everything respect max distance
-        maxModule = np.max( np.sqrt([tmp[:,1]**2 + tmp[:,2]**2]) )
-        tmp = tmp / maxModule
-        tmp[:,0] = ones
-
-        res = np.linalg.det(tmp)
-
-        # this is a quadratic form, more stable to zero
-        if res < 0:
-            res = -(res**2)*3500 #3500 is empirically computed
-        else:
-            res = (res**2)*3500 #3500 is empirically computed
-
-        # the part above 90 degrees scale a lot
-        if res < - 90:
-            res = -90 - (res + 90) * 0.1
-        elif res > 90:
-            res = 90 + (res - 90) * 0.1
-        return res
-
-    def computeRoll(self, lmList):
-        wrist = np.array(lmList[0], dtype=np.int32) # palmo
-        middle_finger_tip = np.array(lmList[12], dtype=np.int32) # punta medio
-
-        # to move the origin from top left to bottom left 
-        middle_finger_tip[2] = self.height - middle_finger_tip[2] 
-        wrist[2] = self.height - wrist[2] 
-
-        sin = middle_finger_tip[1] - wrist[1]
-        cos = middle_finger_tip[2] - wrist[2]
-
-        thetarad = np.arctan2(sin, cos)       
-        #print("\narctan2 value : \n", thetarad * 180 / np.pi)
-        thetadeg = thetarad * 180 / np.pi
-        return -thetadeg
-
-
-    def computeYaw(self, lmList, roll, mean):
-
-        if roll < - 5: # "-90"
-            tol1 = 150
-            tol2 = -250
-            p = np.array(lmList[5], dtype=np.float32)
-            q = np.array(lmList[6], dtype=np.float32)
-            r = np.array(lmList[7], dtype=np.float32)
-
-        elif roll > 5: # "+90"
-            tol1 = 150
-            tol2 = -250
-            p = np.array(lmList[5], dtype=np.float32) 
-            q = np.array(lmList[6], dtype=np.float32)
-            r = np.array(lmList[7], dtype=np.float32)
-
-        else: # "0"
-            tol1 = 150
-            tol2 = -250
-            p = np.array(lmList[9], dtype=np.float32) 
-            q = np.array(lmList[10], dtype=np.float32)
-            r = np.array(lmList[11], dtype=np.float32)
-
-        return self.orientationTest(p, q, r, tol1, tol2, mean)  #  /3 is empirical, should be varied respect the distance
-
-    def convertOriginBottomLeft(self, vector):
-        # move the origin from top left to bottom left
-        vector[1] = self.height - vector[1]
-        return vector
-
-    def findAngle(self, vec1, vec2):
- 
-        sin = vec1[0] - vec2[0]
-        cos = vec1[1] - vec2[1]
-
-        theta = np.arctan2(sin, cos)       
-        #print("\narctan2 value : \n", theta * 180 / np.pi)
-
-        return theta
-
-    def translate(self, vec, listPoint): 
-        print("hello")
-        
-    def rotatate(self, tmp, theta):
-
-        # build matrix 2d rotation
-        # https://ncase.me/matrix/
-        Matrix2dRotation = np.array([[np.cos(theta), -np.sin(theta), 0], [np.sin(theta), np.cos(theta), 0], [0, 0, 1]])
-
-        # apply the transformation to the vector
-        tmp = (Matrix2dRotation @ tmp.T).T
-
-        return tmp
-
-    def scaleMaxDistance(self, tmp):
-        distances = np.sqrt([tmp[:,0]**2 + tmp[:,1]**2])
-        maxDistance = np.max(distances)
-        tmp = tmp / maxDistance
-        tmp[:,2] = np.ones( tmp.shape[0] ) # I can delete this, it's not useful, but maybe elegant...
-
-        return tmp
-
-    def computePitch(self, lmList, roll, yaw, mean, img):
-
-        middle_finger_tip = np.array(lmList[12][1:], dtype=np.int32)
-        wrist = np.array(lmList[0][1:], dtype=np.int32)
-
-        thumb_tip = np.array(lmList[4][1:], dtype=np.int32)
-        index_finger_mcp = np.array(lmList[5][1:], dtype=np.int32)
-        index_finger_pip = np.array(lmList[6][1:], dtype=np.int32)
-
-        mean = np.array([mean[0], mean[1]], dtype=np.float32)
-
-        # to move the origin from top left to bottom left 
-        middle_finger_tip = self.convertOriginBottomLeft(middle_finger_tip)
-        wrist = self.convertOriginBottomLeft(wrist)
-
-        thumb_tip = self.convertOriginBottomLeft(thumb_tip)
-        index_finger_mcp = self.convertOriginBottomLeft(index_finger_mcp)
-        index_finger_pip = self.convertOriginBottomLeft(index_finger_pip)
-
-        mean = self.convertOriginBottomLeft(mean)
-
-        # find angle
-        theta = self.findAngle(middle_finger_tip, wrist)
-
-        # create listPoint
-        tmp = np.array([thumb_tip, index_finger_mcp, index_finger_pip])
-
-        # since mean point as anchor translate everything to the origin
-        tmp = tmp - mean
-
-        # concatenate a column of ones at the end
-        tmp = np.hstack( (tmp, np.ones((3,1)) ))
-
-        # compute rotation
-        tmp = self.rotatate(tmp, theta)
-
-        # scale everything respect max distance
-        tmp = self.scaleMaxDistance(tmp)    
-
-        # copmute the difference from the mean between index_finger_mcp and index_finger_pip with the thumb_tip y value
-        pointZero = (tmp[1,1] + tmp[2,1]) / 2
-        res = pointZero - tmp[0,1]
-
-        # this is a quadratic form, more stable to zero
-        if res < 0:
-            res = (res**2)* 180 # 180 is empirically computed
-        else:
-            res = -(res**2) * 180
-
-        return res
-
-    def drawOrientationVector(self, img, lmList, roll, yaw, pitch):
-        wrist = np.array(lmList[0], dtype=np.int32) # palmo
-        middle_finger_tip = np.array(lmList[12], dtype=np.int32) # punta medio
-
-        # compute the vector that pass at the center
-        centerVector = 1.2 * ( middle_finger_tip - wrist )
-
-        centerVectorEnd = wrist + centerVector
-        centerVectorEnd = ( int(centerVectorEnd[1]), int(centerVectorEnd[2]) )
-        centerVectorStart = (wrist[1], wrist[2])
-        cv2.arrowedLine(img, centerVectorStart, centerVectorEnd, (220, 25, 6), thickness=2, line_type=cv2.LINE_AA, shift=0, tipLength=0.3)
-
-        fontScale = 0.5
-        font = cv2.FONT_HERSHEY_DUPLEX
-        thickness = 2
-        cv2.putText(img, f"Roll: {roll}", (centerVectorEnd[0]+20,centerVectorEnd[1]), font, fontScale, (0, 225, 0), thickness)
-        cv2.putText(img, f"Yaw: {yaw}", (centerVectorEnd[0]+20,centerVectorEnd[1]+40), font, fontScale, (0, 225, 0), thickness)
-        cv2.putText(img, f"Pitch: {pitch}", (centerVectorEnd[0]+20,centerVectorEnd[1]+80), font, fontScale, (0, 225, 0), thickness)
-
-    def drawAllHandTransformed(self, img, lmList, mean):
-
-        # initialize array
-        tmp = np.zeros((21,2), dtype=np.float32)
-
-        for i in range(len(lmList)):
-            # create numpy array point
-            tmp[i] = np.array(lmList[i][1:], dtype=np.float32)
-
-            # to move the origin from top left to bottom left 
-            tmp[i] = self.convertOriginBottomLeft(tmp[i])
-
-        mean = np.array([mean[0], mean[1]], dtype=np.float32)
-        mean = self.convertOriginBottomLeft(mean)
-
-        # find angle
-        theta = self.findAngle(tmp[12], tmp[0])
-
-        # since mean point as anchor translate everything to the origin
-        tmp = tmp - mean
-
-        # concatenate a column of ones at the end
-        tmp = np.hstack( (tmp, np.ones((21,1)) ))
-
-        # compute rotation
-        tmp = self.rotatate(tmp, theta)
-
-        # scale everything respect max distance
-        tmp = self.scaleMaxDistance(tmp)     
-
-        # save this and scale a bit to draw points on canvas
-        tmp = tmp[:,:-1] * 100
-        tmp = tmp + mean + np.array([-300, 0])
-        tmp[:,1] = self.height - tmp[:,1]
-        tmp = tmp.astype(int)
-
-        # drawPoint
-        fontScale = 0.3
-        font = cv2.FONT_HERSHEY_DUPLEX
-        thickness = 1
-        color = (255,255,0)
-        for i in range(len(lmList)):
-            position = tuple(tmp[i])
-            cv2.circle(img, position, radius=0, color=color, thickness=5)
-            cv2.putText(img, str(i), (position[0]+10, position[1]), font, fontScale, color, thickness)
-
-        # put text on thumb_tip, index_finger_mcp and index_finger_pip
-        color = (0,255,0)
-        position = tuple(tmp[4])
-        cv2.circle(img, position, radius=0, color=color, thickness=5)
-        cv2.putText(img, "thumb_tip", ( position[0] + 10, position[1] ), font, fontScale, color, thickness)
-        position = tuple(tmp[5])
-        cv2.circle(img, position, radius=0, color=color, thickness=5)
-        cv2.putText(img, "index_finger_mcp", ( position[0] + 10, position[1] ), font, fontScale, color, thickness)
-        position = tuple(tmp[6])
-        cv2.circle(img, position, radius=0, color=color, thickness=5)
-        cv2.putText(img, "index_finger_pip", ( position[0] + 10, position[1] ), font, fontScale, color, thickness)
-
-        # connect points to get the hand shape
-        color = (0,0,255)
-        cv2.line(img, tuple(tmp[0]), tuple(tmp[1]), color, thickness=1)
-        cv2.line(img, tuple(tmp[0]), tuple(tmp[5]), color, thickness=1)
-        cv2.line(img, tuple(tmp[0]), tuple(tmp[17]), color, thickness=1)
-        cv2.line(img, tuple(tmp[1]), tuple(tmp[2]), color, thickness=1)
-        cv2.line(img, tuple(tmp[2]), tuple(tmp[3]), color, thickness=1)
-        cv2.line(img, tuple(tmp[3]), tuple(tmp[4]), color, thickness=1)
-        cv2.line(img, tuple(tmp[5]), tuple(tmp[6]), color, thickness=1)
-        cv2.line(img, tuple(tmp[5]), tuple(tmp[9]), color, thickness=1)
-        cv2.line(img, tuple(tmp[6]), tuple(tmp[7]), color, thickness=1)
-        cv2.line(img, tuple(tmp[7]), tuple(tmp[8]), color, thickness=1)
-        cv2.line(img, tuple(tmp[9]), tuple(tmp[10]), color, thickness=1)
-        cv2.line(img, tuple(tmp[9]), tuple(tmp[13]), color, thickness=1)
-        cv2.line(img, tuple(tmp[10]), tuple(tmp[11]), color, thickness=1)
-        cv2.line(img, tuple(tmp[11]), tuple(tmp[12]), color, thickness=1)
-        cv2.line(img, tuple(tmp[13]), tuple(tmp[14]), color, thickness=1)
-        cv2.line(img, tuple(tmp[14]), tuple(tmp[15]), color, thickness=1)
-        cv2.line(img, tuple(tmp[15]), tuple(tmp[16]), color, thickness=1)
-        cv2.line(img, tuple(tmp[13]), tuple(tmp[17]), color, thickness=1)
-        cv2.line(img, tuple(tmp[17]), tuple(tmp[18]), color, thickness=1)
-        cv2.line(img, tuple(tmp[18]), tuple(tmp[19]), color, thickness=1)
-        cv2.line(img, tuple(tmp[19]), tuple(tmp[20]), color, thickness=1)
-
-    def run(self, img, lmList, outputClass, probability):
-
-        # mean x and y of all hand leandmark
-        x_sum = y_sum = 0
-        for val in lmList:
-            x_sum += val[1]
-            y_sum += val[2]
-        
-        x_mean = x_sum / 21
-        y_mean = y_sum / 21
-        val = np.array([x_mean, y_mean], dtype=np.int32)
+        val = normalizedPoints.mean.astype(int)
         cv2.circle(img, (val[0], val[1]), radius=3, color=(0,255,0), thickness=3)
 
-        roll = self.computeRoll(lmList)
-        yaw = self.computeYaw(lmList, roll, val) # ATTENTION REMEMBER THAT THERE IS ALSO THE YAW I NEED TO COMPUTE IT
-        pitch = self.computePitch(lmList, roll, yaw, val, img)
-        self.drawOrientationVector(img, lmList, roll, yaw, pitch)
-        self.drawAllHandTransformed(img, lmList, val)
+        lmList = normalizedPoints.lmList
+
+        roll, yaw, pitch = normalizedPoints.computeOrientation()
+        normalizedPoints.drawOrientationVector(img, roll, yaw, pitch)
 
         if "INIZIALIZATION" == self.currentState:
             # fill all the queue before START state
@@ -540,7 +282,10 @@ class tracking():
 
 
 def main():
+
    print("hello")
 
+
 if __name__ == "__main__":
+    
     main()

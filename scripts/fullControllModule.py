@@ -6,6 +6,7 @@ import handTrackingModule as htm
 import handGestureModule as hgm
 import queueModule as qm
 import trackingModule as tm
+import normalizePointsModule as normalize
 from numba import jit
 import numpy as np
 import pdb
@@ -14,6 +15,7 @@ from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
 
 def getKeyboardInput(me):
+
     #left-right, foward-back, up-down, yaw velocity
     lr, fb, ud, yv = 0, 0, 0, 0
     speed = 30
@@ -39,11 +41,14 @@ def getKeyboardInput(me):
 
     return [lr, fb, ud, yv]
 
+
 def main():
+
     global img
 
     detector = htm.handDetector()
     gestureDetector = hgm.handGestureRecognition()
+    normalizedPoints = normalize.normalizePoints()
 
     queue = qm.queueObj(lenMaxQueue=35)
     tracking = tm.tracking(queue, skipEveryNpoints=4, trajTimeDuration=40) # trajTimeDuration is in seconds
@@ -68,9 +73,11 @@ def main():
             # set size
             if resize:
                 tracking.setSize(xResize, yResize)
+                normalizedPoints.setSize(xResize, yResize)
             else:
                 height, width, _ = img.shape
                 tracking.setSize(height, width)
+                normalizedPoints.setSize(height, width)
         else:
             success = False
     else:
@@ -87,7 +94,6 @@ def main():
         else:
             height, width, _ = img.shape
             tracking.setSize(height, width)
-
 
     while True:
 
@@ -110,9 +116,14 @@ def main():
         lmList = detector.findPosition(img, draw=False)
 
         if len(lmList) != 0:
+            # setArray, computeMean, normalize points, and draw
+            normalizedPoints.setArray(lmList)
+            normalizedPoints.normalize()
+            normalizedPoints.drawAllHandTransformed(img)
+
             # hand gesture recognition
             img, outputClass, probability = gestureDetector.processHands(img, lmList)
-            tracking.run(img, lmList, outputClass, probability)
+            tracking.run(img, normalizedPoints, outputClass, probability)
         else:
             tracking.justDrawLast2dTraj(img)
 
