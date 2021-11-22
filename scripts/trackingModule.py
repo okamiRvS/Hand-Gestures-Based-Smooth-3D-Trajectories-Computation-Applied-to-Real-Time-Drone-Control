@@ -215,7 +215,7 @@ class tracking():
         distances = np.sqrt([tmp[:,0]**2 + tmp[:,1]**2])
         maxDistance = np.max(distances)
         tmp = tmp / maxDistance
-        tmp[:,2] = np.ones(3) # I can delete this, it's not useful, but maybe elegant...
+        tmp[:,2] = np.ones( tmp.shape[0] ) # I can delete this, it's not useful, but maybe elegant...
 
         return tmp
 
@@ -299,6 +299,75 @@ class tracking():
         cv2.putText(img, f"Yaw: {yaw}", (centerVectorEnd[0]+20,centerVectorEnd[1]+40), font, fontScale, (0, 225, 0), thickness)
         cv2.putText(img, f"Pitch: {pitch}", (centerVectorEnd[0]+20,centerVectorEnd[1]+80), font, fontScale, (0, 225, 0), thickness)
 
+    def drawAllHandTransformed(self, img, lmList, mean):
+
+        # initialize array
+        tmp = np.zeros((21,2), dtype=np.float32)
+
+        for i in range(len(lmList)):
+            # create numpy array point
+            tmp[i] = np.array(lmList[i][1:], dtype=np.float32)
+
+            # to move the origin from top left to bottom left 
+            tmp[i] = self.convertOriginBottomLeft(tmp[i])
+
+        mean = np.array([mean[0], mean[1]], dtype=np.float32)
+        mean = self.convertOriginBottomLeft(mean)
+
+        # find angle
+        theta = self.findAngle(tmp[12], tmp[0])
+
+        # since mean point as anchor translate everything to the origin
+        tmp = tmp - mean
+
+        # concatenate a column of ones at the end
+        tmp = np.hstack( (tmp, np.ones((21,1)) ))
+
+        # compute rotation
+        tmp = self.rotatate(tmp, theta)
+
+        # scale everything respect max distance
+        tmp = self.scaleMaxDistance(tmp)     
+
+        # save this and scale a bit to draw points on canvas
+        tmp = tmp[:,:-1] * 100
+        tmp = tmp + mean + np.array([-300, 0])
+        tmp[:,1] = self.height - tmp[:,1]
+        tmp = tmp.astype(int)
+
+        # drawPoint
+        fontScale = 0.3
+        font = cv2.FONT_HERSHEY_DUPLEX
+        thickness = 1
+        color = (255,255,0)
+        for i in range(len(lmList)):
+            position = tuple(tmp[i])
+            cv2.circle(img, position, radius=0, color=color, thickness=5)
+            cv2.putText(img, str(i), (position[0]+10, position[1]), font, fontScale, color, thickness)
+
+        color = (0,0,255)
+        cv2.line(img, tuple(tmp[0]), tuple(tmp[1]), color, thickness=1)
+        cv2.line(img, tuple(tmp[0]), tuple(tmp[5]), color, thickness=1)
+        cv2.line(img, tuple(tmp[0]), tuple(tmp[17]), color, thickness=1)
+        cv2.line(img, tuple(tmp[1]), tuple(tmp[2]), color, thickness=1)
+        cv2.line(img, tuple(tmp[2]), tuple(tmp[3]), color, thickness=1)
+        cv2.line(img, tuple(tmp[3]), tuple(tmp[4]), color, thickness=1)
+        cv2.line(img, tuple(tmp[5]), tuple(tmp[6]), color, thickness=1)
+        cv2.line(img, tuple(tmp[5]), tuple(tmp[9]), color, thickness=1)
+        cv2.line(img, tuple(tmp[6]), tuple(tmp[7]), color, thickness=1)
+        cv2.line(img, tuple(tmp[7]), tuple(tmp[8]), color, thickness=1)
+        cv2.line(img, tuple(tmp[9]), tuple(tmp[10]), color, thickness=1)
+        cv2.line(img, tuple(tmp[9]), tuple(tmp[13]), color, thickness=1)
+        cv2.line(img, tuple(tmp[10]), tuple(tmp[11]), color, thickness=1)
+        cv2.line(img, tuple(tmp[11]), tuple(tmp[12]), color, thickness=1)
+        cv2.line(img, tuple(tmp[13]), tuple(tmp[14]), color, thickness=1)
+        cv2.line(img, tuple(tmp[14]), tuple(tmp[15]), color, thickness=1)
+        cv2.line(img, tuple(tmp[15]), tuple(tmp[16]), color, thickness=1)
+        cv2.line(img, tuple(tmp[13]), tuple(tmp[17]), color, thickness=1)
+        cv2.line(img, tuple(tmp[17]), tuple(tmp[18]), color, thickness=1)
+        cv2.line(img, tuple(tmp[18]), tuple(tmp[19]), color, thickness=1)
+        cv2.line(img, tuple(tmp[19]), tuple(tmp[20]), color, thickness=1)
+
     def run(self, img, lmList, outputClass, probability):
 
         # mean x and y of all hand leandmark
@@ -316,6 +385,7 @@ class tracking():
         yaw = self.computeYaw(lmList, roll, val) # ATTENTION REMEMBER THAT THERE IS ALSO THE YAW I NEED TO COMPUTE IT
         pitch = self.computePitch(lmList, roll, yaw, val, img)
         self.drawOrientationVector(img, lmList, roll, yaw, pitch)
+        self.drawAllHandTransformed(img, lmList, val)
 
         if "INIZIALIZATION" == self.currentState:
             # fill all the queue before START state
