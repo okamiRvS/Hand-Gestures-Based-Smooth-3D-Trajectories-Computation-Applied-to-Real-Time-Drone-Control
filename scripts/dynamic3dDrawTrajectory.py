@@ -44,6 +44,41 @@ class dynamic3dDrawTrajectory():
             #self.ax.plot3D(xdata, ydata, zdata, c='gray')
             surf = self.ax.scatter(xdata, ydata, zdata, s=speed,c=speed, vmin = 2, vmax = 10)
 
+            # # draw vector of direction
+            # # vec=(1,0,0) in homogeneous coordinates
+            # vec = np.array([1,0,0,1])
+
+            # directionx = []
+            # directiony = []
+            # directionz = []
+            # for i in range(len(rolldata)):
+            #     roll = rolldata[i] * np.pi / 180
+            #     yaw = yawdata[i] * np.pi / 180
+            #     pitch = pitchdata[i] * np.pi / 180
+            #     Matrix3dRotationX = np.array([[1, 0, 0, 0], [0, np.cos(roll), np.sin(roll), 0], [0, -np.sin(roll), np.cos(roll), 0], [0, 0, 0, 1]])
+            #     Matrix3dRotationY = np.array([[np.cos(yaw), 0, -np.sin(yaw), 0], [0, 1, 0, 0], [np.sin(yaw), 0, np.cos(yaw), 0], [0, 0, 0, 1]])
+            #     Matrix3dRotationZ = np.array([[np.cos(pitch), -np.sin(pitch), 0, 0], [np.sin(pitch), np.cos(pitch), 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]])
+
+            #     vec = (Matrix3dRotationX @ vec.T).T
+            #     vec = (Matrix3dRotationY @ vec.T).T
+            #     vec = (Matrix3dRotationZ @ vec.T).T
+
+            #     vec = vec.astype(int)
+
+            #     directionx.append(xdata + vec[0])
+            #     directiony.append(ydata + vec[1])
+            #     directionz.append(zdata + vec[2])
+
+            # self.ax.quiver(xdata,
+            #         ydata,
+            #         zdata,
+            #         directionx,
+            #         directiony,
+            #         directionz,
+            #         length=0.1,
+            #         normalize=True)
+ 
+
             lenList = len(xdata)
             if lenList > 1:
                 # speed[0] is zero so the point has size zero, so its't not visibile in the graph
