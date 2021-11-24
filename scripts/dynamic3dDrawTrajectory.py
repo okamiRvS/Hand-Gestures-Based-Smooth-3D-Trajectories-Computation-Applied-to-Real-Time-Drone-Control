@@ -31,12 +31,12 @@ class dynamic3dDrawTrajectory():
         self.end = self.ax.text3D(0, 0, 0, "", zdir='x', size=10, zorder=1, color='black')
 
 
-    def run(self, xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed):
+    def run(self, xdata, ydata, zdata, directionx, directiony, directionz, speed):
 
         currentTime = time.time()
         
         if currentTime > self.nextTime:
-            self.nextTime = currentTime + 2
+            self.nextTime = currentTime + 1 #currentTime + 2
 
             #print(xdata, ydata, zdata)
             #print(speed)
@@ -44,39 +44,10 @@ class dynamic3dDrawTrajectory():
             #self.ax.plot3D(xdata, ydata, zdata, c='gray')
             surf = self.ax.scatter(xdata, ydata, zdata, s=speed,c=speed, vmin = 2, vmax = 10)
 
-            # # draw vector of direction
-            # # vec=(1,0,0) in homogeneous coordinates
-            # vec = np.array([1,0,0,1])
-
-            # directionx = []
-            # directiony = []
-            # directionz = []
-            # for i in range(len(rolldata)):
-            #     roll = rolldata[i] * np.pi / 180
-            #     yaw = yawdata[i] * np.pi / 180
-            #     pitch = pitchdata[i] * np.pi / 180
-            #     Matrix3dRotationX = np.array([[1, 0, 0, 0], [0, np.cos(roll), np.sin(roll), 0], [0, -np.sin(roll), np.cos(roll), 0], [0, 0, 0, 1]])
-            #     Matrix3dRotationY = np.array([[np.cos(yaw), 0, -np.sin(yaw), 0], [0, 1, 0, 0], [np.sin(yaw), 0, np.cos(yaw), 0], [0, 0, 0, 1]])
-            #     Matrix3dRotationZ = np.array([[np.cos(pitch), -np.sin(pitch), 0, 0], [np.sin(pitch), np.cos(pitch), 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]])
-
-            #     vec = (Matrix3dRotationX @ vec.T).T
-            #     vec = (Matrix3dRotationY @ vec.T).T
-            #     vec = (Matrix3dRotationZ @ vec.T).T
-
-            #     vec = vec.astype(int)
-
-            #     directionx.append(xdata + vec[0])
-            #     directiony.append(ydata + vec[1])
-            #     directionz.append(zdata + vec[2])
-
-            # self.ax.quiver(xdata,
-            #         ydata,
-            #         zdata,
-            #         directionx,
-            #         directiony,
-            #         directionz,
-            #         length=0.1,
-            #         normalize=True)
+            # draw vector of direction
+            self.ax.quiver(xdata, ydata, zdata, # <-- starting point of vector
+                    directionx, directiony, directionz, # <-- directions of vector
+                    length=0.1, normalize=True)
  
 
             lenList = len(xdata)
@@ -100,7 +71,9 @@ class dynamic3dDrawTrajectory():
             plt.draw()
             #plt.pause(0.5)
   
-            
+            # print(directionx[-1], directiony[-1], directionz[-1])
+            # print(xdata[-1], ydata[-1], zdata[-1])
+
             #print(xdata, ydata, zdata)
 
 
@@ -116,7 +89,7 @@ class dynamic3dDrawTrajectory():
 
         # Set each axis limits
         self.ax.set_xlim3d([0, 1])
-        self.ax.set_ylim3d([-1, 1])
+        self.ax.set_ylim3d([1, -1])
         self.ax.set_zlim3d([0, 1])
 
 

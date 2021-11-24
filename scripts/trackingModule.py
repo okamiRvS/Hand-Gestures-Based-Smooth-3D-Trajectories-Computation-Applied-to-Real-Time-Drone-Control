@@ -51,7 +51,7 @@ class tracking():
         numberOfPoints = len(xdata)
 
         for i in range(1, numberOfPoints):
-            self.endingPoint = ( int(xdata[i] * self.height), int( (1-zdata[i]) * self.width) )
+            self.endingPoint = ( int(xdata[i] * self.width), int( (1-zdata[i]) * self.height) )
             cv2.circle(img, self.startingPoint, radius=0, color=(0,255,0), thickness=-1)
             cv2.circle(img, self.endingPoint, radius=0, color=(0,255,0), thickness=-1)
             
@@ -69,7 +69,7 @@ class tracking():
 
     def justDrawLast2dTraj(self, img):
 
-        xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed = self.traj.skipEveryNpointsFunc()
+        xdata, ydata, zdata, directionx, directiony, directionz, speed = self.traj.skipEveryNpointsFunc()
         self.draw2dTraj(img, xdata, zdata)
 
 
@@ -98,9 +98,9 @@ class tracking():
         #print(self.scale)
         self.previous_mean_distance = current_mean_dist
 
-        self.traj.addPoint(x = val[0] / self.height,
+        self.traj.addPoint(x = val[0] / self.width,
                            y = self.scale / 50,
-                           z = 1 - (val[1] / self.width),
+                           z = 1 - (val[1] / self.height),
                            roll = roll,
                            yaw = yaw,
                            pitch = pitch)
@@ -167,10 +167,9 @@ class tracking():
                 if len(self.traj.trajSpeed) == 0:
                     # mean of all distances from mean point val and hand landmark in lmList
                     self.previous_mean_distance = self.distanceFromMeanPoint(lmList, val)
-
-                    self.traj.addPoint(x = val[0] / self.height,
+                    self.traj.addPoint(x = val[0] / self.width,
                                        y = self.scale / 50,
-                                       z = 1 - (val[1] / self.width),
+                                       z = 1 - (val[1] / self.height),
                                        roll = roll,
                                        yaw = yaw,
                                        pitch = pitch)
@@ -185,7 +184,7 @@ class tracking():
                 
                 if len(self.trajCOMPLETE) > 0:
 
-                    xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed = self.trajCOMPLETE[-1].skipEveryNpointsFunc()
+                    xdata, ydata, zdata, directionx, directiony, directionz, speed = self.trajCOMPLETE[-1].skipEveryNpointsFunc()
 
                     self.startingPoint = ( int( xdata[1] * self.height),
                                            int( (1- zdata[1]) * self.width) )
@@ -203,7 +202,7 @@ class tracking():
 
             elif self.tolleranceSTART < checkStart < self.tolleranceSTART+100 and self.queueObj.checkGesture("stop"):
                 self.traj.saveLastNValues(nPoints = 20) # take only the last 10 points
-                xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed = self.traj.skipEveryNpointsFunc()
+                xdata, ydata, zdata, directionx, directiony, directionz, speed = self.traj.skipEveryNpointsFunc()
 
                 if len(xdata) > 0: # because otherwise could give index out of range
                     self.currentState = "TRACKING"
@@ -238,8 +237,8 @@ class tracking():
                 self.waitForNewTraj = time.time() + self.timeToCatchAnotherTraj
 
                 # smooth every data
-                xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed = self.trajCOMPLETE[-1].skipEveryNpointsFunc()
-                self.smoothing.setPoints(xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed)
+                xdata, ydata, zdata, directionx, directiony, directionz, speed = self.trajCOMPLETE[-1].skipEveryNpointsFunc()
+                self.smoothing.setPoints(xdata, ydata, zdata, directionx, directiony, directionz, speed)
 
                 # this is useful otherwise there is overlap of old and new points
                 self.drawTraj.clean()
@@ -259,9 +258,9 @@ class tracking():
                 if self.traj.checkTrajTimeDuration():
                     # collect data to draw the 3d trajectory
                     # scale X,Z data from 0 to 1; about scale factor I consider 50 values, but maybe it requires some major details...
-                    self.traj.addPoint(x = val[0] / self.height,
+                    self.traj.addPoint(x = val[0] / self.width,
                                        y = self.scale / 50,
-                                       z = 1 - (val[1] / self.width),
+                                       z = 1 - (val[1] / self.height),
                                        roll = roll,
                                        yaw = yaw,
                                        pitch = pitch)
@@ -270,9 +269,9 @@ class tracking():
                     currentSpeed = self.traj.computeIstantSpeed()
                     self.traj.setSpeed(currentSpeed) # speed is zero at the beginning
                 
-            xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed = self.traj.skipEveryNpointsFunc()
+            xdata, ydata, zdata, directionx, directiony, directionz, speed = self.traj.skipEveryNpointsFunc()
             self.draw2dTraj(img, xdata, zdata)
-            self.drawTraj.run(xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed)
+            self.drawTraj.run(xdata, ydata, zdata, directionx, directiony, directionz, speed)
 
             self.drawLog(img, (255,0,0), checkStartTracking, val)
 
@@ -283,7 +282,7 @@ class tracking():
                 self.cleanTraj()
                 self.currentState = "INIZIALIZATION"
             
-            #xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed = self.trajCOMPLETE[-1].skipEveryNpointsFunc()
+            #xdata, ydata, zdata, directionx, directiony, directionz, speed = self.trajCOMPLETE[-1].skipEveryNpointsFunc()
             xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed = self.smoothing.smoothCalculation()
             self.draw2dTraj(img, xdata, zdata)
 

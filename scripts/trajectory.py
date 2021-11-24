@@ -18,6 +18,10 @@ class trajectory():
         self.yaw = []
         self.pitch = []
 
+        self.directionx = []
+        self.directiony = []
+        self.directionz = []
+
         self.trajSpeed = []
 
         self.skipEveryNpoints = skipEveryNpoints
@@ -47,6 +51,30 @@ class trajectory():
         self.roll.append(roll)
         self.yaw.append(yaw)
         self.pitch.append(pitch)
+
+        self.computeDirection(x, y, z, roll, yaw, pitch)
+
+    def computeDirection(self, x, y, z, roll, yaw, pitch):
+        # this is vec=(1,0,0) in homogeneous coordinates
+
+        vec = np.array([0,1,0,1])
+
+        roll = -roll * np.pi / 180
+        yaw = -yaw * np.pi / 180
+        pitch = -pitch * np.pi / 180
+
+        # https://www.brainvoyager.com/bv/doc/UsersGuide/CoordsAndTransforms/SpatialTransformationMatrices.html
+        Matrix3dRotationX = np.array([[1, 0, 0, 0], [0, np.cos(pitch), np.sin(pitch), 0], [0, -np.sin(pitch), np.cos(pitch), 0], [0, 0, 0, 1]])
+        Matrix3dRotationY = np.array([[np.cos(roll), 0, -np.sin(roll), 0], [0, 1, 0, 0], [np.sin(roll), 0, np.cos(roll), 0], [0, 0, 0, 1]])
+        Matrix3dRotationZ = np.array([[np.cos(yaw), -np.sin(yaw), 0, 0], [np.sin(yaw), np.cos(yaw), 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]])
+
+        vec = (Matrix3dRotationX @ vec.T).T
+        vec = (Matrix3dRotationY @ vec.T).T
+        vec = (Matrix3dRotationZ @ vec.T).T
+
+        self.directionx.append(vec[0])
+        self.directiony.append(vec[1])
+        self.directionz.append(vec[2])
 
 
     def setSpeed(self, speed):
@@ -85,6 +113,10 @@ class trajectory():
         self.yaw = []
         self.pitch = []
 
+        self.directionx = []
+        self.directiony = []
+        self.directionz = []
+
         self.trajSpeed = []
 
 
@@ -99,9 +131,13 @@ class trajectory():
         yawdata = self.yaw[::self.skipEveryNpoints]
         pitchdata = self.pitch[::self.skipEveryNpoints]
 
+        directionx = self.directionx[::self.skipEveryNpoints]
+        directiony = self.directiony[::self.skipEveryNpoints]
+        directionz = self.directionz[::self.skipEveryNpoints]
+
         speed = self.trajSpeed[::self.skipEveryNpoints]
 
-        return xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed
+        return xdata, ydata, zdata, directionx, directiony, directionz, speed
 
 
     def saveLastNValues(self, nPoints):
@@ -120,6 +156,10 @@ class trajectory():
         self.yaw = self.yaw[takeOnly:]
         self.pitch = self.pitch[takeOnly:]
 
+        self.directionx = self.directionx[takeOnly:]
+        self.directiony = self.directiony[takeOnly:]
+        self.directionz = self.directionz[takeOnly:]
+
         self.trajSpeed = self.trajSpeed[takeOnly:]
 
 
@@ -133,6 +173,10 @@ class trajectory():
         self.roll = self.roll[:-numberKeyPoints]
         self.yaw = self.yaw[:-numberKeyPoints]
         self.pitch = self.pitch[:-numberKeyPoints]
+
+        self.directionx = self.directionx[:-numberKeyPoints]
+        self.directiony = self.directiony[:-numberKeyPoints]
+        self.directionz = self.directionz[:-numberKeyPoints]
 
         self.trajSpeed = self.trajSpeed[:-numberKeyPoints]
 

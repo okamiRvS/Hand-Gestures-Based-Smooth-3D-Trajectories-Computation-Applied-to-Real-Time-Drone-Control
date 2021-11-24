@@ -52,7 +52,7 @@ def main():
     normalizedPoints = normalize.normalizePoints()
 
     queue = qm.queueObj(lenMaxQueue=35)
-    tracking = tm.tracking(queue, skipEveryNpoints=4, trajTimeDuration=40) # trajTimeDuration is in seconds
+    tracking = tm.tracking(queue, skipEveryNpoints=4, trajTimeDuration=40) # trajTimeDuration is in seconds (40)
 
     pTime = 0
     cTime = 0

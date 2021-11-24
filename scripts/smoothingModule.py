@@ -38,6 +38,7 @@ class smoothing():
 
         # Computed the spline for the asked distances:
         alpha = np.linspace(0, 1, 75)
+        #alpha = np.linspace(0, 1, 40)
 
         # Linear length along the line:
         if data.shape[0] == 1:
