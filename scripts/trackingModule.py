@@ -5,6 +5,7 @@ import math
 import time
 import dynamic3dDrawTrajectory as d3dT
 import trajectory as traj
+import smoothingModule as sm
 import copy
 
 class tracking():
@@ -19,6 +20,7 @@ class tracking():
         self.scale = 0
         self.previous_mean_distance = 0
         self.drawTraj = d3dT.dynamic3dDrawTrajectory()
+        self.smoothing = sm.smoothing()
 
         self.traj = traj.trajectory(skipEveryNpoints, trajTimeDuration)
         self.trajCOMPLETE = []
@@ -93,7 +95,7 @@ class tracking():
         else:
             self.scale -= 1 * abs(current_mean_dist - self.previous_mean_distance) # same
 
-        print(self.scale)
+        #print(self.scale)
         self.previous_mean_distance = current_mean_dist
 
         self.traj.addPoint(x = val[0] / self.height,
@@ -144,7 +146,6 @@ class tracking():
         roll, yaw, pitch = normalizedPoints.computeOrientation()
         normalizedPoints.computeDistanceWristMiddleFingerTip(pitch)
         normalizedPoints.drawOrientationVector(img, roll, yaw, pitch)
-
 
         if "INIZIALIZATION" == self.currentState:
             # fill all the queue before START state
@@ -236,6 +237,13 @@ class tracking():
                 # wait at least n seconds to catch another trajectory
                 self.waitForNewTraj = time.time() + self.timeToCatchAnotherTraj
 
+                # smooth every data
+                xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed = self.trajCOMPLETE[-1].skipEveryNpointsFunc()
+                self.smoothing.setPoints(xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed)
+
+                # this is useful otherwise there is overlap of old and new points
+                self.drawTraj.clean()
+
             elif checkStartTracking < self.tolleranceTRACKING and self.queueObj.checkGesture("stop"):
                 # mean of all distances from mean point val and hand landmark in lmList
                 current_mean_dist = self.distanceFromMeanPoint(lmList, val)
@@ -245,7 +253,7 @@ class tracking():
                 else:
                     self.scale -= 1 * abs(current_mean_dist - self.previous_mean_distance) # same
 
-                print(self.scale)
+                #print(self.scale)
                 self.previous_mean_distance = current_mean_dist
 
                 if self.traj.checkTrajTimeDuration():
@@ -275,8 +283,10 @@ class tracking():
                 self.cleanTraj()
                 self.currentState = "INIZIALIZATION"
             
-            xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed = self.trajCOMPLETE[-1].skipEveryNpointsFunc()
+            #xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed = self.trajCOMPLETE[-1].skipEveryNpointsFunc()
+            xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed = self.smoothing.smoothCalculation()
             self.draw2dTraj(img, xdata, zdata)
+
             self.drawTraj.run(xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed)
             self.drawLog(img, (0,0,255), 0, val)
 

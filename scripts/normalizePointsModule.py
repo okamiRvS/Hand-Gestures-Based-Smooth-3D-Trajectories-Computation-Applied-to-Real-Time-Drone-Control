@@ -85,6 +85,11 @@ class normalizePoints():
         self.tmp = tmp
 
 
+    def getPointsForNet(self):
+
+        return self.tmp.reshape(-1)
+
+
     def computeOrientation(self):
 
         roll = self.computeRoll()
@@ -199,6 +204,10 @@ class normalizePoints():
         cv2.putText(img, f"Pitch: {pitch}", (centerVectorEnd[0]+20,centerVectorEnd[1]+80), font, fontScale, (0, 225, 0), thickness)
         cv2.putText(img, f"MODULE: {self.zcoord}", (centerVectorEnd[0]+20,centerVectorEnd[1]+120), font, fontScale, (0, 225, 0), thickness)
 
+    def removeHomogeneousCoordinate(self):
+
+        if self.tmp.shape[1] == 3:
+            self.tmp = self.tmp[:,:-1]
 
     def drawAllHandTransformed(self, img):
 
@@ -255,8 +264,6 @@ class normalizePoints():
         cv2.line(img, tuple(tmp[17]), tuple(tmp[18]), color, thickness=1)
         cv2.line(img, tuple(tmp[18]), tuple(tmp[19]), color, thickness=1)
         cv2.line(img, tuple(tmp[19]), tuple(tmp[20]), color, thickness=1)
-
-        self.tmp = self.tmp[:,:-1]
 
 
     def computeDistanceWristMiddleFingerTip(self, pitch):

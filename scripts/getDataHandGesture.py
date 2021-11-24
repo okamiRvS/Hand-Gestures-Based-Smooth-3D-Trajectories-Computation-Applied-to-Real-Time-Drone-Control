@@ -2,6 +2,7 @@ from djitellopy import tello
 import time
 import cv2
 import handTrackingModule as htm
+import normalizePointsModule as normalize
 import pandas as pd 
 import numpy as np
 import os
@@ -13,14 +14,14 @@ getFromWebcam = True
 
 # if true you can save all picture of the data and decide the currentPicture, if false you'll use that data that can
 # be uncorrect (could be useful for real application?)
-takeControl = False
+takeControl = True
 
 # wait from a frame and another
 timeDelay = 0
 
 # define images to collect
 labels = ['stop', 'onefingerup', 'twofingerup', 'thumbsup'] # da migliorare con movimenti avanti e indietro
-number_imgs = 621
+number_imgs = 20
 
 # (207*3)
 # IT'S REALLY IMPORTANT DIVERSIFY THE ORIENTATION THROUGH ROLL, PITCH AND YAW
@@ -39,37 +40,10 @@ number_imgs = 621
         # center 161-183
         # left 184-206
 
-# 207-413 z2 (center)
-    # back
-        # right 207-229
-        # center 230-252
-        # left 253-275
-    # center
-        # right 276-298
-        # center 299-321
-        # left 322-344
-    # front
-        # right 345-367
-        # center 368-390
-        # left 391-413
-
-# 414-620 z3 (foreground)
-    # back
-        # right 414-436
-        # center 437-459
-        # left 460-482
-    # center
-        # right 483-505
-        # center 506-528
-        # left 529-551
-    # front
-        # right 552-574
-        # center 575-597
-        # left 598-620
-
-np_array = np.zeros((len(labels)*number_imgs, 21*2 + 1), dtype=np.int32)
+np_array = np.zeros((len(labels)*number_imgs, 21*2 + 1), dtype=np.float32)
 
 detector = htm.handDetector()
+normalizedPoints = normalize.normalizePoints()
 
 # HERE MAYBE COULD BE USEFUL USE A FACTORY FUNCTION (FROM SOFTWARE ENGENEERING)
 if getFromWebcam:
@@ -78,6 +52,8 @@ if getFromWebcam:
     cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
     if cap.isOpened(): # try to get the first frame
         success, img = cap.read()
+        height, width, _ = img.shape
+        normalizedPoints.setSize(height, width)
     else:
         success = False
 else:
@@ -161,17 +137,6 @@ else:
         }
         json.dump(data, f, ensure_ascii=False, indent=4)
 
-# MAYBE THIS PART IT'S NOT REALLY USEFUL, MAYBE IT WORKS JUST WITH THE FOLLOW CODE TO CREATE FOLDER FOR EACH LABEL
-# create if not exist label folders in imgData 
-'''
-IMGDATA_DIR_PATH = os.path.join('src', 'dataHandGesture', 'imgData')
-if not os.path.exists(IMGDATA_DIR_PATH):
-    if os.name == 'posix': # if linux system
-        os.system(f"mkdir -p {IMGDATA_DIR_PATH}")
-    if os.name == 'nt': # if windows system
-        os.system(f"mkdir {IMGDATA_DIR_PATH}")
-'''
-
 try:
     for label in labels[nLabel:]:
 
@@ -212,24 +177,30 @@ try:
 
                         index = nLabel*number_imgs + imgnum # current_row
 
-                        x_sum = y_sum = 0
-                        # insert values, except for the last element for each row because it is the label that we set after this iteration
-                        for j, val in enumerate(lmList):
-                            np_array[index, j*2] = val[1]
-                            x_sum += val[1]
-                            np_array[index, j*2+1] = val[2]
-                            y_sum += val[2]
+                        normalizedPoints.setArray(lmList)
+                        normalizedPoints.normalize()
+                        normalizedPoints.removeHomogeneousCoordinate()
+                        data = normalizedPoints.getPointsForNet()
 
-                        x_mean = x_sum / 21
-                        y_mean = y_sum / 21
+                        # x_sum = y_sum = 0
+                        # # insert values, except for the last element for each row because it is the label that we set after this iteration
+                        # for j, val in enumerate(lmList):
+                        #     np_array[index, j*2] = val[1]
+                        #     x_sum += val[1]
+                        #     np_array[index, j*2+1] = val[2]
+                        #     y_sum += val[2]
 
-                        # translate all values to the origin
-                        for j in range(42):
-                            if j%2 == 0:
-                                np_array[index, j] = np_array[index, j] - x_mean
-                            else:
-                                np_array[index, j] = np_array[index, j] - y_mean
+                        # x_mean = x_sum / 21
+                        # y_mean = y_sum / 21
 
+                        # # translate all values to the origin
+                        # for j in range(42):
+                        #     if j%2 == 0:
+                        #         np_array[index, j] = np_array[index, j] - x_mean
+                        #     else:
+                        #         np_array[index, j] = np_array[index, j] - y_mean
+
+                        np_array[index, :-1] = data
                         np_array[index, -1] = nLabel # put label on last column
 
                         isLmListEmpty = False

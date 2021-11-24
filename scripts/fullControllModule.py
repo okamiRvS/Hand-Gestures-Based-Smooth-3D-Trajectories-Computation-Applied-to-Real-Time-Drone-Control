@@ -121,9 +121,10 @@ def main():
             normalizedPoints.setArray(lmList)
             normalizedPoints.normalize()
             normalizedPoints.drawAllHandTransformed(img)
+            normalizedPoints.removeHomogeneousCoordinate()
 
             # hand gesture recognition
-            img, outputClass, probability = gestureDetector.processHands(img, lmList)
+            img, outputClass, probability = gestureDetector.processHands(img, normalizedPoints)
             tracking.run(img, normalizedPoints, outputClass, probability)
         else:
             tracking.justDrawLast2dTraj(img)

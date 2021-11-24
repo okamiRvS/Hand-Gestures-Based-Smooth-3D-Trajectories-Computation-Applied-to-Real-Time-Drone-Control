@@ -58,11 +58,17 @@ class trajectory():
         currentTime = time.time()
         deltaTime = currentTime - self.previousTime
         self.previousTime = currentTime
-        distanceSpaceBetweenTwoLast3dPoints = math.sqrt( 
-            ( self.trajPointsX[-2] - self.trajPointsX[-1] )**2 +
-            ( self.trajPointsY[-2] - self.trajPointsY[-1] )**2 +
-            ( self.trajPointsZ[-2] - self.trajPointsZ[-1] )**2
-        )
+
+        try:
+            distanceSpaceBetweenTwoLast3dPoints = math.sqrt( 
+                ( self.trajPointsX[-2] - self.trajPointsX[-1] )**2 +
+                ( self.trajPointsY[-2] - self.trajPointsY[-1] )**2 +
+                ( self.trajPointsZ[-2] - self.trajPointsZ[-1] )**2
+            )
+        except:
+            print("An exception occurred")
+            distanceSpaceBetweenTwoLast3dPoints = 0 # this set currentSpeed to zero
+
         factorScale = 10
         currentSpeed = int(factorScale * distanceSpaceBetweenTwoLast3dPoints/deltaTime)
 
