@@ -91,3 +91,39 @@ Impo:
 Iniziare a scrivere le implementazioni.
 Questa parte della generazione delle traettorie 3d, mediapipe e riconoscimento dei gesti si può iniziare a scrivere.
 E' più interessante fare una buona simulazione (ed eventalmente una presentazione pratica) che tante cose a metà.
+
+
+ROS:
+Show different command:
+rospack -h
+
+rospack list (per guardare tutti i pacchetti installati)
+
+in python puoi usare i pacchetti di python o quelli di ros, ad esempio puoi fare:
+import numpy as np
+oppure
+from geometry_msgs.msg import Twist, Quaternion
+il primo import è dai pacchetti python il secondo dai pacchetti di ros
+
+rospack find turtlesim (per verificare se un pacchetto è installato)
+
+Note to install could be important remove devel and build folder in catkin folder.
+
+To install a package:
+https://industrial-training-master.readthedocs.io/en/melodic/_source/session1/Installing-Existing-Packages.html
+
+To install a package of a specific branch
+git clone https://github.com/tu-darmstadt-ros-pkg/hector_quadrotor.git --branch catkin
+
+To remove a package:
+Type sudo apt-get remove ros-fuerte-package_name in the terminal if you have installed a Debian package. Delete the folder otherwise.
+
+Give permission current folder:
+chmod -R 777 ./
+
+Build projects and restart:
+catkin build
+re.
+
+Start always this command in a terminal when run a project:
+roscore 

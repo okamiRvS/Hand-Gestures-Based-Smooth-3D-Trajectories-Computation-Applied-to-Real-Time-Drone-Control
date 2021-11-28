@@ -9,6 +9,7 @@ src/dataHandGesture/imgData/*
 scripts/test.py
 tfod
 Tensorflow
+ros
 
 .ipynb_checkpoints
 ipynb_checkpoints
