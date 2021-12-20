@@ -7,6 +7,7 @@ import dynamic3dDrawTrajectory as d3dT
 import trajectory as traj
 import smoothingModule as sm
 import copy
+import pandas as pd
 
 class tracking():
 
@@ -69,7 +70,7 @@ class tracking():
 
     def justDrawLast2dTraj(self, img):
 
-        xdata, ydata, zdata, directionx, directiony, directionz, speed = self.traj.skipEveryNpointsFunc()
+        xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed = self.traj.skipEveryNpointsFunc()
         self.draw2dTraj(img, xdata, zdata)
 
 
@@ -184,7 +185,7 @@ class tracking():
                 
                 if len(self.trajCOMPLETE) > 0:
 
-                    xdata, ydata, zdata, directionx, directiony, directionz, speed = self.trajCOMPLETE[-1].skipEveryNpointsFunc()
+                    xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed = self.trajCOMPLETE[-1].skipEveryNpointsFunc()
 
                     self.startingPoint = ( int( xdata[1] * self.height),
                                            int( (1- zdata[1]) * self.width) )
@@ -202,7 +203,7 @@ class tracking():
 
             elif self.tolleranceSTART < checkStart < self.tolleranceSTART+100 and self.queueObj.checkGesture("stop"):
                 self.traj.saveLastNValues(nPoints = 20) # take only the last 10 points
-                xdata, ydata, zdata, directionx, directiony, directionz, speed = self.traj.skipEveryNpointsFunc()
+                xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed = self.traj.skipEveryNpointsFunc()
 
                 if len(xdata) > 0: # because otherwise could give index out of range
                     self.currentState = "TRACKING"
@@ -237,8 +238,8 @@ class tracking():
                 self.waitForNewTraj = time.time() + self.timeToCatchAnotherTraj
 
                 # smooth every data
-                xdata, ydata, zdata, directionx, directiony, directionz, speed = self.trajCOMPLETE[-1].skipEveryNpointsFunc()
-                self.smoothing.setPoints(xdata, ydata, zdata, directionx, directiony, directionz, speed)
+                xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed = self.trajCOMPLETE[-1].skipEveryNpointsFunc()
+                self.smoothing.setPoints(xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed)
 
                 # this is useful otherwise there is overlap of old and new points
                 self.drawTraj.clean()
@@ -269,7 +270,7 @@ class tracking():
                     currentSpeed = self.traj.computeIstantSpeed()
                     self.traj.setSpeed(currentSpeed) # speed is zero at the beginning
                 
-            xdata, ydata, zdata, directionx, directiony, directionz, speed = self.traj.skipEveryNpointsFunc()
+            xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed = self.traj.skipEveryNpointsFunc()
             self.draw2dTraj(img, xdata, zdata)
             self.drawTraj.run(xdata, ydata, zdata, directionx, directiony, directionz, speed)
 
@@ -282,8 +283,9 @@ class tracking():
                 self.cleanTraj()
                 self.currentState = "INIZIALIZATION"
             
-            #xdata, ydata, zdata, directionx, directiony, directionz, speed = self.trajCOMPLETE[-1].skipEveryNpointsFunc()
-            xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed = self.smoothing.smoothCalculation()
+            #xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed = self.trajCOMPLETE[-1].skipEveryNpointsFunc()
+            xdata, ydata, zdata, rolldata, yawdata, pitchdata, dtime, speed = self.smoothing.smoothCalculation()
+            pd.DataFrame(np.array([xdata, ydata, zdata, rolldata, yawdata, pitchdata, dtime, speed])).to_csv("data.csv", index=False, header=None)
             self.draw2dTraj(img, xdata, zdata)
 
             self.drawTraj.run(xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed)

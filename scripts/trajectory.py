@@ -22,12 +22,15 @@ class trajectory():
         self.directiony = []
         self.directionz = []
 
+        self.dtime = []
+
         self.trajSpeed = []
 
         self.skipEveryNpoints = skipEveryNpoints
 
         self.startTimeTraj = 0 # set when start tracking
-        self.previousTime = self.startTimeTraj
+        self.startTime = -1
+        self.previousTime = -1
         self.trajTimeDuration = trajTimeDuration
 
 
@@ -79,12 +82,19 @@ class trajectory():
 
     def setSpeed(self, speed):
 
+        if self.previousTime == -1: #at the beginning
+            self.startTime = time.time()
+            self.previousTime = self.startTime
+            self.dtime.append(0.0)
+            
         self.trajSpeed.append(speed)
+
 
     def computeIstantSpeed(self):
 
         currentTime = time.time()
         deltaTime = currentTime - self.previousTime
+        self.dtime.append(currentTime - self.startTime)
         self.previousTime = currentTime
 
         try:
@@ -117,6 +127,10 @@ class trajectory():
         self.directiony = []
         self.directionz = []
 
+        self.startTime = -1
+        self.previousTime = -1
+        self.dtime = []
+
         self.trajSpeed = []
 
 
@@ -135,9 +149,11 @@ class trajectory():
         directiony = self.directiony[::self.skipEveryNpoints]
         directionz = self.directionz[::self.skipEveryNpoints]
 
+        dtime = self.dtime[::self.skipEveryNpoints]
+
         speed = self.trajSpeed[::self.skipEveryNpoints]
 
-        return xdata, ydata, zdata, directionx, directiony, directionz, speed
+        return xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed
 
 
     def saveLastNValues(self, nPoints):
@@ -160,6 +176,8 @@ class trajectory():
         self.directiony = self.directiony[takeOnly:]
         self.directionz = self.directionz[takeOnly:]
 
+        self.dtime = self.dtime[takeOnly:]
+
         self.trajSpeed = self.trajSpeed[takeOnly:]
 
 
@@ -177,6 +195,8 @@ class trajectory():
         self.directionx = self.directionx[:-numberKeyPoints]
         self.directiony = self.directiony[:-numberKeyPoints]
         self.directionz = self.directionz[:-numberKeyPoints]
+
+        self.dtime = self.dtime[:-numberKeyPoints]
 
         self.trajSpeed = self.trajSpeed[:-numberKeyPoints]
 

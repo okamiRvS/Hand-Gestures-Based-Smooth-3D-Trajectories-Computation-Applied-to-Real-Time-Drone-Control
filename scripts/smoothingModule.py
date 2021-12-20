@@ -6,14 +6,20 @@ import pdb
 
 class smoothing():
 
-    def setPoints(self, xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed):
+    def setPoints(self, xdata, ydata, zdata, rolldata, yawdata, pitchdata, dtime, speed):
 
         coord = np.array([xdata, ydata, zdata]).T
         orientation = np.array([rolldata, yawdata, pitchdata]).T
+        dtime = np.array([dtime], dtype=np.float64)
         speed = np.array([speed])
+
 
         self.coordData = self.smoothData(coord)
         self.orientationData = self.smoothData(orientation)
+
+        tmpTime = self.smoothData(dtime)[0]
+        self.dtime = [np.where(tmpTime < 0, 0, tmpTime)] # to have only positive values
+
         self.speedData = self.smoothData(speed)
        
         # fig = plt.figure()
@@ -31,7 +37,7 @@ class smoothing():
 
     def smoothCalculation(self):
 
-        return self.coordData[0], self.coordData[1], self.coordData[2], self.orientationData[0], self.orientationData[1], self.orientationData[2], self.speedData[0]
+        return self.coordData[0], self.coordData[1], self.coordData[2], self.orientationData[0], self.orientationData[1], self.orientationData[2], self.dtime[0], self.speedData[0]
 
 
     def smoothData(self, data):
