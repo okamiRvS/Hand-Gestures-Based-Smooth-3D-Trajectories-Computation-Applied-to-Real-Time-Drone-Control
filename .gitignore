@@ -1,6 +1,7 @@
 __pycache__/
 altro
 backup
+tello_ros_gazebo
 
 src/known_faces/*
 src/unknown_faces/*

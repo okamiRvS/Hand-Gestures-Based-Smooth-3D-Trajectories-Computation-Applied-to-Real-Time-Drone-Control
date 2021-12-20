@@ -1,10 +1,15 @@
 #!/usr/bin/env python
+from os import read
 import rospy
 from math import *
 import tf
 from geometry_msgs.msg import Pose2D, Twist
+from hector_uav_msgs.srv import EnableMotors
+from std_srvs.srv import Empty
 from nav_msgs.msg import Odometry
 import pdb
+import csv
+import numpy as np
 
 
 class ThymioController(object):
@@ -14,12 +19,58 @@ class ThymioController(object):
         rospy.init_node('controllerByScript', anonymous=True)
         self.velocity_publisher = rospy.Publisher("/cmd_vel", Twist, queue_size=10)
         self.pose_subscriber = rospy.Subscriber(f"/tello/odom", Odometry, self.log_odometry)
-        self.pose = Pose2D()
+        
+        # we need enable the motors to move the drone in the simulation
+        rospy.wait_for_service("/enable_motors") # wait until service isn't running
+        fan = rospy.ServiceProxy("/enable_motors", EnableMotors)
+        fan(enable=True)
+
+        self.pose2d = Pose2D()
         self.vel_msg = Twist()
         rospy.on_shutdown(self.stop)
         frequency = 20.0
         self.rate = rospy.Rate(frequency)
         self.step = rospy.Duration.from_sec(1.0 / frequency)
+
+        # reset model poses when we launch the script
+        rospy.wait_for_service("/gazebo/reset_world")
+        reset = rospy.ServiceProxy("/gazebo/reset_world", Empty)
+        reset()
+        self.sleep()
+
+        self.readCsv() # test
+
+        
+    def readCsv(self):
+        self.pose = []
+        self.orientation = []
+        self.dtime = []
+        self.speed = []
+        with open('/home/usiusi/catkin_ws/src/tello_ros_gazebo/tello_driver/scripts/data.csv') as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=',')
+            line_count = 0
+            for row in csv_reader:
+                print(f'{", ".join(row)}')
+                elem = [float(x) for x in row]
+
+                if line_count < 3:
+                    self.pose.append(elem)
+                elif line_count < 6:
+                    self.orientation.append(elem)
+                elif line_count == 6:
+                    self.dtime.append(elem)
+                elif line_count == 7:
+                    self.speed.append(elem)
+                
+                line_count+=1
+
+                print("\n\n")
+
+        self.pose = np.vstack((self.pose[1], self.pose[0] , self.pose[2])).T * 5
+        print(self.pose)
+        self.orientation = np.vstack((self.orientation[0], self.orientation[1], self.orientation[2])).T
+        self.dtime = self.dtime[0]
+        self.speed = self.speed[0]
 
 
     def human_readable_pose2d(self, pose):
@@ -40,7 +91,7 @@ class ThymioController(object):
 
         #Pose and velocities update
         self.vel_msg = data.twist.twist
-        self.pose = self.human_readable_pose2d(data.pose.pose)
+        self.pose2d = self.human_readable_pose2d(data.pose.pose)
 
         # log robot's pose
         rospy.loginfo_throttle(

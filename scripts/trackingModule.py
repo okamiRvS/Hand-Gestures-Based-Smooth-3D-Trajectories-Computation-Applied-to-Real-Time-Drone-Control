@@ -285,6 +285,7 @@ class tracking():
             
             #xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed = self.trajCOMPLETE[-1].skipEveryNpointsFunc()
             xdata, ydata, zdata, rolldata, yawdata, pitchdata, dtime, speed = self.smoothing.smoothCalculation()
+            pdb.set_trace()
             pd.DataFrame(np.array([xdata, ydata, zdata, rolldata, yawdata, pitchdata, dtime, speed])).to_csv("data.csv", index=False, header=None)
             self.draw2dTraj(img, xdata, zdata)
 
