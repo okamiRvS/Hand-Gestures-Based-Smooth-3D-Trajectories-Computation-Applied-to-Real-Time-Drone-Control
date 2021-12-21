@@ -50,7 +50,9 @@ class ThymioController(object):
             csv_reader = csv.reader(csv_file, delimiter=',')
             line_count = 0
             for row in csv_reader:
-                print(f'{", ".join(row)}')
+                #print(f'{", ".join(row)}')
+                #print("\n\n")
+                
                 elem = [float(x) for x in row]
 
                 if line_count < 3:
@@ -64,10 +66,8 @@ class ThymioController(object):
                 
                 line_count+=1
 
-                print("\n\n")
-
         self.pose = np.vstack((self.pose[1], self.pose[0] , self.pose[2])).T * 5
-        print(self.pose)
+        #print(self.pose)
         self.orientation = np.vstack((self.orientation[0], self.orientation[1], self.orientation[2])).T
         self.dtime = self.dtime[0]
         self.speed = self.speed[0]

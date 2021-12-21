@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <model name="my1stmodel">
+    <static>true</static> <!-- we make the obj static ,so it doesn't fall down, and disable the collision-->
+    <link name="link">
+      <gravity>0</gravity> <!-- this is to disable gravity for this obj-->
+      <!-- <collision name="collision">
+        <geometry>
+          <sphere>
+            <radius>0.1</radius>
+          </sphere>
+        </geometry> 
+      </collision> -->
+      <visual name="sphere">
+        <geometry>
+          <sphere>
+            <radius>0.02</radius>
+          </sphere>
+        </geometry>
+        <material> <!-- Wheel material -->
+          <ambient>0.1 1 0.1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 0</specular>
+          <emissive>0 0 0 1</emissive>
+        </material> <!-- End wheel material -->
+      </visual>
+    </link>
+  </model>
+</sdf>
