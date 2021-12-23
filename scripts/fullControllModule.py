@@ -10,6 +10,7 @@ import normalizePointsModule as normalize
 from numba import jit
 import numpy as np
 import pdb
+import os
 
 from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
@@ -65,10 +66,22 @@ def main():
 
     # HERE MAYBE COULD BE USEFUL USE A FACTORY FUNCTION (FROM SOFTWARE ENGENEERING)
     if getFromWebcam:
+        
         # OPEN WEBCAM
         cv2.namedWindow("Image")
-        cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
-        if cap.isOpened(): # try to get the first frame
+
+        # For Linux, make sure OpenCV is built using the WITH_V4L (with video for linux).
+        # sudo apt install v4l-utils
+        # https://www.youtube.com/watch?v=ec4-1gF-cNU
+        if os.name == 'posix': # if linux system
+            cap = cv2.VideoCapture(0)
+        elif os.name == 'nt': # if windows system
+            cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
+
+        #Check if camera was opened correctly
+        if cap.isOpened():
+
+            # try to get the first frame
             success, img = cap.read()
 
             # set size

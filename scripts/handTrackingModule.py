@@ -1,9 +1,13 @@
 import cv2
 import mediapipe as mp
 import time
+import pdb
+
 
 class handDetector():
+
     def __init__(self, mode=False, maxHands = 2, detectionCon = 0.5, trackCon=0.5 ):
+
         self.mode = mode
         self.maxHands = maxHands
         self.detectionCon = detectionCon
@@ -15,7 +19,9 @@ class handDetector():
                                         self.detectionCon, self.trackCon)
         self.mpDraw = mp.solutions.drawing_utils # this is useful to draw things
 
+
     def findHands(self, img, draw=True):
+
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         self.results = self.hands.process(imgRGB)
         
@@ -29,7 +35,9 @@ class handDetector():
         
         return img
 
+
     def findPosition(self, img, handNo=0, draw=True):
+
         #this is to find a position for a specific hand.
 
         lmList = []
@@ -84,4 +92,5 @@ def main():
     cv2.destroyWindow("preview")
 
 if __name__ == "__main__":
+    
     main()
