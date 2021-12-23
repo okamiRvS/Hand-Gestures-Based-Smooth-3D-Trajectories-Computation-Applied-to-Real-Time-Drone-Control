@@ -8,6 +8,7 @@ import trajectory as traj
 import smoothingModule as sm
 import copy
 import pandas as pd
+import os
 
 class tracking():
 
@@ -33,7 +34,9 @@ class tracking():
 
         self.idxPoint = 0
         self.delayToExecuteTrajectory = 50
+
         self.previousTmpTime = 0
+        self.trajFlag = True
 
 
     def drawLog(self, img, color, checkTollerance, val):
@@ -47,7 +50,10 @@ class tracking():
         cv2.putText(img, f"{self.currentState}", (10,160), font, fontScale, color, thickness)
 
 
-    def draw2dTraj(self, img, xdata, zdata):
+    def draw2dTraj(self, img, xdata, zdata, flag = False):
+
+        if flag:
+            pdb.set_trace()
 
         numberOfPoints = len(xdata)
 
@@ -183,20 +189,44 @@ class tracking():
 
             elif checkStart < self.tolleranceSTART and self.queueObj.checkGesture("thumbsup"): # execute last trajectory
                 
-                if len(self.trajCOMPLETE) > 0:
+                if len(self.trajCOMPLETE) > 0: # if trajectory it exists
 
-                    xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed = self.trajCOMPLETE[-1].skipEveryNpointsFunc()
+                    if os.name == 'posix': # if linux system
 
-                    self.startingPoint = ( int( xdata[1] * self.height),
-                                           int( (1- zdata[1]) * self.width) )
-                    self.executeTrajectory(img, xdata, zdata)
+                        if self.trajFlag:
+                            # destory 3d figure
+                            self.drawTraj.destroy()
+                            self.previousTmpTime = time.time()
+                            self.trajFlag = False 
 
-                    tmpTime = time.time()
-                    if tmpTime > self.previousTmpTime + self.delayToExecuteTrajectory and self.idxPoint < len(xdata)-1:
-                        self.idxPoint += 1
-                        self.previousTime = tmpTime
+                        # draw 2d trajectory
+                        xdata, ydata, zdata, rolldata, yawdata, pitchdata, dtime, speed = self.smoothing.smoothCalculation()
+
+                        self.draw2dTraj(img, xdata, zdata, False)
+
+                        # after n seconds return in this way draw2dTraj() works
+                        if (time.time() - self.previousTmpTime) > 2:
+                            # return data to ros
+                            return xdata, ydata, zdata, rolldata, yawdata, pitchdata, dtime, speed
+                        
+                    elif os.name == 'nt': # if windows system
+
+                        # just execute directly into the window
+
+                        xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed = self.trajCOMPLETE[-1].skipEveryNpointsFunc()
+
+                        self.startingPoint = ( int( xdata[1] * self.height),
+                                            int( (1- zdata[1]) * self.width) )
+                
+                        self.executeTrajectory(img, xdata, zdata)
+
+                        tmpTime = time.time()
+                        if tmpTime > self.previousTmpTime + self.delayToExecuteTrajectory and self.idxPoint < len(xdata)-1:
+                            self.idxPoint += 1
+                            self.previousTime = tmpTime
 
                 else:
+
                     # there is no trajectory in queue...
                     self.cleanTraj()
                     self.currentState = "INIZIALIZATION"
@@ -288,10 +318,7 @@ class tracking():
             
             # export data as csv
             #pd.DataFrame(np.array([xdata, ydata, zdata, rolldata, yawdata, pitchdata, dtime, speed])).to_csv("data.csv", index=False, header=None)
-            
-            # return data
-            return xdata, ydata, zdata, rolldata, yawdata, pitchdata, dtime, speed
-            
+                        
             self.draw2dTraj(img, xdata, zdata)
 
             self.drawTraj.run(xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed)

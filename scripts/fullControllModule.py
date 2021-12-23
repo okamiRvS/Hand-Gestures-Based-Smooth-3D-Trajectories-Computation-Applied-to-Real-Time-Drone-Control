@@ -15,6 +15,8 @@ import os
 from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
 
+from screeninfo import get_monitors
+
 
 class FullControll():
 
@@ -66,11 +68,15 @@ class FullControll():
         
         getFromWebcam = True
 
+        nameWindowWebcam = "Image"
+
         # HERE MAYBE COULD BE USEFUL USE A FACTORY FUNCTION (FROM SOFTWARE ENGENEERING)
         if getFromWebcam:
             
             # OPEN WEBCAM
-            cv2.namedWindow("Image")
+            cv2.namedWindow(nameWindowWebcam)
+
+            cv2.moveWindow(nameWindowWebcam, 0, int( get_monitors()[0].height / 2) + 10)
 
             # For Linux, make sure OpenCV is built using the WITH_V4L (with video for linux).
             # sudo apt install v4l-utils
@@ -157,7 +163,7 @@ class FullControll():
             thickness = 1
             cv2.putText(img, f"FPS: {int(fps)}", (10,40), font, fontScale, (255,0,255), thickness) # print fps
 
-            cv2.imshow("Image", img)
+            cv2.imshow(nameWindowWebcam, img)
             key = cv2.waitKey(1)
             if key == 27: # exit on ESC
                 break

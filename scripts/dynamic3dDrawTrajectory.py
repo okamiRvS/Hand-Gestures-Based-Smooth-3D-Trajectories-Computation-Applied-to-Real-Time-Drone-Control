@@ -77,6 +77,11 @@ class dynamic3dDrawTrajectory():
             #print(xdata, ydata, zdata)
 
 
+    def destroy(self):
+
+        plt.close("all")
+
+
     def clean(self):
 
         # delete everything
