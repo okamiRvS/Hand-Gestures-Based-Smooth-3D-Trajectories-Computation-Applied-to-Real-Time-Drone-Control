@@ -1,9 +1,14 @@
 #!/usr/bin/env python
+import sys
+sys.path.append('/home/usiusi/catkin_ws/src/DJI-Tello-3D-Hand-Gesture-control/scripts')
+import fullControllModule
+
 import rospy
 from math import *
-from geometry_msgs.msg import Pose2D, Pose
-from thymio import ThymioController
-from gazebo_msgs.srv import SpawnModel, DeleteModel, GetModelState
+from geometry_msgs.msg import Pose2D, Pose, Twist
+from thymio import ThymioController, PID
+from gazebo_msgs.msg import ModelState 
+from gazebo_msgs.srv import SpawnModel, DeleteModel, GetModelState, SetModelState
 import pdb
 
 
@@ -27,6 +32,8 @@ class Task1(ThymioController):
             print("Service call failed: %s"%e)
 
         self.numberSpheres = -1
+
+        self.time_take_off = 5
 
 
     def drawPoint(self, event): # callback
@@ -52,51 +59,159 @@ class Task1(ThymioController):
 
 
     def takeoff(self):
-        # Create a Twist message and add linear x and angular z values
-        self.vel_msg.linear.z = .3
+        # # Create a Twist message and add linear x and angular z values
+        # self.vel_msg.linear.z = .3
 
-        #https://roboticsbackend.com/ros-rate-roscpy-roscpp/
-        # Save current time and set publish rate at 20 Hz
-        now = rospy.Time.now()
+        # #https://roboticsbackend.com/ros-rate-roscpy-roscpp/
+        # now = rospy.Time.now()
+
+        # # When using simulated Clock time, rospy.Time.now() returns time 0 until first message has been 
+        # # received on /clock, so 0 means essentially that the client does not know clock time yet. 
+        # # A value of 0 should therefore be treated differently, such as looping over rospy.Time.now()
+        # # until non-zero is returned.
+        # while now.secs == 0:
+        #     now = rospy.Time.now()
+        #     #print("NON ANCORA")
+
+        # step = rospy.Duration.from_sec(3) 
+
+        # # For the next 6 seconds publish cmd_vel
+        # while rospy.Time.now() < now + step:
+        #     rospy.loginfo(f"Current time {rospy.Time.now().secs}s, {rospy.Time.now().nsecs}ns")
+        #     et = now+step
+        #     rospy.loginfo(f"END time {et.secs}s, {et.nsecs}ns")
+        #     self.velocity_publisher.publish(self.vel_msg)
+        #     self.sleep() 
+
+        # rospy.loginfo(f"Current time {rospy.Time.now().secs}s, {rospy.Time.now().nsecs}ns")
+        # et = now+step
+        # rospy.loginfo(f"END time {et.secs}s, {et.nsecs}ns")
+        
 
         # When using simulated Clock time, rospy.Time.now() returns time 0 until first message has been 
         # received on /clock, so 0 means essentially that the client does not know clock time yet. 
         # A value of 0 should therefore be treated differently, such as looping over rospy.Time.now()
         # until non-zero is returned.
-        while now.secs == 0:
-            now = rospy.Time.now()
-            #print("NON ANCORA")
+        start_time = rospy.Time.now()
+        while start_time.secs == 0:
+            start_time = rospy.Time.now()
 
-        step = rospy.Duration.from_sec(3) 
+        current_pose = self.get_model_state("quadrotor", "").pose
 
-        # For the next 6 seconds publish cmd_vel
-        while rospy.Time.now() < now + step:
-            rospy.loginfo(f"Current time {rospy.Time.now().secs}s, {rospy.Time.now().nsecs}ns")
-            et = now+step
-            rospy.loginfo(f"END time {et.secs}s, {et.nsecs}ns")
-            self.velocity_publisher.publish(self.vel_msg)
+        # x_controll = PID(1, 0, 1)
+        # y_controll = PID(1, 0, 1)
+        # x_ang_controll = PID(1, 0, 1)
+        # y_ang_controll = PID(1, 0, 1)
+        # z_ang_controll = PID(1, 0, 1)
+
+        while not rospy.is_shutdown():
+            elapsed_time = rospy.Time.now() - start_time
+            next_time = (elapsed_time + self.step).to_sec()
+            goal_pose = self.next_takeoff_pose(next_time)
+
+            # pos_drone = self.get_model_state("quadrotor", "").pose
+            # self.vel_msg.linear.x = x_controll.step(pos_drone.position.x, self.step.to_sec())
+            # self.vel_msg.linear.y = y_controll.step(pos_drone.position.y, self.step.to_sec())
+            # self.vel_msg.angular.x = x_ang_controll.step(pos_drone.orientation.x, self.step.to_sec())
+            # self.vel_msg.angular.y = y_ang_controll.step(pos_drone.orientation.y, self.step.to_sec())
+            # self.vel_msg.angular.z = z_ang_controll.step(pos_drone.orientation.x, self.step.to_sec())
+            
+            if next_time < self.time_take_off + 2:
+                self.vel_msg.linear.z = self.linear_vel(goal_pose.position.z, current_pose.position.z)
+                self.velocity_publisher.publish(self.vel_msg) 
+            else:
+                self.vel_msg.linear.z = 0
+                self.velocity_publisher.publish(self.vel_msg)
+                self.sleep()
+                break
+
+            current_pose = goal_pose
+            self.sleep()
+
+            
+    def next_takeoff_pose(self, time_delta):
+            
+        pose = Pose()
+        if self.time_take_off > time_delta:
+
+            # we have to start not from zero, otherwise there are problems
+            z = 0.1 + 3 * time_delta / self.time_take_off
+
+            pose.position.z = z
+
+        quadr = self.get_model_state("quadrotor", "")
+        print(time_delta)
+        print(quadr.pose)
+            
+        return pose
+
+
+    def set_position(self, for_x_time, state_msg):
+
+        start_time = rospy.Time.now()
+        while start_time.secs == 0:
+            start_time = rospy.Time.now()
+
+        while not rospy.is_shutdown():
+            elapsed_time = (rospy.Time.now() - start_time).to_sec()
+
+            if elapsed_time < for_x_time:
+
+                rospy.wait_for_service('/gazebo/set_model_state')
+                try:
+                    set_state = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
+                    resp = set_state( state_msg )
+
+                except rospy.ServiceException as e:
+                    print("Service call failed: %s" % e)
+
+                self.vel_msg = Twist()
+                self.velocity_publisher.publish(self.vel_msg)
+
+                #pos_drone = self.get_model_state("quadrotor", "").pose
+                #print(pos_drone)
+            else:
+                break
+            
             self.sleep() 
 
-        rospy.loginfo(f"Current time {rospy.Time.now().secs}s, {rospy.Time.now().nsecs}ns")
-        et = now+step
-        rospy.loginfo(f"END time {et.secs}s, {et.nsecs}ns")
-        
-        # wait a couple of seconds before execute other things
-        now = rospy.Time.now()
-        step = rospy.Duration.from_sec(2) 
-        print("Wait a bit before start the trajectory...")
-        self.vel_msg.linear.z = 0
-        while rospy.Time.now() < now + step:
-            self.velocity_publisher.publish(self.vel_msg)
-            self.sleep() 
+    def test2(self):
 
+        # set position and orientation of the drone
+        state_msg = ModelState()
+        state_msg.model_name = 'quadrotor'
+
+        print("Initialization...")
+        state_msg.pose.position.z = 0.03
+        self.set_position(2, state_msg)
+
+        self.takeoff() #### fly fly little drone
+
+        print("Wait a bit before execute trajectory...")
+        pos_drone = self.get_model_state("quadrotor", "").pose
+        state_msg.pose.position.z = pos_drone.position.z
+        self.set_position(1, state_msg)
 
     def run(self):
-        self.sleep()
 
-        # takeoff
-        self.takeoff()
+        #self.resetPose() # it doesn't work this...
 
+        # set position and orientation of the drone
+        state_msg = ModelState()
+        state_msg.model_name = 'quadrotor'
+
+        print("Initialization...")
+        state_msg.pose.position.z = 0.03
+        self.set_position(2, state_msg)
+
+        self.takeoff() #### fly fly little drone
+
+        print("Wait a bit before execute trajectory...")
+        pos_drone = self.get_model_state("quadrotor", "").pose
+        state_msg.pose.position.z = pos_drone.position.z
+        self.set_position(1, state_msg)
+
+        # start to execute the trajectory
         start_time = rospy.Time.now()
         current_pose = None
 
@@ -187,6 +302,19 @@ if __name__ == '__main__':
 
     try:
         controller = Task1()
-        controller.run()
+
+        fullControll = fullControllModule.FullControll()
+        
+        while True:
+            #Get data from hand
+            resTraj = fullControll.main()
+            controller.normalizeData(resTraj)
+
+            # execute trajectory
+            controller.run()
+            
+            # test
+            #controller.test2()
+
     except rospy.ROSInterruptException as e:
         pass

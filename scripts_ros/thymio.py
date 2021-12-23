@@ -22,10 +22,13 @@ class ThymioController(object):
         
         # we need enable the motors to move the drone in the simulation
         rospy.wait_for_service("/enable_motors") # wait until service isn't running
-        fan = rospy.ServiceProxy("/enable_motors", EnableMotors)
-        fan(enable=True)
+        try:
+            fan = rospy.ServiceProxy("/enable_motors", EnableMotors)
+            fan(enable=True)
+        except rospy.ServiceException as e:
+            print("Service call failed: %s"%e)
 
-        self.pose2d = Pose2D()
+        self.pose2d = Pose2D() # we should delete this
         self.vel_msg = Twist()
         rospy.on_shutdown(self.stop)
         frequency = 20.0
@@ -34,13 +37,19 @@ class ThymioController(object):
 
         # reset model poses when we launch the script
         rospy.wait_for_service("/gazebo/reset_world")
-        reset = rospy.ServiceProxy("/gazebo/reset_world", Empty)
-        reset()
-        self.sleep()
+        self.resetPose = rospy.ServiceProxy("/gazebo/reset_world", Empty)
 
-        self.readCsv() # test
+        # test reading csv file
+        #self.readCsv()
 
         
+    def normalizeData(self, resTraj):
+        self.pose = np.vstack((resTraj[1], resTraj[0] , resTraj[2])).T * 5
+        self.orientation = np.vstack((resTraj[3], resTraj[4], resTraj[5])).T
+        self.dtime = resTraj[6]
+        self.speed = resTraj[7]
+
+
     def readCsv(self):
         self.pose = []
         self.orientation = []
