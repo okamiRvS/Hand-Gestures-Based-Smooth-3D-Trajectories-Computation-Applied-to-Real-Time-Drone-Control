@@ -12,7 +12,7 @@ import os
 
 class tracking():
 
-    def __init__(self, queueObj, skipEveryNpoints, trajTimeDuration):
+    def __init__(self, queueObj, skipEveryNpoints, trajTimeDuration, log3D):
 
         self.queueObj = queueObj 
         self.currentState = "INIZIALIZATION"
@@ -21,7 +21,11 @@ class tracking():
         self.nlastMovements = 5
         self.scale = 0
         self.previous_mean_distance = 0
-        self.drawTraj = d3dT.dynamic3dDrawTrajectory()
+
+        if log3D:
+            self.drawTraj = d3dT.dynamic3dDrawTrajectory()
+        self.log3D = log3D
+
         self.smoothing = sm.smoothing()
 
         self.traj = traj.trajectory(skipEveryNpoints, trajTimeDuration)
@@ -121,7 +125,10 @@ class tracking():
         self.scale = 0
         self.previous_mean_distance = 0
         self.traj.reset()
-        self.drawTraj.clean()
+
+        if self.log3D:
+            self.drawTraj.clean()
+
         self.currentState = "START"
 
 
@@ -273,7 +280,8 @@ class tracking():
                 self.smoothing.setPoints(xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed)
 
                 # this is useful otherwise there is overlap of old and new points
-                self.drawTraj.clean()
+                if self.log3D:
+                    self.drawTraj.clean()
 
             elif checkStartTracking < self.tolleranceTRACKING and self.queueObj.checkGesture("stop"):
                 # mean of all distances from mean point val and hand landmark in lmList
@@ -303,7 +311,9 @@ class tracking():
                 
             xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed = self.traj.skipEveryNpointsFunc()
             self.draw2dTraj(img, xdata, zdata)
-            self.drawTraj.run(xdata, ydata, zdata, directionx, directiony, directionz, speed)
+
+            if self.log3D:
+                self.drawTraj.run(xdata, ydata, zdata, directionx, directiony, directionz, speed)
 
             self.drawLog(img, (255,0,0), checkStartTracking, val)
 
@@ -322,7 +332,9 @@ class tracking():
                         
             self.draw2dTraj(img, xdata, zdata)
 
-            self.drawTraj.run(xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed)
+            if self.log3D:
+                self.drawTraj.run(xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed)
+
             self.drawLog(img, (0,0,255), 0, val)
 
         self.queueObj.addMeanAndMatch(val, outputClass, probability)

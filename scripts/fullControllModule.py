@@ -57,7 +57,7 @@ class FullControll():
         normalizedPoints = normalize.normalizePoints()
 
         queue = qm.queueObj(lenMaxQueue=35)
-        tracking = tm.tracking(queue, skipEveryNpoints=4, trajTimeDuration=10) # trajTimeDuration is in seconds (40)
+        tracking = tm.tracking(queue, skipEveryNpoints=4, trajTimeDuration=10, log3D=False) # trajTimeDuration is in seconds (40)
 
         pTime = 0
         cTime = 0
@@ -76,7 +76,7 @@ class FullControll():
             # OPEN WEBCAM
             cv2.namedWindow(nameWindowWebcam)
 
-            cv2.moveWindow(nameWindowWebcam, 0, int( get_monitors()[0].height / 2) + 10)
+            cv2.moveWindow(nameWindowWebcam, 0, int( get_monitors()[0].height / 2 ) + 10)
 
             # For Linux, make sure OpenCV is built using the WITH_V4L (with video for linux).
             # sudo apt install v4l-utils
