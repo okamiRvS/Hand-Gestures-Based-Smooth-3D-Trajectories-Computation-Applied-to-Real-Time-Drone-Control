@@ -46,7 +46,7 @@ class tracking():
         thickness = 1
         cv2.putText(img, f"checkTollerance: {checkTollerance:.2f}", (10,70), font, fontScale, color, thickness)
         cv2.putText(img, f"val: {val}", (10,100), font, fontScale, color, thickness)
-        cv2.putText(img, f"scale: {self.scale}", (10,130), font, fontScale, color, thickness)
+        cv2.putText(img, f"scale: {round(self.scale, 3)}", (10,130), font, fontScale, color, thickness)
         cv2.putText(img, f"{self.currentState}", (10,160), font, fontScale, color, thickness)
 
 
@@ -152,7 +152,8 @@ class tracking():
 
         roll, yaw, pitch = normalizedPoints.computeOrientation()
         normalizedPoints.computeDistanceWristMiddleFingerTip(pitch)
-        normalizedPoints.drawOrientationVector(img, roll, yaw, pitch)
+        # IF YOU WANT PRINT PITCH, ROLL, YAW
+        #normalizedPoints.drawOrientationVector(img, roll, yaw, pitch)
 
         if "INIZIALIZATION" == self.currentState:
             # fill all the queue before START state
@@ -259,7 +260,7 @@ class tracking():
                 self.currentState = "EXIT"
 
                 # remove last n keypoint because the movemente to thumbup
-                self.traj.thumbsUpFix(numberKeyPoints=30)
+                self.traj.thumbsUpFix(numberKeyPoints=10)
 
                 currentTraj = copy.deepcopy(self.traj)
                 self.trajCOMPLETE.append(currentTraj)

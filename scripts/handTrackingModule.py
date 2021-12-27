@@ -23,13 +23,14 @@ class handDetector():
     def findHands(self, img, draw=True):
 
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        self.results = self.hands.process(imgRGB)
         
-        # if an hand is detected return coordinate position with 
-        #print(results.multi_hand_landmarks) 
-        if self.results.multi_hand_landmarks:
-            for handLms in self.results.multi_hand_landmarks:
-                if draw:
+        if draw:
+            self.results = self.hands.process(imgRGB)
+
+            # if an hand is detected return coordinate position with 
+            #print(results.multi_hand_landmarks) 
+            if self.results.multi_hand_landmarks:
+                for handLms in self.results.multi_hand_landmarks:
                     #mpDraw.draw_landmarks(img, handLms) # we draw each hand detected
                     self.mpDraw.draw_landmarks(img, handLms, self.mpHands.HAND_CONNECTIONS) # we draw each hand detected
         
@@ -45,19 +46,32 @@ class handDetector():
         if self.results.multi_hand_landmarks:
             myHand = self.results.multi_hand_landmarks[handNo]
 
+            #print(self.results.multi_handedness[0].classification[0].label)
+            
             for id, lm in enumerate(myHand.landmark):
+
+
                 #print(id, lm)
                 h, w, c = img.shape
                 cx, cy = int(lm.x * w), int(lm.y * h)
                 # here we know the pixel of the dots-hand
                 lmList.append([id, cx, cy])
+
                 if draw:
+                    
                     cv2.circle(img, (cx, cy), 7, (255, 0, 0), cv2.FILLED)
+
+                    # print depth
+                    if id == 0 or id == 12 or id == 4 or id == 20:
+                        img = cv2.putText(img, f'{round(lm.z, 3)}', (cx+2, cy+2), cv2.FONT_HERSHEY_SIMPLEX, 
+                                        0.6, (0, 255, 0), 1, cv2.LINE_AA)
+
 
         return lmList
 
 
 def main():
+
     pTime = 0
     cTime = 0
 
@@ -80,6 +94,7 @@ def main():
         cv2.imshow("preview", img)
 
         success, img = cap.read()
+        img = cv2.flip(img, 1)
         img = detector.findHands(img)
         lmList = detector.findPosition(img)
         if len(lmList) != 0:

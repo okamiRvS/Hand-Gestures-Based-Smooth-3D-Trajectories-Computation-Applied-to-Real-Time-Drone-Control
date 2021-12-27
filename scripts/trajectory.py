@@ -28,7 +28,7 @@ class trajectory():
 
         self.skipEveryNpoints = skipEveryNpoints
 
-        self.startTimeTraj = 0 # set when start tracking
+        self.startTimeTraj = -1 # set when start tracking
         self.startTime = -1
         self.previousTime = -1
         self.trajTimeDuration = trajTimeDuration
@@ -36,13 +36,17 @@ class trajectory():
 
     def checkTrajTimeDuration(self):
 
+        if self.startTimeTraj == -1:
+            self.startTimeTraj = time.time()
+
         currentTime = time.time()
-        if self.startTimeTraj + self.trajTimeDuration > currentTime:
+        # print(currentTime - self.startTimeTraj > self.trajTimeDuration)
+        # print(currentTime - self.startTimeTraj)
 
-            return True
-        else:
-
+        if currentTime - self.startTimeTraj > self.trajTimeDuration:
             return False
+        else:
+            return True
 
 
     def addPoint(self, x, y, z, roll, yaw, pitch):
@@ -127,6 +131,7 @@ class trajectory():
         self.directiony = []
         self.directionz = []
 
+        self.startTimeTraj = -1
         self.startTime = -1
         self.previousTime = -1
         self.dtime = []
