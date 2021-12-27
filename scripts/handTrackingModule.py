@@ -23,14 +23,13 @@ class handDetector():
     def findHands(self, img, draw=True):
 
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        
-        if draw:
-            self.results = self.hands.process(imgRGB)
+        self.results = self.hands.process(imgRGB)
 
-            # if an hand is detected return coordinate position with 
-            #print(results.multi_hand_landmarks) 
-            if self.results.multi_hand_landmarks:
-                for handLms in self.results.multi_hand_landmarks:
+        # if an hand is detected return coordinate position with 
+        #print(results.multi_hand_landmarks) 
+        if self.results.multi_hand_landmarks:
+            for handLms in self.results.multi_hand_landmarks:
+                if draw:
                     #mpDraw.draw_landmarks(img, handLms) # we draw each hand detected
                     self.mpDraw.draw_landmarks(img, handLms, self.mpHands.HAND_CONNECTIONS) # we draw each hand detected
         
