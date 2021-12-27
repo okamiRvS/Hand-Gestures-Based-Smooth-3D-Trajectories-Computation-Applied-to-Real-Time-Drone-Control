@@ -1,0 +1,265 @@
+\documentclass[mscthesis, 11pt, oneside, openany]{usiinfthesis}
+
+\usepackage[utf8]{inputenc} 
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{float}
+\usepackage{blindtext}
+
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{6}
+
+\usepackage{tocloft}
+\setlength{\cftfignumwidth}{3em}
+
+\usepackage{enumitem}
+
+\usepackage{graphicx}
+\pdfsuppresswarningpagegroup=1
+\usepackage{caption}
+%\usepackage[justification=justified,singlelinecheck=false]{caption}
+\usepackage{subcaption}
+
+\usepackage{url}
+\makeatletter
+\g@addto@macro{\UrlBreaks}{\UrlOrds}
+\makeatother
+\PassOptionsToPackage{hyphens}{url}
+%Import the natbib package and sets a bibliography  and citation styles
+%\bibliographystyle{dinat}
+%\bibliographystyle{alpha}
+%\bibliographystyle{dcu}
+\bibliographystyle{plainnat}
+\setcitestyle{authoryear,open={[},close={]}}
+
+\newfloat{Equation}{htbp}{equ}[chapter]
+\newcommand{\listequationsname}{Equations}
+
+\usepackage{xcolor}
+\usepackage{listings,lstautogobble}
+\definecolor{gray}{gray}{0.5}
+\colorlet{commentcolour}{green!50!black}
+\colorlet{stringcolour}{red!60!black}
+\colorlet{keywordcolour}{blue}
+\colorlet{exceptioncolour}{yellow!50!red}
+\colorlet{commandcolour}{magenta!90!black}
+\colorlet{numpycolour}{blue!60!green}
+\colorlet{literatecolour}{magenta!90!black}
+\colorlet{promptcolour}{green!50!black}
+\colorlet{specmethodcolour}{violet}
+\newcommand*{\literatecolour}{\textcolor{literatecolour}}
+\newcommand*{\pythonprompt}{\textcolor{promptcolour}{{>}{>}{>}}}
+\lstdefinestyle{python}{
+	language=python,
+	showtabs=true,
+	tab=,
+	tabsize=4,
+	basicstyle=\ttfamily\footnotesize,
+	stringstyle=\color{stringcolour},
+	showstringspaces=false,
+	keywordstyle=\color{keywordcolour}\bfseries,
+	emph={as,and,break,class,continue,def,yield,del,elif ,else,%
+		except,exec,finally,for,from,global,if,in,%
+		lambda,not,or,pass,print,raise,return,try,while,assert,with},
+	emphstyle=\color{blue}\bfseries,
+	emph={[2]True, False, None},
+	emphstyle=[3]\color{commandcolour},
+	morecomment=[s]{"""}{"""},
+	commentstyle=\color{commentcolour}\slshape,
+	emph={array, matmul, ones, transpose, float32},
+	emphstyle=[4]\color{numpycolour},
+	emph={[5]assert,yield},
+	emphstyle=[5]\color{keywordcolour}\bfseries,
+	emph={[6]range},
+	emphstyle={[6]\color{keywordcolour}\bfseries},
+	literate=*%
+	{:}{{\literatecolour:}}{1}%
+	{=}{{\literatecolour=}}{1}%
+	{-}{{\literatecolour-}}{1}%
+	{+}{{\literatecolour+}}{1}%
+	{*}{{\literatecolour*}}{1}%
+	{**}{{\literatecolour{**}}}2%
+	{/}{{\literatecolour/}}{1}%
+	{//}{{\literatecolour{//}}}2%
+	{!}{{\literatecolour!}}{1}%
+	{<}{{\literatecolour<}}{1}%
+	{>}{{\literatecolour>}}{1}%
+	{>>>}{\pythonprompt}{3},
+	frame=trbl,
+	rulecolor=\color{black!40},
+	backgroundcolor=\color{gray!5},
+	breakindent=.5\textwidth,
+	frame=single,
+	breaklines=true,
+	basicstyle=\ttfamily\footnotesize,%
+	keywordstyle=\color{keywordcolour},%
+	emphstyle={[7]\color{keywordcolour}},%
+	emphstyle=\color{exceptioncolour},%
+	literate=*%
+	{:}{{\literatecolour:}}{2}%
+	{=}{{\literatecolour=}}{2}%
+	{-}{{\literatecolour-}}{2}%
+	{+}{{\literatecolour+}}{2}%
+	{*}{{\literatecolour*}}2%
+	{**}{{\literatecolour{**}}}3%
+	{/}{{\literatecolour/}}{2}%
+	{//}{{\literatecolour{//}}}{2}%
+	{!}{{\literatecolour!}}{2}%
+	{<}{{\literatecolour<}}{2}%
+	{<=}{{\literatecolour{<=}}}3%
+	{>}{{\literatecolour>}}{2}%
+	{>=}{{\literatecolour{>=}}}3%
+	{==}{{\literatecolour{==}}}3%
+	{!=}{{\literatecolour{!=}}}3%
+	{+=}{{\literatecolour{+=}}}3%
+	{-=}{{\literatecolour{-=}}}3%
+	{*=}{{\literatecolour{*=}}}3%
+	{/=}{{\literatecolour{/=}}}3%
+}
+\lstnewenvironment{python}
+{\lstset{style=python}}
+{}
+
+% Load the package with the acronym option
+\usepackage[titletoc,page]{appendix}
+\makeatletter\@openrightfalse\makeatother
+
+\usepackage[acronym,automake,nonumberlist]{glossaries}
+%\usepackage[noindex]{glossaries-extra}
+
+% Generate the glossary
+\makeglossaries
+\renewcommand*\glspostdescription{\dotfill}
+\renewcommand*\acronymname{ }
+
+\newcommand{\nomNoPrint}[3]{\newglossaryentry{#1}{
+		name={#2},
+		symbol={#2},
+		description={#3},
+		sort={A\three@digits{\value{page}}}
+	}\glsadd[format=hyperbf]{#1}}   
+\makeatother
+
+\newcommand{\nom}[3]{\nomNoPrint{#1}{#2}{#3}#2}
+
+\input{abbreviations}
+\input{acronyms}
+
+\newcommand{\footlabel}[2]{%
+	\addtocounter{footnote}{1}%
+	\footnotetext[\thefootnote]{%
+		\addtocounter{footnote}{-1}%
+		\refstepcounter{footnote}\label{#1}%
+		#2%
+	}%
+	$^{\ref{#1}}$%
+}
+
+\newcommand{\footref}[1]{%
+	$^{\ref{#1}}$%
+}
+
+\lstdefinelanguage{algebra}
+{morekeywords={import,sort,constructors,observers,transformers,axioms,if,
+else,end},
+sensitive=false,
+morecomment=[l]{//s},
+}
+
+\title{DJI Tello 3D Hand Gesture control} 
+%compulsory
+%\specialization{Dependable Distributed Systems}%optional
+%\subtitle{Subtitle: Reinventing the World} %optional 
+\author{Umberto Cocca} %compulsory
+\begin{committee}
+\advisor{Dr.}{Alessandro}{Giusti} %compulsory
+\coadvisor{Dr.}{Loris}{Roveda}{} %optional
+\coadvisor{Dr.}{Gianluigi}{Ciocca}{} %optional
+\end{committee}
+\Day{23} %compulsory
+\Month{February} %compulsory
+\Year{2022} %compulsory, put only the year
+\place{Lugano} %compulsory
+
+\dedication{This is a sentence for all my followers} %optional
+\openepigraph{``Gutta cavat lapidem, non vi sed saepe cadendo.''}
+%optional
+
+%\makeindex %optional, also comment out \theindex at the end
+
+\begin{document}
+\maketitle %generates the titlepage, this is FIXED
+\let\cleardoublepage\clearpage
+\frontmatter %generates the frontmatter, this is FIXED
+%\let\cleardoublepage\clearpage
+\begingroup
+%\let\cleardoublepage\clearpage
+\begin{abstract}
+%\addcontentsline{toc}{chapter}{Abstract}  % added 
+\input{contents/abstract.tex}
+\end{abstract}
+
+
+\begin{acknowledgements}
+%\addcontentsline{toc}{chapter}{Acknowledgements}  % added 
+\input{contents/acknowledgements.tex}
+\end{acknowledgements}
+\endgroup
+
+\tableofcontents 
+\newpage
+
+\begingroup
+\let\cleardoublepage\clearpage
+\listoffigures %optional
+\addcontentsline{toc}{chapter}{List of Figures}
+\clearpage%\cleardoublepage
+\listoftables %optional
+\addcontentsline{toc}{chapter}{List of Tables}
+%\cleardoublepage
+\listof{Equation}{\listequationsname}
+\addcontentsline{toc}{chapter}{List of \listequationsname}
+\lstlistoflistings
+\addcontentsline{toc}{chapter}{List of Listings}
+\endgroup
+%\let\cleardoublepage\relax
+
+\makeatletter
+\renewcommand\mainmatter{\clearpage\@mainmattertrue\pagenumbering{arabic}}
+\makeatother
+
+\mainmatter
+
+\begingroup
+\let\cleardoublepage\clearpage
+\input{contents/introduction}
+\input{contents/literature}
+\input{contents/background}
+\input{contents/implementation}
+\input{contents/model}
+\input{contents/experiments}
+\input{contents/conclusion}
+\endgroup
+
+\appendix %optional, use only if you have an appendix
+
+\begingroup
+\chapter{List of Acronyms}
+\label{chp:acronyms}
+\let\clearpage\relax
+%\glsaddall  % comment to hide unused acronyms
+\vspace*{-120pt}
+\printglossary[type=acronym]
+\endgroup
+
+\backmatter
+
+\nocite{*}
+\bibliography{biblio}
+%\cleardoublepage
+%\theindex %optional, use only if you have an index, must use
+%\makeindex in the preamble
+
+\end{document}
