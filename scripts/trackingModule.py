@@ -202,8 +202,11 @@ class tracking():
                     if os.name == 'posix': # if linux system
 
                         if self.trajFlag:
+                            
                             # destory 3d figure
-                            self.drawTraj.destroy()
+                            if self.log3D:
+                                self.drawTraj.destroy()
+
                             self.previousTmpTime = time.time()
                             self.trajFlag = False 
 
