@@ -1,1 +1,9 @@
-Hello
+Robotics systems are increasingly adopted for filming and photography purposes. Exploiting robots, in fact, it is possible to program complex motions for the camera, achieving high-quality video/photography. \\ 
+
+\noindent These robots, until recent years, must be controlled through physical remote systems, nevertheless, this is not true anymore. Thanks to the latest efforts, a high-fidelity hand and finger tracking solution without specialized hardware needed (e.g. depth sensors, Kinect etc...) was built by MediaPipe machine learning solutions. \\
+
+\noindent Delving into the goal of capturing 3D motions taking advantage of a hand tracking system my contribution was in the first instance to build a gesture recognition neural network, next to set up a robust pipeline that solves different problems during the process of detecting 3D trajectories obtained from 2D pixel landmarks, estimating orientation (roll, yaw pitch) and consequently z-space. The trajectories are based on a dynamic speed, interpolating and smoothing them with ridge regression. \\
+
+\noindent In conclusion, the captured trajectory has been launched on a drone in simulation. It is implemented in the ROS framework, using Gazebo as a tool by reason of robust physics engine with high-quality graphics. \\
+
+\noindent Since hand tracking is a vital component to provide a natural way for interaction and communication in AR/VR then the entire pipeline that has been built to detect the trajectories can be easily translated into another kind of task.

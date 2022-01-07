@@ -281,7 +281,7 @@
 \newcommand{\@place}{\@latex@error{No \noexpand\place given}\@ehc}
 \newcommand{\@crnotice}{\vfill  \noindent Copyright \copyright\ \@year\ by \@author \\ All rights reserved. }
 \newcommand{\@authdecl}{%
-I certify that except where due acknowledgement has been given, the
+\noindent I certify that except where due acknowledgement has been given, the
 work presented in this thesis is that of the author alone; the work
 has not been submitted previously, in whole or in part, to qualify for
 any other academic award; and the content of the thesis is the result
