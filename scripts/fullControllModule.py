@@ -66,7 +66,7 @@ class FullControll():
         xResize = 360
         yResize = 240
         
-        getFromWebcam = True
+        getFromWebcam = False
 
         nameWindowWebcam = "Image"
 
@@ -106,7 +106,6 @@ class FullControll():
             kp.init()
             me = tello.Tello()
             me.connect()
-            print(me.get_battery())
             me.streamon() # to get the stream image
 
             # set size
@@ -128,11 +127,18 @@ class FullControll():
                     time.sleep(0.05)
 
                 img = me.get_frame_read().frame
+                img = cv2.flip(img, 1)
+
+                # print drone battery on screen
+                fontScale = 1
+                font = cv2.FONT_HERSHEY_DUPLEX
+                thickness = 1
+                color = (0,0,255)
+                img = cv2.putText(img, f"Battery: {me.get_battery()}", (10,tracking.height-5), font, fontScale, color, thickness)
 
             if resize:
                 img = cv2.resize(img, (xResize, yResize)) # comment to get bigger frames
-
-            img = cv2.flip(img, 1)
+                img = cv2.flip(img, 1)
             
             img = detector.findHands(img)
             lmList = detector.findPosition(img, draw=False)

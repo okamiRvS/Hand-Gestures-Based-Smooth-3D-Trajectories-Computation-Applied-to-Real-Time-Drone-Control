@@ -91,3 +91,22 @@ Impo:
 Iniziare a scrivere le implementazioni.
 Questa parte della generazione delle traettorie 3d, mediapipe e riconoscimento dei gesti si può iniziare a scrivere.
 E' più interessante fare una buona simulazione (ed eventalmente una presentazione pratica) che tante cose a metà.
+
+
+FATTO:
+- dive opportunity to create or not the log3dtrajectory
+- fix timer duration trajectory
+-non tutte le palle su ros si eliminano
+
+DA FARE:
+-mgliorare framerate su ubuntu
+
+
+Per oggi:
+-stabilire un titolo e inviarlo ai prof per conferma
+-[DONE] aggiungere battery nel display
+-sistemare abstract e altre parti e inviare pdf ai prof
+-contattare il prof ciocca, aggiornandolo sulla data di quando mi voglio laureare, informarlo degli avanzamenti e chiedere anche a lui una lettura/consigli della tesi nei prossimi giorni.
+- informare anche i prof giusti e loris che ho risentito il mio relatore della bicocca
+-aggiungere gesto di "stop", "left", "right" (vedere se funziona)
+-aggiornare pipeline per comandi veloci di controllo con la mano

@@ -35,12 +35,25 @@ def getKeyboardInput():
 
 while True:
     vals = getKeyboardInput()
-    pdb.set_trace()    
-    print(vals[0], vals[1], vals[2], vals[3])
+  
     me.send_rc_control(vals[0], vals[1], vals[2], vals[3])
     sleep(0.05)
 
     img = me.get_frame_read().frame
-    #img = cv2.resize(img, (360, 240))
+    img = cv2.resize(img, (360, 240))
+    height, width, _ = img.shape
+
+    # print drone battery on screen
+    fontScale = 1
+    font = cv2.FONT_HERSHEY_DUPLEX
+    thickness = 1
+    color = (0,0,255)
+    img = cv2.putText(img, f"Battery: {me.get_battery()}", (10,height-5), font, fontScale, color, thickness)
+
+    # print value of command on screen
+    fontScale = 0.8
+    color = (0,255,0)
+    img = cv2.putText(img, f"{vals[0], vals[1], vals[2], vals[3]}", (10,70), font, fontScale, color, thickness)
+
     cv2.imshow("Image", img)
     cv2.waitKey(1)
