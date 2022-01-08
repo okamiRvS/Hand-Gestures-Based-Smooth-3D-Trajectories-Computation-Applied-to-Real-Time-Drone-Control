@@ -2,6 +2,7 @@ from djitellopy import tello
 import keyPressModule as kp
 from time import sleep
 import cv2
+import pdb
 
 kp.init()
 
@@ -34,6 +35,8 @@ def getKeyboardInput():
 
 while True:
     vals = getKeyboardInput()
+    pdb.set_trace()    
+    print(vals[0], vals[1], vals[2], vals[3])
     me.send_rc_control(vals[0], vals[1], vals[2], vals[3])
     sleep(0.05)
 
