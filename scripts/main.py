@@ -193,7 +193,7 @@ class FullControll():
     def autoSet(self):
         # Set if webcam or drone camera source
         # True is webcam, False is drone camera
-        getFromWebcam = True
+        getFromWebcam = False
 
         # Set name window of imshow
         nameWindowWebcam = "Image"
