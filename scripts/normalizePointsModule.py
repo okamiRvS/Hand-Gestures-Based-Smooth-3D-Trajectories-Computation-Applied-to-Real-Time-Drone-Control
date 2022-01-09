@@ -1,3 +1,4 @@
+from typing import Tuple
 import numpy as np
 import pointManipulationModule as pm
 import cv2
@@ -22,16 +23,21 @@ class normalizePoints():
         self.zcoord = 0
 
 
-    def setSize(self, height, width):
+    def setSize(self, height: int, width: int):
+        """
+        Set size of the window.
+        """
 
         self.transf.setSize(height, width)
         self.height = height
         self.width = width
 
 
-    def setArray(self, lmList):
+    def setArray(self, lmList: list):
+        """
+        Set lmList and compute mean x and y of all hand leandmark.
+        """
 
-        # mean x and y of all hand leandmark
         # assign value
         self.lmList = lmList # you should check if more than hand detected...
         tmp = self.tmp
@@ -57,6 +63,10 @@ class normalizePoints():
 
 
     def normalize(self):
+        """
+        Normalize each point using mean, rotatation (to have the hand that always points up)
+        and scale respect max distance.
+        """
 
         mean = copy.deepcopy(self.mean) # LASCIA COSì! DOBBIAMO COPIARE SELF.MEAN
         mean = self.transf.convertOriginBottomLeft(mean)
@@ -90,7 +100,10 @@ class normalizePoints():
         return self.tmp.reshape(-1)
 
 
-    def computeOrientation(self):
+    def computeOrientation(self) -> Tuple[float, float, float]:
+        """
+        Compute roll, yaw and pitch.
+        """
 
         roll = self.computeRoll()
         yaw = self.computeYaw(roll)
@@ -99,14 +112,20 @@ class normalizePoints():
         return roll, yaw, pitch
 
 
-    def computeRoll(self):
+    def computeRoll(self) -> float:
+        """
+        Compute roll.
+        """
 
         thetadeg = self.theta * 180 / np.pi
 
         return -thetadeg
 
 
-    def computeYaw(self, roll):
+    def computeYaw(self, roll: float) -> float:
+        """
+        Compute Yaw.
+        """
 
         if roll < - 5: # "-90"
             tol1 = 150
@@ -132,7 +151,11 @@ class normalizePoints():
         return self.orientationTest(p, q, r, tol1, tol2)
 
 
-    def orientationTest(self, p, q, r, tol1, tol2):
+    def orientationTest(self, p: float, q: float, r: float, tol1: float, tol2: float) -> float:
+        """
+        Compute orientation test of three points with this sequence: p, q, r
+        There are 2 tollerances tol1, tol2
+        """
 
         #testOnThisPhalanges = [[5,6,7], [6,7,8], [9,10,11], [10,11,12], [13,14,15], [14,15,16], [17,18,19], [18,19,20]]
 
@@ -158,7 +181,10 @@ class normalizePoints():
         return res
 
 
-    def computePitch(self):
+    def computePitch(self) -> float:
+        """
+        Compute pitch.
+        """
 
         thumb_tip  = self.tmp[4]
         index_finger_mcp = self.tmp[5]
@@ -183,7 +209,10 @@ class normalizePoints():
         return res
 
     
-    def drawOrientationVector(self, img, roll, yaw, pitch):
+    def drawOrientationVector(self, img: np.array, roll: float, yaw: float, pitch: float):
+        """
+        Draw the orientation vector based on middle_finger_tip and wrist points.
+        """
 
         wrist = np.array(self.lmList[0], dtype=np.int32) # palmo
         middle_finger_tip = np.array(self.lmList[12], dtype=np.int32) # punta medio
@@ -205,11 +234,17 @@ class normalizePoints():
         cv2.putText(img, f"MODULE: {self.zcoord}", (centerVectorEnd[0]+20,centerVectorEnd[1]+120), font, fontScale, (0, 225, 0), thickness)
 
     def removeHomogeneousCoordinate(self):
+        """
+        Remove homogeneous coordinate in the landmarks points.
+        """
 
         if self.tmp.shape[1] == 3:
             self.tmp = self.tmp[:,:-1]
 
-    def drawAllHandTransformed(self, img):
+    def drawAllHandTransformed(self, img: np.array):
+        """
+        Draw all the point that defines the hand after the normalization in the window.
+        """
 
         # scale a bit to draw points on canvas
         tmp = self.tmp
@@ -266,7 +301,10 @@ class normalizePoints():
         cv2.line(img, tuple(tmp[19]), tuple(tmp[20]), color, thickness=1)
 
 
-    def computeDistanceWristMiddleFingerTip(self, pitch):
+    def computeDistanceWristMiddleFingerTip(self, pitch: float):
+        """
+        Compute distance from wrist to middle finger tip.
+        """
 
         # they have the same x cause rotation, so just diff y
         diff = self.middle_finger_tip[1] - self.wrist[1]

@@ -4,7 +4,6 @@ from numba import jit
 import numpy as np
 import pdb
 
-from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
@@ -31,7 +30,10 @@ class dynamic3dDrawTrajectory():
         self.end = self.ax.text3D(0, 0, 0, "", zdir='x', size=10, zorder=1, color='black')
 
 
-    def run(self, xdata, ydata, zdata, directionx, directiony, directionz, speed):
+    def run(self, xdata: list, ydata: list, zdata: list, directionx: list, directiony: list, directionz: list, speed: list):
+        """
+        Update each frame of execution the plot with the new input data.
+        """
 
         currentTime = time.time()
         
@@ -78,12 +80,18 @@ class dynamic3dDrawTrajectory():
 
 
     def destroy(self):
+        """
+        Destroy the plot.
+        """
 
         plt.close("all")
 
 
     def clean(self):
-
+        """
+        Reset the plot. It continues to exist.
+        """
+        
         # delete everything
         self.ax.clear()
 

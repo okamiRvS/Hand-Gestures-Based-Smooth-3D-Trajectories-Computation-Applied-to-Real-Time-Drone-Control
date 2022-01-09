@@ -12,7 +12,6 @@ import numpy as np
 import pdb
 import os
 
-from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
 
 from screeninfo import get_monitors
@@ -57,7 +56,7 @@ class FullControll():
         normalizedPoints = normalize.normalizePoints()
 
         queue = qm.queueObj(lenMaxQueue=35)
-        tracking = tm.tracking(queue, skipEveryNpoints=4, trajTimeDuration=10, log3D=False) # trajTimeDuration is in seconds (40)
+        tracking = tm.tracking(queue, skipEveryNpoints=4, trajTimeDuration=10, log3D=True) # trajTimeDuration is in seconds (40)
 
         pTime = 0
         cTime = 0
@@ -66,7 +65,7 @@ class FullControll():
         xResize = 360
         yResize = 240
         
-        getFromWebcam = False
+        getFromWebcam = True
 
         nameWindowWebcam = "Image"
 
@@ -120,6 +119,8 @@ class FullControll():
 
             if getFromWebcam:
                 success, img = cap.read()
+                img = cv2.flip(img, 1)
+
             else:
                 vals = self.getKeyboardInput(me)
                 if not (vals[0] == vals[1] == vals[2] == vals[3] == 0):

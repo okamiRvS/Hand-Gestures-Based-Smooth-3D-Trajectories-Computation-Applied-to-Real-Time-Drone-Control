@@ -22,6 +22,10 @@ def main():
         print("Left key pressed")
     if getKey("RIGHT"):
         print("Right key pressed")
+    if getKey("UP"):
+        print("UP")
+    if getKey("DOWN"):
+        print("DOWN")
 
 if __name__ == "__main__":
     init()

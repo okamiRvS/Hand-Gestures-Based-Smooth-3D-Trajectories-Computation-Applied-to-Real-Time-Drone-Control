@@ -10,6 +10,7 @@ src/dataHandGesture/imgData/*
 scripts/test.py
 tfod
 Tensorflow
+!Tensorflow\workspace\models\my_hand_gesture_model
 
 .ipynb_checkpoints
 ipynb_checkpoints

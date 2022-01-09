@@ -103,10 +103,19 @@ DA FARE:
 
 
 Per oggi:
--stabilire un titolo e inviarlo ai prof per conferma
+-[DONE]stabilire un titolo e inviarlo ai prof per conferma
 -[DONE] aggiungere battery nel display
--sistemare abstract e altre parti e inviare pdf ai prof
--contattare il prof ciocca, aggiornandolo sulla data di quando mi voglio laureare, informarlo degli avanzamenti e chiedere anche a lui una lettura/consigli della tesi nei prossimi giorni.
-- informare anche i prof giusti e loris che ho risentito il mio relatore della bicocca
+-[DONE]sistemare abstract e altre parti e inviare pdf ai prof
+-[DONE]contattare il prof ciocca, aggiornandolo sulla data di quando mi voglio laureare, informarlo degli avanzamenti e chiedere anche a lui una lettura/consigli della tesi nei prossimi giorni.
+-[DONE]informare anche i prof giusti e loris che ho risentito il mio relatore della bicocca
+
+-inserire commenti al codice
+-rendere più chiaro il main
+-dare in input al drone la traettoria eseguirla e andare a provarla
+-[magari è meglio aspettare prima riposta prof] scrivere nella tesi parte relativa al batch gradient descent per la ridge regression 
+-guardare parte andrew ng sulle NN
+-scrivere nella tesi parte relativa alle reti neurali
 -aggiungere gesto di "stop", "left", "right" (vedere se funziona)
 -aggiornare pipeline per comandi veloci di controllo con la mano
+-nella simulazione aggiungere anche lo yaw (e volendo il pitch e il roll)
+-creare una scena di acquisizione video nella simulazione
