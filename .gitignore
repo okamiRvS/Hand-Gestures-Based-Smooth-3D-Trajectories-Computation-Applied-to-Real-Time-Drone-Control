@@ -20,7 +20,6 @@ Tensorflow/workspace/images/*
 Tensorflow/workspace/pre-trained-models/*
 Tensorflow/workspace/models/my_ssd_mobnet/*
 
-
 .ipynb_checkpoints
 ipynb_checkpoints
 
