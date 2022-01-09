@@ -9,8 +9,17 @@ src/tello_screenshots/*
 src/dataHandGesture/imgData/*
 scripts/test.py
 tfod
-Tensorflow
-!Tensorflow/workspace/models/my_hand_gesture_model
+
+
+Tensorflow/labelimg/*
+Tensorflow/models/*
+Tensorflow/protoc/*
+Tensorflow/scripts/*
+Tensorflow/workspace/annotations/*
+Tensorflow/workspace/images/*
+Tensorflow/workspace/pre-trained-models/*
+Tensorflow/workspace/models/my_ssd_mobnet/*
+
 
 .ipynb_checkpoints
 ipynb_checkpoints
