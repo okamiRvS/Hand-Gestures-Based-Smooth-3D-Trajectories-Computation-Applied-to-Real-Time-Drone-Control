@@ -5,6 +5,7 @@ import cv2
 import copy
 import pdb
 
+
 class normalizePoints():
 
     def __init__(self):

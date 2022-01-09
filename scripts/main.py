@@ -19,28 +19,6 @@ from screeninfo import get_monitors
 
 class FullControll():
 
-    def __init__(self, 
-                getFromWebcam: bool, 
-                nameWindowWebcam: str, 
-                resize: bool, 
-                xResize: int, 
-                yResize: int, 
-                detector: htm.handDetector,
-                gestureDetector: hgm.handGestureRecognition,
-                normalizedPoints: normalize.normalizePoints,
-                tracking: tm.tracking):
-
-        self.getFromWebcam = getFromWebcam
-        self.nameWindowWebcam = nameWindowWebcam
-        self.resize = resize
-        self.xResize = xResize
-        self.yResize = yResize
-        self.detector = detector
-        self.gestureDetector = gestureDetector
-        self.normalizedPoints = normalizedPoints
-        self.tracking = tracking
-       
-
     def getKeyboardInput(self, me: tello.Tello, img: np.array) -> list:
         """
         Get keyboard input to move the drone a fixed speed using a controller.
@@ -212,52 +190,55 @@ class FullControll():
                 break
 
 
+    def autoSet(self):
+        # Set if webcam or drone camera source
+        # True is webcam, False is drone camera
+        getFromWebcam = True
+
+        # Set name window of imshow
+        nameWindowWebcam = "Image"
+
+        # Set if resize input img
+        # if resize is True then width = xResize and height = yResize
+        resize = False
+        xResize = 360
+        yResize = 240
+
+        # Istantiate handDetector obj
+        detector = htm.handDetector()
+
+        #Istantiate handGestureRecognition obj
+        gestureDetector = hgm.handGestureRecognition()
+
+        # Istantiate normalizePoints obj
+        normalizedPoints = normalize.normalizePoints()
+
+        # Create a queue obj of a certain length 
+        queue = qm.queueObj(lenMaxQueue=35)
+
+        # Instantite tracking obj
+        showPlot = True
+        tracking = tm.tracking(queue, 
+                                skipEveryNpoints=4, 
+                                trajTimeDuration=10, # trajTimeDuration is in seconds
+                                log3D=showPlot) 
+
+        # set variable
+        self.getFromWebcam = getFromWebcam
+        self.nameWindowWebcam = nameWindowWebcam
+        self.resize = resize
+        self.xResize = xResize
+        self.yResize = yResize
+        self.detector = detector
+        self.gestureDetector = gestureDetector
+        self.normalizedPoints = normalizedPoints
+        self.tracking = tracking
+
+
 def main():
 
-    global img
-
-    # Set if webcam or drone camera source
-    # True is webcam, False is drone camera
-    getFromWebcam = True
-
-    # Set name window of imshow
-    nameWindowWebcam = "Image"
-
-    # Set if resize input img
-    # if resize is True then width = xResize and height = yResize
-    resize = False
-    xResize = 360
-    yResize = 240
-
-    # Istantiate handDetector obj
-    detector = htm.handDetector()
-
-    #Istantiate handGestureRecognition obj
-    gestureDetector = hgm.handGestureRecognition()
-
-    # Istantiate normalizePoints obj
-    normalizedPoints = normalize.normalizePoints()
-
-    # Create a queue obj of a certain length 
-    queue = qm.queueObj(lenMaxQueue=35)
-
-    # Instantite tracking obj
-    showPlot = True
-    tracking = tm.tracking(queue, 
-                            skipEveryNpoints=4, 
-                            trajTimeDuration=10, # trajTimeDuration is in seconds
-                            log3D=showPlot) 
-
-    # Instantite FullControll obj
-    fullControll = FullControll(getFromWebcam, 
-                                nameWindowWebcam, 
-                                resize, 
-                                xResize, 
-                                yResize, 
-                                detector,
-                                gestureDetector,
-                                normalizedPoints,
-                                tracking)
+    fullControll = FullControll()
+    fullControll.autoSet()                  
     fullControll.run()
 
 
