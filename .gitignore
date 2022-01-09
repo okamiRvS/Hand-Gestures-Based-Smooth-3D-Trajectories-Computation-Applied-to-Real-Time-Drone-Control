@@ -11,10 +11,10 @@ scripts/test.py
 tfod
 
 
-Tensorflow/labelimg/*
+Tensorflow/labelimg
 Tensorflow/models/*
 Tensorflow/protoc/*
-Tensorflow/scripts/*
+Tensorflow/scripts
 Tensorflow/workspace/annotations/*
 Tensorflow/workspace/images/*
 Tensorflow/workspace/pre-trained-models/*
