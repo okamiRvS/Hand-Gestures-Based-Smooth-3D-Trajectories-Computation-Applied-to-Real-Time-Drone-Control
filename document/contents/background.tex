@@ -16,7 +16,7 @@ presented in this thesis.
 % andrew ng - Da pag 3 fino a pag 11 (cioè Polynomial Regression)
 The goal of regression is to predict the value of one or more continuous target variables $t$ given the value of a $D$-dimensional vector $x$ of input variables. \cite[]{bishop:2006:PRML}
 
-\noindent Given a training data set comprising $N$ observations ${x_n}$, where $n = 1, . . . , N$,
+\noindent Given a training data set comprising $N$ observations ${x_n}$, where $n = 1,...,N$,
 together with corresponding target values ${t_n}$, the goal is to predict the value of $t$
 for a new value of $x$.
 
@@ -77,22 +77,24 @@ The simplest linear model for regression is one that involved a linear combinati
 \label{subsec:reglinmulnormeq}
 % Bishop -pattern recognition and machine learning (pg. 25 intro chap 1.1)
 %https://en.wikipedia.org/wiki/Mean_squared_error
-The values of the coefficients will be determined by fitting the polynomial to the training data. This can be done by minimizing an error function that measures the misfit between the function $y(x, w)$, for any given value of $w$, and the training set data points. One simple choice of error function, which is widely used, is given by the sum of the squares of the errors between the predictions $y(x_n, w)$ for each data
-point $x_n$ and the corresponding target values $t_n$, so that we minimize
+The values of the coefficients will be determined by fitting the polynomial to the training data. This can be done by minimizing an error function that measures the misfit between the function $y(x, w)$, for any given value of $w$, and the training set data points. One simple choice of error function, which is widely used, is given by the sum of the squares of the errors between the predictions $y(x_n, w)$ for each data point $x_n$ and the corresponding target values $t_n$ (called also sum of squares regression \cite[]{sum-squares}), so that we minimize:
 
 \begin{Equation}[H]
 	\centering
-	\begin{equation}
+	\begin{equation}\label{eq:mats}
 		E(w)=\frac{1}{2} \sum_{n=1}^{N} [y(x_n,w)-t_n]^2
 	\end{equation}
-	\label{eq:mats}
 \end{Equation}
 
 \noindent where the factor of 1/2 is included for mathematical convenience. It is a nonnegative quantity that would be zero if, and only if, the function $y(x, w)$ were to pass exactly through each training data point.
 
 \noindent We can solve the curve fitting problem by choosing the value of $w$ for which $E(w)$ is as small as possible. Because the error function is a quadratic function of the coefficients $w$, its derivatives with respect to the coefficients will be linear in the elements of $w$, and so the minimization of the error function has a unique solution $w^*$. The resulting polynomial is given by the function $y(x, w^*)$.
 
-\noindent We can  write \ref{eq:mats} (2.5) in matrix notation as:
+% Leggere gli articoli che chiariscono differenza tra MSE e RSS...
+%https://stats.stackexchange.com/questions/73540/what-is-the-relationship-between-the-mean-squared-error-and-the-residual-sum-of
+%https://365datascience.com/tutorials/statistics-tutorials/sum-squares/
+%https://en.wikipedia.org/wiki/Errors_and_residuals#Regressions
+\noindent We can  write (\ref{eq:mats}) in matrix notation as:
 
 \begin{Equation}[H]
 	\centering
@@ -222,7 +224,7 @@ One of the simplest forms of regularizer is given by the sum-of-squares of the w
 %https://en.wikipedia.org/wiki/Ridge_regression
 \noindent This is also called ridge regression, a method of estimating the coefficitents of multiple-regression models in scenarios where indipendent variables are highly correlated.
 
-If we also consider the sum-of-squares error function given by:
+\noindent If we also consider the sum-of-squares error function given by:
 \begin{Equation}[H]
 	\centering
 		\begin{equation}
@@ -233,7 +235,7 @@ If we also consider the sum-of-squares error function given by:
 	\label{eq:mathmodelaada}
 \end{Equation}
 
-then the total error function becomes:
+\noindent then the total error function becomes:
 
 \begin{Equation}[H]
 	\centering
@@ -249,7 +251,7 @@ then the total error function becomes:
 weight decay because in sequential learning algorithms, it encourages weight values
 to decay towards zero.
 
-\noindent Setting the gradient of E(w) wrt w to zero, and solving for w, we obtain:
+\noindent Setting the gradient of $E(w)$ wrt $w$ to zero, and solving for $w$, we obtain:
 
 \begin{Equation}[H]
 	\centering
@@ -266,53 +268,237 @@ to decay towards zero.
 \subsection{(Batch) Gradient Descent}
 \label{subsec:batchgradientdescen}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\iffalse
+
+
 
 \section{Artificial Neural Networks}
 \label{sec:nn}
-In the field of \gls{ml}, \glspl{ann} are mathematical models based on the 
-simplification of Biological Neural Networks \cite[][]{zou2008overview}. 
+The term  \gls{nn} has its origins in attempts to find mathematical representations of information processing in biological systems. In fact, \glspl{ann}, subset of \gls{ml} field, are models inspired from the biological performance of human brain \cite[]{inbook}. 
 
-%FIXME missing reference of the image
-\begin{figure}[htb]
+\begin{figure}[H]
 	\centering
-	\includegraphics[width=.7\textwidth]{contents/images/Neuron}
-	\caption{Structure of a Biological Neuron.}
+	\includegraphics[width=.7\textwidth]{images/Neuron3}
+	\caption[Image of a human neuron.]{Neuron and myelinated axon, with signal flow from inputs at dendrites to outputs at axon terminals. The signal represents a short electrical pulse called 'spike'.}
 	\label{fig:bioneuron}
 \end{figure}
 
-A \gls{nn} can be considered as a dynamic system having the topology of an 
-oriented graph, whose nodes model the neurons in a biological brain, while the 
-edges represent the synapses — interconnections of information.
-Each connection can transmit a signal from one artificial neuron to another,
-which are typically aggregated in layers. The stimuli are received by a level of 
-input nodes, called processing unit, which processes the signal and transmits it to 
-other neurons connected to it.
+\noindent Neurons have cel body (fig. \ref{fig:bioneuron}) and a number of input wires called dendrites. Neurons also have an output wire called axon, used to send signals to other neurons. At a simplistic level the neuron is a computational unit that gets a number of inputs through its input wires, then does some computation and finally it sends outputs to other neurons connected to it in the brain. \\
 
-As we anticipated, \glspl{nn} can be seen as mathematical models that define a 
-function $f : X \rightarrow Y$. 
-The network function of a neuron $f(x)$ is defined as a composition of
-other functions $g_i(x)$, which can in turn be decomposed into others.
-A widely used representation for the description of traditional \glspl{ann} is the 
-weighted sum, shown in Equation \ref{eq:mathmodel}.
+\subsection{Feedforward Fully-Connected Neural Networks}
+\label{nn:feedforward}
 
-\begin{Equation}[!h]
+\noindent In (fig. \ref{fig:nn}) is visible a \gls{nn}, seen as mathematical model. It's just a group of this different neurons strung together. Trying to underline an analogy with the biological systems: circles identify the cell body where they are feeded with some inputs that pass through the input wires, similar to the dendrites. The neuron does some computation and outputs some value on an output wire, where in the biological neuron it identifies the axon.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=.7\textwidth]{images/NN}
+	\caption[Feed forward neural network.]{The image graphically shows a \gls{nn} with three layers (or two hidden layers). The input layer has $M^{(0)}$ neurons and the output layer has $K$ outputs. Neurons are organized in  layers to allow parallel copmutation to avoid cyclic dependendices. The process of computing \gls{nn} outputs from inputs is called forward propagation. This kind of network is also called Multi-layer perceptron.}
+	\label{fig:nn}
+\end{figure}
+
+\noindent The $z^{(l)}_m$ are neurons, each takes its input values and computes a single output value from them. Neurons are organized in layers $1,...,L$ and usually the starting input is considered the 0th layer. Inputs $x_1,...,x_D$ are occasionally called input layer/neurons (even though they do not compute anything). The output of the entire network is then $y=z^{(L)}$, called output layer. Instead, the internal layers are called hidden layers. Each layer $l\in \{1,...,L\}$ has $M^{(l)}$ neurons.
+
+\noindent $M^{(1)}$ neurons perform a preceptron-like computation:
+
+\begin{Equation}[H]
 	\centering
 	\begin{equation}
-	f(x)=\phi \bigg( \sum_{i}w_{i}x_i + \theta \bigg)
+	u^{(1)}_m = (w^{(1)}_m)^T x + b^{(1)}_m,  
+	\quad \quad
+	z^{(1)}_m = f(u{(1)}_m),
+	\quad \quad
+	m=1,...,M^{(1)}
 	\end{equation}
-	\caption[Mathematical description of traditional \glspl{ann}.]{Function that 
-		describes mathematically the traditional \glspl{ann} in terms of weighted sum.}
+	\label{eq:hommatrix}
+\end{Equation}
+
+\noindent with a differentiable activation function $f$ for gradient descent. This step is iterated multiple times taking the outputs of the previous step:
+
+\begin{Equation}[H]
+	\centering
+	\begin{equation}
+	z^{(l-1)} = (z^{(l-1)}_m)_{m=1,...,M^{(l-1)}}
+	\end{equation}
+	\label{eq:hommatrix}
+\end{Equation}
+
+\noindent as input of:
+
+\begin{Equation}[H]
+	\centering
+	\begin{equation}
+		u^{(l)}_m = (w^{(l)}_m)^T z^{(l-1)} + b^{(l)}_m,  
+		\quad \quad
+		z^{(l)}_m = f(u^{(l)}_m)
+	\end{equation}
+	\label{eq:hommatrix}
+\end{Equation}
+
+\noindent where $m=1,...,M^{(1)}$ and $l=2,...,L$. Weights $w$ are usually indendent for each step. Additionally define $z^{(0)}$ to be the input, i.e.
+
+\begin{Equation}[H]
+	\centering
+	\begin{equation}
+	z^{(0)} = x
+	\end{equation}
+	\label{eq:hommatrix}
+\end{Equation}
+
+\noindent For each layer $l \in 1,...,L$ the computation is
+
+\begin{Equation}[H]
+	\centering
+	\begin{equation}
+		z^{(l)}_m = f( (w^{(l)}_m)^T z^{(l-1)} + b^{(l)}_m)
+	\end{equation}
 	\label{eq:mathmodel}
 \end{Equation}
-Each input signal $x_i$ is multiplied by its corresponding weight $w_{i}$, which 
-assumes a positive or negative value depending on whether you want to excite or 
-inhibit the neuron.
-The bias $\theta$ varies according to the propensity of the neuron to activate, 
-influencing its output.
-Additionally, a predefined function $\phi$ can be applied, also called activation 
-function, which is explained in the following paragraph.
+
+\noindent which can be written as a matrix multiplication:
+
+\begin{Equation}[H]
+	\centering
+	\begin{equation}
+		z^{(l)} = f( W^{(l)} z^{(l-1)} + b^{(l)})
+	\end{equation}
+	\caption[Forward propagation.]{Function that idetifies input transformation at each step $l$ of the net.}
+	\label{eq:activationfun}
+\end{Equation}
+
+\noindent The weights $w$ are directed connections between the neurons, e.g. the neurons of layer 2 are connected to the ones of layer 1 by the weights $w^{(2)}_{mn}, m=1,...M^{(1)}, n=1,...,M^{(2)}$. The bias $b$ varies according to the propensity of the neuron to activate, influencing its output. 
+
+\noindent $f()$ is an activation functions and need to be differentiable, because we wish to apply gradient descent training. For the hidden layers of the nework, the activation function must be nonlinear, because multiple linear computations can be collapsed to a single one, therefore in order to gain power from iterative computation we thus need nonlinear steps.
+
+\noindent Many possible activation functions for the hidden layers of a \gls{nn} exist:
+\begin{itemize}
+	\item Sigmoid, Hyperbolic Tangent: Monotonic, squeeze output to a fixed range
+	\item ReLU: "almost linear" (a clipped identity function)
+\end{itemize}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=.7\textwidth]{images/old_act_fun}
+	\caption[Image of a human neuron.]{Neuron and myelinated axon, with signal flow from inputs at dendrites to outputs at axon terminals. The signal represents a short electrical pulse called 'spike'.}
+	\label{fig:old_act_fun}
+\end{figure}
+
+\noindent One of the key characteristics of modern deep learning system is to use non-saturated activation function (e.g. ReLU) to replace its saturated counterpart (e.g. sigmoid, tanh). The advantage of using non-saturated activation function lies in two aspects: the first is to solve the so called "exploding/vanishing gradient" \cite[]{bengio1994learning}, in particular on the difficulty of training \gls{rnn} \cite[]{pascanu2013difficulty}, while the second is to accelerate the convergence speed. More sophisticated activation function as the "leaky ReLU" trying to solve the dying ReLU problem \cite[]{LeakyReL95:online}. In contrast to ReLU, in which the negative part is totally dropped, leaky ReLU assigns a noon-zero slope to it. Leaky ReLU and its variants are consistently better than ReLU in \gls{cnn} \cite[]{xu2015empirical}.
+
+\noindent Leaky Rectified linear activation is introduced in acoustic model \cite[]{maas2013rectifier}. Mathematically, it is defined as follows:
+
+\begin{Equation}[H]
+	\centering
+	\begin{equation}
+ 		f(x) = 
+			\begin{cases}
+			\frac{x}{a} & \text{if $x < 0 $} \\
+			x & \text{otherwise}
+		\end{cases}
+	\end{equation}
+	\caption[Leaky Rectified linear activation.]{Function that idetifies input transformation at each step $l$ of the net.}
+	\label{eq:activationfun}
+\end{Equation}
+
+\noindent where $a$ is a fixed parameter in range $(1; +\inf)$. In original paper, the authors suggest to set $a$ to a large number like $100$.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=.7\textwidth]{images/leaky_relu}
+	\caption[Leaky Rectified linear activation.]{Neuron and myelinated axon, with signal flow from inputs at dendrites to outputs at axon terminals. The signal represents a short electrical pulse called 'spike'.}
+	\label{fig:leakyrelu}
+\end{figure}
+
+\subsection{\gls{nn} Setup for Classification}
+\label{nn:nnclassification}
+For a classification task with $K$ classes, we use a $K$-idmendional output layer. A sample $x \in R^D$ is classified as belonging to class $k$ if the output neuron $y_k$ has the maximal value:
+
+\begin{Equation}[H]
+	\centering
+	\begin{equation}
+		c^*= \operatorname*{arg\,max}_k  y_k
+	\end{equation}
+	\label{eq:mathmodelaada}
+\end{Equation}
+
+\noindent The problem is that the $arg max$ function is not differentiable. Therefore, this is solved by letting the \gls{nn} output a probability distribution over classes:
+
+\begin{Equation}[H]
+	\centering
+	\begin{equation}
+		y = (y_k)_{k=1,...,K}
+		\quad
+		\quad
+		\quad
+		y_k \geq 0,
+		\quad
+		\sum_{k} y_k = 1
+	\end{equation}
+	\caption[Forward propagation.]{Function that idetifies input transformation at each step $l$ of the net.}
+	\label{eq:activationfun}
+\end{Equation}
+
+\noindent The advantage is that we can derive a differentiable measure of the quality of the output on theoretical grounds, using probability theory. In order to make the network output a probability distribution, we take exponentials and normalize. This is the softmax nonlinearity:
+
+\begin{Equation}[H]
+	\centering
+	\begin{equation}
+		S(y) = (\frac{e^{y_1}}{\sum_k e^{y_k}},...,\frac{e^{y_K}}{\sum_k e^{y_k}})
+	\end{equation}
+	\caption[Forward propagation.]{Function that idetifies input transformation at each step $l$ of the net.}
+	\label{eq:activationfun}
+\end{Equation}
+
+\noindent In contrast to other activation functinos, it is applied to the full last layer of the \gls{nn}, not to each indipendent component. The hidden layers can have any nonlinear activation function.
+
+\noindent The learning process is structured as a non-convex optimisation problem in which the aim is to minimise a cost function, which measures the distance between a particular solution and an optimal one.
+
+\noindent If we assume a \gls{nn} with softmax output, we can compute the loss by measuring the cross-entropy between the output distribution and the target distribution.
+
+\noindent Encoding the target in one-hot style, e.g. if a sample belongs to class k, the target is:
+
+\begin{Equation}[H]
+	\centering
+	\begin{equation}
+		t=(0,...,0,1,0,...,0)
+	\end{equation}
+	\caption[Forward propagation.]{Function that idetifies input transformation at each step $l$ of the net.}
+	\label{eq:activationfun}
+\end{Equation}
+
+\noindent We treat this as a probability distribution: in an ideal world, a perfect hypothesis $y$ would exactly match this $t$, assigning probability $1$ to the correct class, and probability $0$ otherwise. The cross-entropy loss is defined as:
+
+\begin{Equation}[H]
+	\centering
+	\begin{equation}
+		E_{CE} = -\sum_{k}(t_k \, \log y_k)
+	\end{equation}
+	\caption[Forward propagation.]{Function that idetifies input transformation at each step $l$ of the net.}
+	\label{eq:activationfun}
+\end{Equation}
+
+\noindent The intuition about the cross-entropy corresponds to the number of additional bits needed to encode the
+correct output, given that we have access to the (possibly wrong) prediction of the network. One property of the cross-entropy loss is that is always non-negative. For efficiency and numerical stability, one should merge
+softmax loss and cross-entropy criterion into one function:
+
+\begin{Equation}[H]
+	\centering
+	\begin{equation}
+		E_{CE+SM} = -\sum_{k}(t_k \, \log S_k(y))
+	\end{equation}
+	\caption[Softmax cross entropy.]{To train the network with backpropagation, you need to calculate the derivative of the loss. In the general case, that derivative can get complicated, but using the softmax and the cross entropy loss, that complexity fades away.}
+	\label{eq:softmaxcrossentr}
+\end{Equation}
+
+\subsection{Optimisation algorithms}
+\label{nn:optmalgo}
+The choice of optimization algorithms strongly influence the effectiveness of the learning process as they update and calculate the appropriate and optimal values of that model. Specifically if we consider the gradient descent, the most popular optimization strategy used in machine learning, the extent of the update is determined by the learning rate $\lambda$, which guarantees convergence to the global minimum for convex error surfaces and to a local minimum for non-convex surfaces. By the way, there are better optimization as the non linear conjugate gradient \cite[]{conjugategradient}, BFGS, the improved version to decrease memory usage L-BFGS \cite[]{saputro2017limited}, etc... the main advantages are that no need to manually pick $\lambda$ and often are faster than gradient descent, although more complex algorithms. \\
+
+\noindent The optimiser chosen for this thesis project is Adam, an algorithm for first-order gradient-based optimisation of stochastic objective functions, based on adaptive estimates of lower-order moments \cite[]{kingma2017adam}. It is an extension to stochastic gradient descent that has recently seen broader adoption for \gls{dl} applications in computer vision and \gls{nlp}.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\iffalse
 
 \begin{figure}[htb]
 	\centering
@@ -321,6 +507,8 @@ function, which is explained in the following paragraph.
 	\label{fig:neuron}
 	\vspace{-0.5cm}
 \end{figure}
+
+
 
 \subsection{Activation functions}
 \label{subsec:activationfun}
