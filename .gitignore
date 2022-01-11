@@ -10,6 +10,7 @@ src/dataHandGesture/imgData/*
 scripts/test.py
 tfod
 
+document/images/*
 
 Tensorflow/labelimg
 Tensorflow/models/*
@@ -40,6 +41,8 @@ ipynb_checkpoints
 *.aux
 *.gz
 *.log
+*.equ
+*.ist
 
 # OS generated files #
 ######################
