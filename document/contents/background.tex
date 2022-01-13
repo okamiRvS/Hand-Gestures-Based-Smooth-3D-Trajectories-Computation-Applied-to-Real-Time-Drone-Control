@@ -77,13 +77,14 @@ The simplest linear model for regression is one that involved a linear combinati
 \label{subsec:reglinmulnormeq}
 % Bishop -pattern recognition and machine learning (pg. 25 intro chap 1.1)
 %https://en.wikipedia.org/wiki/Mean_squared_error
-The values of the coefficients will be determined by fitting the polynomial to the training data. This can be done by minimizing an error function that measures the misfit between the function $y(x, w)$, for any given value of $w$, and the training set data points. One simple choice of error function, which is widely used, is given by the sum of the squares of the errors between the predictions $y(x_n, w)$ for each data point $x_n$ and the corresponding target values $t_n$ (called also sum of squares regression \cite[]{sum-squares}), so that we minimize:
+The values of the coefficients will be determined by fitting the polynomial to the training data. This can be done by minimizing an error function that measures the misfit between the function $y(x, w)$, for any given value of $w$, and the training set data points. One simple choice of error function, which is widely used, is given by the \gls{sse} between the predictions $y(x_n, w)$ for each data point $x_n$ and the corresponding target values $t_n$ (called also sum of squares regression \cite[]{sum-squares}), so that we minimize:
 
 \begin{Equation}[H]
 	\centering
-	\begin{equation}\label{eq:mats}
+	\begin{equation}\label{eq:sumsquarereg}
 		E(w)=\frac{1}{2} \sum_{n=1}^{N} [y(x_n,w)-t_n]^2
 	\end{equation}
+	\caption[Sum of squares regression.]{Is a statistical technique used in regression analysis to determine the dispersion of data points and the function that best fits (varies least) from the data.}
 \end{Equation}
 
 \noindent where the factor of 1/2 is included for mathematical convenience. It is a nonnegative quantity that would be zero if, and only if, the function $y(x, w)$ were to pass exactly through each training data point.
@@ -94,14 +95,23 @@ The values of the coefficients will be determined by fitting the polynomial to t
 %https://stats.stackexchange.com/questions/73540/what-is-the-relationship-between-the-mean-squared-error-and-the-residual-sum-of
 %https://365datascience.com/tutorials/statistics-tutorials/sum-squares/
 %https://en.wikipedia.org/wiki/Errors_and_residuals#Regressions
-\noindent We can  write (\ref{eq:mats}) in matrix notation as:
+
+% http://michael.orlitzky.com/articles/the_derivative_of_a_quadratic_form.xhtml
+% derivative_of_a_quadratic_form
+
+% Derivative of transpose of a matrix
+% https://en.wikipedia.org/wiki/Matrix_calculus#Identities_in_differential_form
+
+% Derivate of matrix form
+% https://math.stackexchange.com/questions/756679/least-squares-residual-sum-of-squares-in-closed-form/757130#757130
+\noindent We can write (\ref{eq:sumsquarereg}) in matrix notation as:
 
 \begin{Equation}[H]
 	\centering
-	\begin{equation}
+	\begin{equation}\label{eq:sumsquareregvec}
 	\frac{1}{2} (\phi w - t)^T (\phi w - t)
 	\end{equation}
-	\label{eq:mathmodelaada}
+	\caption[Sum of squares regression in matrix notation.]{This is the sum of squares regression in matrix notation.}
 \end{Equation}
 
 \noindent where $\phi$ is an $N x M$ matrix, so that:
@@ -125,30 +135,30 @@ The values of the coefficients will be determined by fitting the polynomial to t
 
 \begin{Equation}[!htb]
 	\centering
-	\begin{equation}
-	w = 
-	\begin{pmatrix}
-	w_0 \\
-	\vdots \\
-	w_{M-1}
-	\end{pmatrix}
-	\quad t =
-	\begin{pmatrix}
-	t_1 \\
-	\vdots \\
-	t_N \\
-	\end{pmatrix}
+	\begin{equation} \label{eq:weightsandtarget}
+		w = 
+		\begin{pmatrix}
+			w_0 \\
+			\vdots \\
+			w_{M-1}
+		\end{pmatrix}
+		\quad t =
+		\begin{pmatrix}
+			t_1 \\
+			\vdots \\
+			t_N \\
+		\end{pmatrix}
 	\end{equation}
-	\label{eq:hommatrix}
+	\caption[Weights of $M-1$ features and target of $N$ examples.]{Weights of $M-1$ features and target of $N$ examples.}
 \end{Equation}
 
 \noindent Therefore, we have to solve the optimization problem finding the minimum of the cost function $E(w)$:
 \begin{Equation}[H]
 	\centering
-	\begin{equation}
-	w^*= \operatorname*{arg\,min}_w  \frac{1}{2}(\phi w - t)^T (\phi w - t)
+	\begin{equation}\label{eq:mincostregr}
+		w^*= \operatorname*{arg\,min}_w  \frac{1}{2}(\phi w - t)^T (\phi w - t)
 	\end{equation}
-	\label{eq:mathmodelaada}
+	\caption[Solve the optimization problem for ridge regression.]{The goal is to find the weight $w$ that minimize the cost function $E(w)$.}
 \end{Equation}
 
 \noindent So we compute the gradient and solving for $w$ we obtain:
@@ -195,12 +205,11 @@ We want to penalize for some features with parameters with high values, if our m
 
 \begin{Equation}[H]
 	\centering
-		\begin{equation}
-			\begin{aligned}
-				E(w) = E_D(w) + \lambda E_W(w)
-			\end{aligned}
-		\end{equation}
-	\label{eq:mathmodelaada}
+	\begin{equation}\label{eq:fullreg}
+		\begin{aligned}
+			E(w) = E_D(w) + \lambda E_W(w)
+		\end{aligned}
+	\end{equation}
 \end{Equation}
 
 \noindent Where $\lambda$ is the regularization coefficient and it is the trade-off between how we well fit training set and how to establish the parameters $w$ with low values, therefore having simple hypotesys avoiding over-fitting. $E_D$ is the error based on dataset, while $E_W$ is based on weights.
@@ -211,12 +220,12 @@ We want to penalize for some features with parameters with high values, if our m
 One of the simplest forms of regularizer is given by the sum-of-squares of the weight vector elements:
 \begin{Equation}[H]
 	\centering
-		\begin{equation}
-			\begin{aligned}
-				E_W(w) = \frac{1}{2} w^T w = \frac{||w||^2_2}{2}
-			\end{aligned}
-		\end{equation}
-	\label{eq:mathmodelaada}
+	\begin{equation}\label{eq:regularizer}
+		\begin{aligned}
+			E_W(w) = \frac{1}{2} w^T w = \frac{||w||^2_2}{2}
+		\end{aligned}
+	\end{equation}
+	\caption[Cost function | Regularisation term.]{Cost function | Regularisation term.}
 \end{Equation}
 
 \noindent where $||w||_2$ is the euclidean norm $\sqrt{ \sum_{i=1}^{n} x^2_i}$.
@@ -267,7 +276,91 @@ to decay towards zero.
 
 \subsection{(Batch) Gradient Descent}
 \label{subsec:batchgradientdescen}
+\noindent Gradient descent is a first-order iterative optimization algorithm for finding the minimum $w$ of a function $E(w)$. To achieve this goal, it performs two steps iteratively, until convergence:
 
+\begin{itemize}
+	\item Compute the slope (gradient) that is the first-order derivative of the function at the current point
+	\item Move-in the opposite direction of the slope increase from the current point by the computed amount
+\end{itemize}
+
+%it should edit this pic to avoid copyright...
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=.7\textwidth]{images/grad_desc}
+	\caption[Gradient descent.]{Gradient descent is based on the observation that if the multi-variable function $E(w)$ is defined and differentiable in a neighborhood of a point $w_0$ , then $w_0$ decreases fastest if one goes from $w_0$  in the direction of the negative gradient of $E(w)$ at $w_0$, $-\nabla E(w_0)$.}
+	\label{fig:grad_desc}
+\end{figure}
+
+% https://stats.stackexchange.com/questions/539137/why-use-mse-instead-of-sse-as-cost-function-in-linear-regression
+\noindent Let's now using \gls{mse}, instead of using (\ref{eq:sumsquarereg}) due to the fact that we are able to reach obvious benefits: first of all to keep the value in a expressible range usable by computers, then to make the results comparable across samples regardless of the size of the sample. Infact, the \gls{sse} depends on how many terms are added up (note the case of millions/billions of data points). In addition, using \gls{sse} or \gls{mse} it still leads to find an equivalent solution.
+
+\begin{Equation}[H]
+	\centering
+	\begin{equation} \label{eq:mser}
+		\begin{aligned}
+			E_D(w) = \frac{1}{2N} \sum_{n=1}^{N} [y(x_n,w)-t_n]^2
+		\end{aligned}
+	\end{equation}
+	\caption[Mean Squared Error.]{Mean Squared Error. $1/2$ is added, as in \gls{sse}, so the derivative doesn't need a constant out front. We get away with it because the minima of $E_D(w)$ and $E_D(w) / 2$ are achieved at the same value(s) of $w$.}
+\end{Equation}
+
+\noindent Concerning the regularisation term $E_W(w)$ (\ref{eq:regularizer}), we could also write:
+
+\begin{Equation}[H]
+	\centering
+	\begin{equation} \label{eq:regnew}
+		\begin{aligned}
+			E_W(w) = \frac{ \sum_{m=1}^{M} {w^2_m}}{2}
+		\end{aligned}
+	\end{equation}
+	\caption[Regularisation term.]{Regularisation term.}
+\end{Equation}
+
+\noindent Note that, conventionally, $m$ starts from $1$, and not from $0$, even if it exists (\ref{eq:weightsandtarget}). Nevertheless, it's important to know that nothing change consistently even if we consider the 0th weight. 
+
+\noindent Combining together following (\ref{eq:fullreg}) 
+
+% WE NEED CHECK M, CHANGE ALPHA WHERE I HAVE SPOKEN ABOUT GRANDIENT
+\begin{Equation}[H]
+	\centering
+	\begin{equation} \label{eq:fullregnew}
+	\begin{aligned}
+	E(w) = \frac{1}{2N} \left\{ \sum_{n=1}^{N} [ y(x_n,w)-t_n ]^2 + \lambda \sum_{m=1}^{M} {w^2_m} \right\}
+	\end{aligned}
+	\end{equation}
+	\caption{Gradient Descent.}
+\end{Equation}
+
+\noindent Have some function $E(w)$ \\
+\noindent Want $\operatorname*{arg\,min}_w  E(w))$ \\
+
+\noindent Keep changing $w$ to reduce $E(w)$ until we hopefully end up at a minimum:
+
+\begin{Equation}[H]
+	\centering
+	\begin{equation} \label{eq:graddesc}
+		\begin{aligned}
+			Repeat = \{ \\
+				w_0 &:= w_0 - \alpha \frac{1}{N} \sum_{n=1}^{N} [ y(x_n,w)-t_n ]^2 \, x_0 \\
+				w_j &:= w_j - \alpha \frac{1}{N} \sum_{n=1}^{N} [ y(x_n,w)-t_n ]^2 \, x_j + \frac{\lambda}{M} w_j\\
+			\}
+		\end{aligned}
+	\end{equation}
+	\caption[Gradient Descent.]{Cost function for Gradient Descent.}
+\end{Equation}
+
+\noindent where in compact form is:
+\begin{Equation}[H]
+	\centering
+	\begin{equation} \label{eq:graddesccompact}
+	\begin{aligned}
+		Repeat = \{ \\
+			w_j &:= w_j(1-\alpha \frac{\lambda}{N}) - \alpha \frac{1}{N} \sum_{n=1}^{N} [ y(x_n,w)-t_n ]^2 \, x_j \\
+		\}
+	\end{aligned}
+	\end{equation}
+	\caption[Cost function for Gradient Descent.]{Cost function for Gradient Descent.}
+\end{Equation}
 
 
 

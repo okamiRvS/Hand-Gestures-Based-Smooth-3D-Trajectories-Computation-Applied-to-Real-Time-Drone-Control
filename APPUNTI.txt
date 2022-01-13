@@ -117,10 +117,9 @@ Per oggi:
 
 10/1
 -[DONE]guardare parte andrew ng sulle NN
+-[DONE] iniziare scrivere nella tesi parte relativa alle reti neurali
 
--nella simulazione aggiungere anche lo yaw (e volendo il pitch e il roll)
--[magari è meglio aspettare prima riposta prof] scrivere nella tesi parte relativa al batch gradient descent per la ridge regression 
-
+11/01
 -scrivere nella tesi parte relativa alle reti neurali
 
 -aggiornare pipeline per comandi veloci di controllo con la mano
@@ -128,7 +127,9 @@ Per oggi:
 -creare una scena di acquisizione video nella simulazione
 
 
+-nella simulazione aggiungere anche lo yaw (e volendo il pitch e il roll)
+-[magari è meglio aspettare prima riposta prof] scrivere nella tesi parte relativa al batch gradient descent per la ridge regression 
+
 -aggiungere gesto di "stop", "left", "right" (vedere se funziona)
 -controllare il risultato con adam ottimizzatore
-
-- NASPI
+-Leaky Rectified linear activation 
