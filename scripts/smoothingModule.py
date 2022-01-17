@@ -6,21 +6,28 @@ import pdb
 
 class smoothing():
 
+    def __init__(self, skipEveryNpoints):
+        self.skipEveryNpoints = skipEveryNpoints
+
     def setPoints(self, xdata, ydata, zdata, rolldata, yawdata, pitchdata, dtime, speed):
+
+        # Computed the spline for the asked distances:
+        subdivision = len(xdata) * 3
+        self.alpha = np.linspace(0, 1, subdivision)
 
         coord = np.array([xdata, ydata, zdata]).T
         orientation = np.array([rolldata, yawdata, pitchdata]).T
         dtime = np.array([dtime], dtype=np.float64)
         speed = np.array([speed])
 
-
-        self.coordData = self.smoothData(coord)
-        self.orientationData = self.smoothData(orientation)
-
         tmpTime = self.smoothData(dtime)[0]
-        self.dtime = [np.where(tmpTime < 0, 0, tmpTime)] # to have only positive values
+        self.data = {
+            "position": self.smoothData(coord),
+            "orientation": self.smoothData(orientation),
+            "time": [np.where(tmpTime < 0, 0, tmpTime)][0], # to have only positive values
+            "speed": self.smoothData(speed)[0]
+        }
 
-        self.speedData = self.smoothData(speed)
        
         # fig = plt.figure()
         # ax = fig.add_subplot(111, projection='3d')
@@ -37,14 +44,26 @@ class smoothing():
 
     def smoothCalculation(self):
 
-        return self.coordData[0], self.coordData[1], self.coordData[2], self.orientationData[0], self.orientationData[1], self.orientationData[2], self.dtime[0], self.speedData[0]
+        return self.data["position"][0], self.data["position"][1], self.data["position"][2], self.data["orientation"][0], self.data["orientation"][1], self.data["orientation"][2], self.data["time"], self.data["speed"]
+
+
+    def skipEveryNpointsFunc(self):
+
+        # skip each n points, to have a better view of data
+        self.data["position"][0] = self.data["position"][0][::self.skipEveryNpoints]
+        self.data["position"][1] = self.data["position"][1][::self.skipEveryNpoints]
+        self.data["position"][2] = self.data["position"][2][::self.skipEveryNpoints]
+
+        self.data["orientation"][0] = self.data["orientation"][0][::self.skipEveryNpoints]
+        self.data["orientation"][1] = self.data["orientation"][1][::self.skipEveryNpoints]
+        self.data["orientation"][2] = self.data["orientation"][2][::self.skipEveryNpoints]
+
+        self.data["time"] = self.data["time"][::self.skipEveryNpoints]
+
+        self.data["speed"] = self.data["speed"][::self.skipEveryNpoints]
 
 
     def smoothData(self, data):
-
-        # Computed the spline for the asked distances:
-        alpha = np.linspace(0, 1, 75)
-        #alpha = np.linspace(0, 1, 40)
 
         # Linear length along the line:
         if data.shape[0] == 1:
@@ -54,7 +73,7 @@ class smoothing():
 
             spline = UnivariateSpline(distance, data, k=3)
 
-            return [spline(alpha)]
+            return [spline(self.alpha)]
         else:
             distance = np.cumsum( np.sqrt(np.sum( np.diff(data, axis=0)**2, axis=1 )) )
 
@@ -65,7 +84,7 @@ class smoothing():
 
         out = []
         for spline in splines:
-            out.append(spline(alpha))
+            out.append(spline(self.alpha))
 
         return out
 

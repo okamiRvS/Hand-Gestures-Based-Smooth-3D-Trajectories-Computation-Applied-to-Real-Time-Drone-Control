@@ -138,7 +138,7 @@ def main():
         #ax.plot3D(xdata, ydata, zdata, 'gray')
         ax.scatter(xdata, ydata, zdata, c=zdata)
         plt.draw()
-        plt.pause(0.5)
+        plt.pause(1)
         ax.clear()
 
 if __name__ == "__main__":

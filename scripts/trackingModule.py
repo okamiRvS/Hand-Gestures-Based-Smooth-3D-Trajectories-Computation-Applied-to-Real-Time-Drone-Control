@@ -12,7 +12,7 @@ import os
 
 class tracking():
 
-    def __init__(self, queueObj, skipEveryNpoints, trajTimeDuration, log3D):
+    def __init__(self, queueObj, skipEveryNsec, skipEveryNpoints, trajTimeDuration, log3D):
 
         self.queueObj = queueObj 
         self.currentState = "INIZIALIZATION"
@@ -20,15 +20,15 @@ class tracking():
         self.tolleranceTRACKING = 500 # 100 before
         self.nlastMovements = 5
         self.scale = 0
-        self.previous_mean_distance = 0
+        self.previous_mean_distance = -1
 
         if log3D:
             self.drawTraj = d3dT.dynamic3dDrawTrajectory()
         self.log3D = log3D
 
-        self.smoothing = sm.smoothing()
+        self.smoothing = sm.smoothing(skipEveryNpoints)
 
-        self.traj = traj.trajectory(skipEveryNpoints, trajTimeDuration)
+        self.traj = traj.trajectory(skipEveryNsec, trajTimeDuration)
         self.trajCOMPLETE = []
 
         self.height = 0
@@ -80,7 +80,7 @@ class tracking():
 
     def justDrawLast2dTraj(self, img):
 
-        xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed = self.traj.skipEveryNpointsFunc()
+        xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed = self.traj.getData()
         self.draw2dTraj(img, xdata, zdata)
 
 
@@ -98,25 +98,35 @@ class tracking():
 
     def addTrajectoryPointAndSpeed(self, lmList, val, roll, yaw, pitch):
 
-        # mean of all distances from mean point val and hand landmark in lmList
-        current_mean_dist = self.distanceFromMeanPoint(lmList, val)
-
-        if current_mean_dist > self.previous_mean_distance:
-            self.scale += 1 * abs(current_mean_dist - self.previous_mean_distance) # greater if the difference is high
+        if self.previous_mean_distance == -1:
+            self.previous_mean_distance = self.distanceFromMeanPoint(lmList, val)
         else:
-            self.scale -= 1 * abs(current_mean_dist - self.previous_mean_distance) # same
+            # mean of all distances from mean point val and hand landmark in lmList
+            current_mean_dist = self.distanceFromMeanPoint(lmList, val)
 
-        #print(self.scale)
-        self.previous_mean_distance = current_mean_dist
+            if current_mean_dist > self.previous_mean_distance:
+                self.scale += 1 * abs(current_mean_dist - self.previous_mean_distance) # greater if the difference is high
+            else:
+                self.scale -= 1 * abs(current_mean_dist - self.previous_mean_distance) # same
 
+            #print(self.scale)
+            self.previous_mean_distance = current_mean_dist
+
+        # collect data to draw the 3d trajectory
+        # scale X,Z data from 0 to 1; about scale factor I consider 50 values, but maybe it requires some major details...
         self.traj.addPoint(x = val[0] / self.width,
                            y = self.scale / 50,
                            z = 1 - (val[1] / self.height),
                            roll = roll,
                            yaw = yaw,
                            pitch = pitch)
-        currentSpeed = self.traj.computeIstantSpeed() # compute istant speed
+
+        # compute istant speed
+        currentSpeed = self.traj.computeIstantSpeed() 
         self.traj.setSpeed(currentSpeed)
+                
+        # add time elapsed from the beginning
+        self.traj.addTimeElapsed()
 
 
     def cleanTraj(self):
@@ -179,62 +189,31 @@ class tracking():
                 cv2.circle(img, (val[0], val[1]), radius=self.tolleranceSTART, color=(0,0,255), thickness=1) # draw the tollerance inside 
                 cv2.circle(img, (val[0], val[1]), radius=self.tolleranceSTART+100, color=(0,255,0), thickness=1) # draw the tollerance outside 
                 
-                if len(self.traj.trajSpeed) == 0:
-                    # mean of all distances from mean point val and hand landmark in lmList
-                    self.previous_mean_distance = self.distanceFromMeanPoint(lmList, val)
-                    self.traj.addPoint(x = val[0] / self.width,
-                                       y = self.scale / 50,
-                                       z = 1 - (val[1] / self.height),
-                                       roll = roll,
-                                       yaw = yaw,
-                                       pitch = pitch)
-                                       
-                    self.traj.setSpeed(0) # speed is zero at the beginning
-                else:
+                if self.traj.checkIsPossibleAddPoint():
                     self.addTrajectoryPointAndSpeed(lmList, val, roll, yaw, pitch)
-
-                self.traj.startTimeTraj = self.traj.previousTime # update the startTimeTraj until tracking state
-
+ 
             elif checkStart < self.tolleranceSTART and self.queueObj.checkGesture("thumbsup"): # execute last trajectory
                 
-                if len(self.trajCOMPLETE) > 0: # if trajectory it exists
+                if len(self.trajCOMPLETE) > 0: # if trajectory exists
 
-                    if os.name == 'posix': # if linux system
-
-                        if self.trajFlag:
-                            
-                            # destory 3d figure
-                            if self.log3D:
-                                self.drawTraj.destroy()
-
-                            self.previousTmpTime = time.time()
-                            self.trajFlag = False 
-
-                        # draw 2d trajectory
-                        xdata, ydata, zdata, rolldata, yawdata, pitchdata, dtime, speed = self.smoothing.smoothCalculation()
-
-                        self.draw2dTraj(img, xdata, zdata, False)
-
-                        # after n seconds return in this way draw2dTraj() works
-                        if (time.time() - self.previousTmpTime) > 2:
-                            # return data to ros
-                            return xdata, ydata, zdata, rolldata, yawdata, pitchdata, dtime, speed
+                    if self.trajFlag:
                         
-                    elif os.name == 'nt': # if windows system
+                        # destory 3d figure
+                        if self.log3D:
+                            self.drawTraj.destroy()
 
-                        # just execute directly into the window
+                        self.previousTmpTime = time.time()
+                        self.trajFlag = False 
 
-                        xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed = self.trajCOMPLETE[-1].skipEveryNpointsFunc()
+                    # draw 2d trajectory
+                    xdata, ydata, zdata, rolldata, yawdata, pitchdata, dtime, speed = self.smoothing.smoothCalculation()
 
-                        self.startingPoint = ( int( xdata[1] * self.height),
-                                            int( (1- zdata[1]) * self.width) )
-                
-                        self.executeTrajectory(img, xdata, zdata)
+                    self.draw2dTraj(img, xdata, zdata, False)
 
-                        tmpTime = time.time()
-                        if tmpTime > self.previousTmpTime + self.delayToExecuteTrajectory and self.idxPoint < len(xdata)-1:
-                            self.idxPoint += 1
-                            self.previousTime = tmpTime
+                    # after n seconds return in this way draw2dTraj() works
+                    if (time.time() - self.previousTmpTime) > 2:
+                        # return data to ros
+                        return xdata, ydata, zdata, rolldata, yawdata, pitchdata, dtime, speed
 
                 else:
 
@@ -243,8 +222,8 @@ class tracking():
                     self.currentState = "INIZIALIZATION"
 
             elif self.tolleranceSTART < checkStart < self.tolleranceSTART+100 and self.queueObj.checkGesture("stop"):
-                self.traj.saveLastNValues(nPoints = 20) # take only the last 10 points
-                xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed = self.traj.skipEveryNpointsFunc()
+                self.traj.saveLastNValues(nPoints = 20) # take only the last 20 points
+                xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed = self.traj.getData()
 
                 if len(xdata) > 0: # because otherwise could give index out of range
                     self.currentState = "TRACKING"
@@ -269,8 +248,8 @@ class tracking():
             if self.queueObj.checkGesture("thumbsup"):
                 self.currentState = "EXIT"
 
-                # remove last n keypoint because the movemente to thumbup
-                self.traj.thumbsUpFix(numberKeyPoints=10)
+                # remove last n keypoint because the movement is thumbup, so the end of traj
+                self.traj.thumbsUpFix(numberKeyPoints=2)
 
                 currentTraj = copy.deepcopy(self.traj)
                 self.trajCOMPLETE.append(currentTraj)
@@ -279,40 +258,22 @@ class tracking():
                 self.waitForNewTraj = time.time() + self.timeToCatchAnotherTraj
 
                 # smooth every data
-                xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed = self.trajCOMPLETE[-1].skipEveryNpointsFunc()
+                xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed = self.trajCOMPLETE[-1].getData()
                 self.smoothing.setPoints(xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed)
+                self.smoothing.skipEveryNpointsFunc()
 
                 # this is useful otherwise there is overlap of old and new points
                 if self.log3D:
                     self.drawTraj.clean()
 
             elif checkStartTracking < self.tolleranceTRACKING and self.queueObj.checkGesture("stop"):
-                # mean of all distances from mean point val and hand landmark in lmList
-                current_mean_dist = self.distanceFromMeanPoint(lmList, val)
 
-                if current_mean_dist > self.previous_mean_distance:
-                    self.scale += 1 * abs(current_mean_dist - self.previous_mean_distance) # greater if the difference is high
-                else:
-                    self.scale -= 1 * abs(current_mean_dist - self.previous_mean_distance) # same
-
-                #print(self.scale)
-                self.previous_mean_distance = current_mean_dist
-
-                if self.traj.checkTrajTimeDuration():
-                    # collect data to draw the 3d trajectory
-                    # scale X,Z data from 0 to 1; about scale factor I consider 50 values, but maybe it requires some major details...
-                    self.traj.addPoint(x = val[0] / self.width,
-                                       y = self.scale / 50,
-                                       z = 1 - (val[1] / self.height),
-                                       roll = roll,
-                                       yaw = yaw,
-                                       pitch = pitch)
-                    
-                    # compute istant speed
-                    currentSpeed = self.traj.computeIstantSpeed()
-                    self.traj.setSpeed(currentSpeed) # speed is zero at the beginning
+                # if totaltime is under the time of trajectory execution
+                # and if passed n secs to add a new point
+                if self.traj.checkIsPossibleAddPoint() and self.traj.checkTrajTimeDuration():
+                    self.addTrajectoryPointAndSpeed(lmList, val, roll, yaw, pitch)
                 
-            xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed = self.traj.skipEveryNpointsFunc()
+            xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed = self.traj.getData()
             self.draw2dTraj(img, xdata, zdata)
 
             if self.log3D:
@@ -327,7 +288,7 @@ class tracking():
                 self.cleanTraj()
                 self.currentState = "INIZIALIZATION"
             
-            #xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed = self.trajCOMPLETE[-1].skipEveryNpointsFunc()
+            #xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed = self.trajCOMPLETE[-1].getData()
             xdata, ydata, zdata, rolldata, yawdata, pitchdata, dtime, speed = self.smoothing.smoothCalculation()
             
             # export data as csv

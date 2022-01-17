@@ -8,7 +8,7 @@ import dynamic3dDrawTrajectory as d3dT
 
 class trajectory():
 
-    def __init__(self, skipEveryNpoints, trajTimeDuration):
+    def __init__(self, skipEveryNsec, trajTimeDuration):
 
         self.trajPointsX = []
         self.trajPointsY = []
@@ -26,27 +26,65 @@ class trajectory():
 
         self.trajSpeed = []
 
-        self.skipEveryNpoints = skipEveryNpoints
+        self.skipEveryNsec = skipEveryNsec
 
-        self.startTimeTraj = -1 # set when start tracking
-        self.startTime = -1
-        self.previousTime = -1
         self.trajTimeDuration = trajTimeDuration
+        
+        #  startTimeTraj will start when in TRACKING state
+        self.startTimeTraj = -1 
+        
+        # currentTime value will be update each frame
+        self.currentTime = -1
+        
+        # previousTime value will be update when passed "skipEveryNsec" secs
+        self.previousTime = -1
+        
+        # startTime will start at the very beginning, in START state
+        self.startTime = -1
+
+        self.deltaTime = 0
 
 
     def checkTrajTimeDuration(self):
+        # check when TRACKING state
 
+        # at the beginning 
         if self.startTimeTraj == -1:
             self.startTimeTraj = time.time()
 
-        currentTime = time.time()
         # print(currentTime - self.startTimeTraj > self.trajTimeDuration)
         # print(currentTime - self.startTimeTraj)
 
-        if currentTime - self.startTimeTraj > self.trajTimeDuration:
+        if self.currentTime - self.startTimeTraj > self.trajTimeDuration:
             return False
         else:
             return True
+
+
+    def checkIsPossibleAddPoint(self):
+        # check when START or TRACKING state
+
+        if self.startTime == -1:
+            self.startTime = time.time()
+
+        # at the beginning initialize the previousTime and startTime
+        if self.previousTime == -1:
+            self.previousTime = time.time()
+
+        self.currentTime = time.time()
+
+        # If passed 0.25 sec then return True to permit adding a point
+        # and update previous time
+        if self.currentTime - self.previousTime > self.skipEveryNsec:
+            self.deltaTime = self.currentTime - self.previousTime
+            self.previousTime = self.currentTime
+            return True
+        else:
+            return False
+
+
+    def addTimeElapsed(self):
+        self.dtime.append(self.currentTime - self.startTime)
 
 
     def addPoint(self, x, y, z, roll, yaw, pitch):
@@ -60,6 +98,7 @@ class trajectory():
         self.pitch.append(pitch)
 
         self.computeDirection(x, y, z, roll, yaw, pitch)
+
 
     def computeDirection(self, x, y, z, roll, yaw, pitch):
         # this is vec=(1,0,0) in homogeneous coordinates
@@ -85,34 +124,29 @@ class trajectory():
 
 
     def setSpeed(self, speed):
-
-        if self.previousTime == -1: #at the beginning
-            self.startTime = time.time()
-            self.previousTime = self.startTime
-            self.dtime.append(0.0)
             
         self.trajSpeed.append(speed)
 
 
     def computeIstantSpeed(self):
+        
+        if self.deltaTime != 0:
+            try:
+                distanceSpaceBetweenTwoLast3dPoints = math.sqrt( 
+                    ( self.trajPointsX[-2] - self.trajPointsX[-1] )**2 +
+                    ( self.trajPointsY[-2] - self.trajPointsY[-1] )**2 +
+                    ( self.trajPointsZ[-2] - self.trajPointsZ[-1] )**2
+                )
+            except:
+                print("An exception occurred")
+                distanceSpaceBetweenTwoLast3dPoints = 0 # this set currentSpeed to zero
 
-        currentTime = time.time()
-        deltaTime = currentTime - self.previousTime
-        self.dtime.append(currentTime - self.startTime)
-        self.previousTime = currentTime
+            factorScale = 10
 
-        try:
-            distanceSpaceBetweenTwoLast3dPoints = math.sqrt( 
-                ( self.trajPointsX[-2] - self.trajPointsX[-1] )**2 +
-                ( self.trajPointsY[-2] - self.trajPointsY[-1] )**2 +
-                ( self.trajPointsZ[-2] - self.trajPointsZ[-1] )**2
-            )
-        except:
-            print("An exception occurred")
-            distanceSpaceBetweenTwoLast3dPoints = 0 # this set currentSpeed to zero
-
-        factorScale = 10
-        currentSpeed = int(factorScale * distanceSpaceBetweenTwoLast3dPoints/deltaTime)
+            currentSpeed = int(factorScale * distanceSpaceBetweenTwoLast3dPoints / self.deltaTime)
+        
+        else:
+            currentSpeed = 0.0
 
         return currentSpeed
     
@@ -132,33 +166,17 @@ class trajectory():
         self.directionz = []
 
         self.startTimeTraj = -1
-        self.startTime = -1
+        self.currentTime = -1
         self.previousTime = -1
+        self.startTime = -1
         self.dtime = []
 
         self.trajSpeed = []
 
 
-    def skipEveryNpointsFunc(self):
+    def getData(self):
 
-        # skip each n points, to have a better view of data
-        xdata = self.trajPointsX[::self.skipEveryNpoints]
-        ydata = self.trajPointsY[::self.skipEveryNpoints]
-        zdata = self.trajPointsZ[::self.skipEveryNpoints]
-
-        rolldata = self.roll[::self.skipEveryNpoints]
-        yawdata = self.yaw[::self.skipEveryNpoints]
-        pitchdata = self.pitch[::self.skipEveryNpoints]
-
-        directionx = self.directionx[::self.skipEveryNpoints]
-        directiony = self.directiony[::self.skipEveryNpoints]
-        directionz = self.directionz[::self.skipEveryNpoints]
-
-        dtime = self.dtime[::self.skipEveryNpoints]
-
-        speed = self.trajSpeed[::self.skipEveryNpoints]
-
-        return xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed
+        return self.trajPointsX, self.trajPointsY, self.trajPointsZ, self.directionx, self.directiony, self.directionz, self.dtime, self.trajSpeed
 
 
     def saveLastNValues(self, nPoints):

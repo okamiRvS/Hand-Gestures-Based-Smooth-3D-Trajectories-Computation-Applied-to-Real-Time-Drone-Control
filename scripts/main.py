@@ -193,7 +193,7 @@ class FullControll():
     def autoSet(self):
         # Set if webcam or drone camera source
         # True is webcam, False is drone camera
-        getFromWebcam = False
+        getFromWebcam = True
 
         # Set name window of imshow
         nameWindowWebcam = "Image"
@@ -219,8 +219,9 @@ class FullControll():
         # Instantite tracking obj
         showPlot = True
         tracking = tm.tracking(queue, 
-                                skipEveryNpoints=4, 
-                                trajTimeDuration=10, # trajTimeDuration is in seconds
+                                skipEveryNsec=0.25, #0
+                                skipEveryNpoints=2, #4
+                                trajTimeDuration=20, # trajTimeDuration is in seconds
                                 log3D=showPlot) 
 
         # set variable

@@ -120,7 +120,7 @@ Per oggi:
 -[DONE] iniziare scrivere nella tesi parte relativa alle reti neurali
 
 11/01
--scrivere nella tesi parte relativa alle reti neurali
+-[DONE] scrivere nella tesi parte relativa alle reti neurali
 
 -aggiornare pipeline per comandi veloci di controllo con la mano
 
@@ -133,3 +133,11 @@ Per oggi:
 -aggiungere gesto di "stop", "left", "right" (vedere se funziona)
 -controllare il risultato con adam ottimizzatore
 -Leaky Rectified linear activation 
+
+
+lunedì 17 ore 16.00
+
+17/01
+-ritornare dizionario di valori invece di n liste...(magari robe in numpy)
+-andrebbe calcolato la velocità ocme vettore, non ci dovrebbe essere il modulo, e andrebbe quindi eseguito lo smooth sulla velocità computata sucessivamente
+-[DONE]skip n step dovrebbe essere eseguito semplicemenete salvando il dato ogni n secondi, ora invece salva una montagna di dati e ogni secondo vengono recuperati solo i valori di n secondi
