@@ -97,6 +97,11 @@ class normalizePoints():
 
 
     def getPointsForNet(self):
+        """
+        Gives a new shape to an array without changing its data.
+        One shape dimension can be -1. In this case, the value is inferred from
+        the length of the array and remaining dimensions.
+        """
 
         return self.tmp.reshape(-1)
 
@@ -255,7 +260,7 @@ class normalizePoints():
         tmp[:,1] = self.height - tmp[:,1]
         tmp = tmp.astype(int)
 
-        # drawPoint
+        # DrawPoint
         fontScale = 0.3
         font = cv2.FONT_HERSHEY_DUPLEX
         thickness = 1
@@ -265,7 +270,7 @@ class normalizePoints():
             cv2.circle(img, position, radius=0, color=color, thickness=5)
             cv2.putText(img, str(i), (position[0]+10, position[1]), font, fontScale, color, thickness)
 
-        # put text on thumb_tip, index_finger_mcp and index_finger_pip
+        # Put text on thumb_tip, index_finger_mcp and index_finger_pip
         color = (0,255,0)
         position = tuple(tmp[4])
         cv2.circle(img, position, radius=0, color=color, thickness=5)
@@ -277,7 +282,7 @@ class normalizePoints():
         cv2.circle(img, position, radius=0, color=color, thickness=5)
         cv2.putText(img, "index_finger_pip", ( position[0] + 10, position[1] ), font, fontScale, color, thickness)
 
-        # connect points to get the hand shape
+        # Connect points to get the hand shape
         color = (0,0,255)
         cv2.line(img, tuple(tmp[0]), tuple(tmp[1]), color, thickness=1)
         cv2.line(img, tuple(tmp[0]), tuple(tmp[5]), color, thickness=1)

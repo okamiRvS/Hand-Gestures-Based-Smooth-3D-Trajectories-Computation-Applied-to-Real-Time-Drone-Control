@@ -8,7 +8,7 @@ import dynamic3dDrawTrajectory as d3dT
 
 class trajectory():
 
-    def __init__(self, skipEveryNsec, trajTimeDuration):
+    def __init__(self, skipEveryNsec: float, trajTimeDuration: float):
 
         # Lists to save point (x,y,z)
         self.trajPointsX = []
@@ -54,11 +54,11 @@ class trajectory():
 
 
     def checkTrajTimeDuration(self) -> bool:
-        '''
+        """
         Check if it is possibile to add other points into the trajectory 
         queue given the self.trajTimeDuration. The begining of check
         starts when TRACKING state is available.
-        '''
+        """
 
         # at the beginning 
         if self.startTimeTraj == -1:
@@ -74,12 +74,12 @@ class trajectory():
 
 
     def checkIsPossibleAddPoint(self) -> bool:
-        '''
+        """
         Check if it is possibile to add other points into the trajectory
         queue given the self.skipEveryNsec. The beginning of check
         starts when START state is available. This check works also in
         TRACKING state. 
-        '''
+        """
 
         if self.startTime == -1:
             self.startTime = time.time()
@@ -101,20 +101,20 @@ class trajectory():
 
 
     def addTimeElapsed(self):
-        '''
+        """
         Add time elapsed from self.startTime to the self.currentTime
         in the dtime list.
-        '''
+        """
         
         self.dtime.append(self.currentTime - self.startTime)
 
 
-    def addPoint(self, x, y, z, roll, yaw, pitch):
-        '''
+    def addPoint(self, x: float, y: float, z: float, roll: float, yaw: float, pitch: float):
+        """
         Add position (x,y,z) and orientation (roll,yaw,pitch) in their 
         respective lists.
         Compute also direction using point and orientation.
-        '''
+        """
         
         self.trajPointsX.append(x)
         self.trajPointsY.append(y)
@@ -127,10 +127,10 @@ class trajectory():
         self.computeDirection(x, y, z, roll, yaw, pitch)
 
 
-    def computeDirection(self, x, y, z, roll, yaw, pitch):
-        '''
+    def computeDirection(self, x: float, y: float, z: float, roll: float, yaw: float, pitch: float):
+        """
         Compute direction given a point (x,y,z) and the orientation. 
-        '''
+        """
         
         # this is vec=(1,0,0) in homogeneous coordinates
         vec = np.array([0,1,0,1])
@@ -162,18 +162,18 @@ class trajectory():
         self.directionz.append(vec[2])
 
 
-    def setSpeed(self, speed):
-        '''
+    def setSpeed(self, speed: float):
+        """
         Add the norm of speed in the trajSpeed list.
-        '''
+        """
             
         self.trajSpeed.append(speed)
 
 
     def computeIstantSpeed(self) -> float:
-        '''
+        """
         Compute speed given the last two points added and the time self.deltaTime.
-        '''
+        """
         
         if self.deltaTime != 0:
             try:
@@ -197,9 +197,9 @@ class trajectory():
     
 
     def reset(self):
-        '''
+        """
         This function permits to reset every component of the current object.
-        '''
+        """
 
         self.trajPointsX = []
         self.trajPointsY = []
@@ -223,18 +223,18 @@ class trajectory():
 
 
     def getData(self):
-        '''
+        """
         Return all object components.
-        '''
+        """
 
         return self.trajPointsX, self.trajPointsY, self.trajPointsZ, self.directionx, self.directiony, self.directionz, self.dtime, self.trajSpeed
 
 
-    def saveLastNValues(self, nPoints):
-        '''
+    def saveLastNValues(self, nPoints: int):
+        """
         This function is useful to take only the n frames during the START state,
         because otherwise we loose some part of trajectory
-        '''
+        """
 
         lenTraj = len(self.trajPointsX) - 1
         takeOnly = lenTraj - nPoints 
@@ -259,12 +259,12 @@ class trajectory():
         self.trajSpeed = self.trajSpeed[takeOnly:]
 
 
-    def thumbsUpFix(self, numberKeyPoints):
-        '''
+    def thumbsUpFix(self, numberKeyPoints: int):
+        """
         When we close the trajectory it is necessary a thumbs up gesture
         but closer to that gesture some points are detected and are noises, therefore
         we need to remove them (just few frames).
-        '''
+        """
 
         # remove last n keypoint because the movemente to thumbup
         self.trajPointsX = self.trajPointsX[:-numberKeyPoints]
