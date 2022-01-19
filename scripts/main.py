@@ -19,42 +19,6 @@ from screeninfo import get_monitors
 
 class FullControll():
 
-    def getKeyboardInput(self, me: tello.Tello, img: np.array) -> list:
-        """
-        Get keyboard input to move the drone a fixed speed using a controller.
-        Speed can be increased or decresed dinamically.
-
-        Arguments:
-            me: this permits to takeoff or land the drone
-            img: save this img if getKey('z')
-        """
-
-        #left-right, foward-back, up-down, yaw velocity
-        lr, fb, ud, yv = 0, 0, 0, 0
-        speed = 30
-
-        if kp.getKey("LEFT"): lr = -speed
-        elif kp.getKey("RIGHT"): lr = speed
-
-        if kp.getKey("UP"): fb = speed
-        elif kp.getKey("DOWN"): fb = -speed
-
-        if kp.getKey("w"): ud = speed
-        elif kp.getKey("s"): ud = -speed
-
-        if kp.getKey("a"): yv = speed
-        elif kp.getKey("d"): yv = -speed
-
-        if kp.getKey("e"): me.takeoff(); time.sleep(3) # this allows the drone to takeoff
-        if kp.getKey("q"): me.land() # this allows the drone to land
-
-        if kp.getKey('z'):
-            cv2.imwrite(f'src/tello_screenshots/{time.time()}.jpg', img)
-            time.sleep(0.3)
-
-        return [lr, fb, ud, yv]
-
-
     def isWebcamOrDrone(self, me):
         """
         This function set parameters to work with webcam or drone camera
@@ -96,8 +60,6 @@ class FullControll():
             return img, cap
 
         else:
-            kp.init()
-
             # set size
             img = me.get_frame_read().frame
             if self.resize:
@@ -127,10 +89,6 @@ class FullControll():
                 img = cv2.flip(img, 1)
 
             else:
-                vals = self.getKeyboardInput(me, img)
-                if not (vals[0] == vals[1] == vals[2] == vals[3] == 0):
-                    me.send_rc_control(vals[0], vals[1], vals[2], vals[3])
-                    time.sleep(0.05)
 
                 img = me.get_frame_read().frame
                 img = cv2.flip(img, 1)

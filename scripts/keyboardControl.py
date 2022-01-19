@@ -31,11 +31,11 @@ points = [(500, 500, 500)]
 flag = True
 
 def getKeyboardInput2(vels):
-    global x, y, z, yaw, a, height, totTime, flag
+    global x, y, z, yaw, a, height, totTime, flag, isWebcam
 
     const = 117/10 # forward speed in cm/2     (15cm/s)
     interval = 0.25
-    dInterval = fSpeed*interval
+    dInterval = const*interval
 
     lr, fb, ud, yv = 0, 0, 0, 0
 
@@ -43,19 +43,19 @@ def getKeyboardInput2(vels):
         # if first index of vels
         if totTime < vel[2]:
 
-            lr, ud, _, interval = vel
+            lr, ud, _, _ = vel
 
-            lr_speed = (lr/15) * const
-            dInterval = lr_speed * interval
-            lr_interval = int(dInterval)
+            lr_speed = (lr/15) * const * interval
+            lr_interval = int(lr_speed)
 
-            ud_speed = (ud/15) * const
-            dInterval = ud_speed * interval
-            ud_interval = int(dInterval)
+            ud_speed = (ud/15) * const * interval
+            ud_interval = int(ud_speed)
 
             break
 
-    if totTime > vels[-1][2] + 2 and flag:
+    print(interval)
+
+    if totTime > vels[-1][2] + 2 and flag and not isWebcam:
         me.land()
         flag = False
 
@@ -75,7 +75,16 @@ def getKeyboardInput2(vels):
     return [lr, fb, ud, yv, x, y, z]
     
 
-def getKeyboardInput(img):
+def getKeyboardInput() -> list:
+    """
+    Get keyboard input to move the drone a fixed speed using a controller.
+    Speed can be increased or decresed dinamically.
+
+    Arguments:
+        me: this permits to takeoff or land the drone
+        img: save this img if getKey('z')
+    """
+
     #left-right, foward-back, up-down, yaw veloity
     lr, fb, ud, yv = 0, 0, 0, 0
     speed = 15
@@ -124,8 +133,11 @@ def getKeyboardInput(img):
     if kp.getKey("q"): me.land() # this allows the drone to land
 
     if kp.getKey('z'):
+        img = me.get_frame_read().frame
+        img = cv2.flip(img, 1)
         cv2.imwrite(f'src/tello_screenshots/{time.time()}.jpg', img)
         time.sleep(0.3)
+        return [lr, fb, ud, yv, x, y, z]
 
     time.sleep(interval)
     totTime += interval
@@ -218,8 +230,8 @@ def normalizeData(resTraj):
     dspace = np.diff(xz)
 
     # scale time from 0 to 10
-    #istTime = resTraj[6] / np.max(resTraj[6]) * 10
-    istTime = resTraj[6]
+    istTime = resTraj[6] / np.max(resTraj[6]) * 10
+    #istTime = resTraj[6]
 
     # delta time in secs
     dtime = np.diff(istTime)
@@ -237,16 +249,18 @@ def normalizeData(resTraj):
 isWebcam = True
 fullControll = fullControllModule.FullControll()
 
+kp.init()
+
 me = tello.Tello()
 
 if not isWebcam:
     me.connect()
     print(me.get_battery())
+    me.streamon() # to get the stream image
 
     me.takeoff(); 
     time.sleep(3)
     me.move_up(30)
-    me.streamon() # to get the stream image
     print("let's start")
 
 # Reset values
@@ -262,14 +276,19 @@ velocities = normalizeData(resTraj)
 
 while True:
 
+    # Control with joystick
+    vals = getKeyboardInput()
+    if not (vals[0] == vals[1] == vals[2] == vals[3] == 0):
+        me.send_rc_control(vals[0], vals[1], vals[2], vals[3])
+        time.sleep(0.05)
+
+    # Control with detected trajectory
     vals = getKeyboardInput2(velocities)
-    #vals = getKeyboardInput()
     imgXY = np.zeros((1000,1000,3), dtype=np.uint8) # 0 - 256
     imgXZ = np.zeros((1000,1000,3), dtype=np.uint8) # 0 - 256
     
     if points[-1][0] != vals[4] or points[-1][1] != vals[5] or points[-1][2] != vals[6]:
         points.append((vals[4], vals[5], vals[6]))
-    #print(points)
 
     me.send_rc_control(vals[0], vals[1], vals[2], vals[3])
     drawXYPoints(imgXY, points)

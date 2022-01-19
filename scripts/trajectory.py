@@ -174,17 +174,13 @@ class trajectory():
         """
         Compute speed given the last two points added and the time self.deltaTime.
         """
-        
-        if self.deltaTime != 0:
-            try:
-                distanceSpaceBetweenTwoLast3dPoints = math.sqrt( 
-                    ( self.trajPointsX[-2] - self.trajPointsX[-1] )**2 +
-                    ( self.trajPointsY[-2] - self.trajPointsY[-1] )**2 +
-                    ( self.trajPointsZ[-2] - self.trajPointsZ[-1] )**2
-                )
-            except:
-                print("An exception occurred")
-                distanceSpaceBetweenTwoLast3dPoints = 0 # this set currentSpeed to zero
+
+        if self.deltaTime != 0 and len(self.trajPointsX)>1:
+            distanceSpaceBetweenTwoLast3dPoints = math.sqrt( 
+                ( self.trajPointsX[-2] - self.trajPointsX[-1] )**2 +
+                ( self.trajPointsY[-2] - self.trajPointsY[-1] )**2 +
+                ( self.trajPointsZ[-2] - self.trajPointsZ[-1] )**2
+            )
 
             factorScale = 10
 
