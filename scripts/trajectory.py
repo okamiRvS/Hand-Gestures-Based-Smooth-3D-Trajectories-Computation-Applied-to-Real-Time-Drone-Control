@@ -10,27 +10,34 @@ class trajectory():
 
     def __init__(self, skipEveryNsec, trajTimeDuration):
 
+        # Lists to save point (x,y,z)
         self.trajPointsX = []
         self.trajPointsY = []
         self.trajPointsZ = []
 
+        # Lists to save orientation (roll,yaw,pitch)
         self.roll = []
         self.yaw = []
         self.pitch = []
 
+        # Lists to directions of each point
         self.directionx = []
         self.directiony = []
         self.directionz = []
 
+        # List to save the time elapsed from beginnning each time a new point added
         self.dtime = []
 
+        # List of norm speed computed each time a new point added
         self.trajSpeed = []
 
+        # Do not add points if not passed at least self.skipEveryNsec
         self.skipEveryNsec = skipEveryNsec
 
+        # Do not add points anymore if passed trajTimeDuration
         self.trajTimeDuration = trajTimeDuration
         
-        #  startTimeTraj will start when in TRACKING state
+        # startTimeTraj will start when in TRACKING state
         self.startTimeTraj = -1 
         
         # currentTime value will be update each frame
@@ -42,11 +49,16 @@ class trajectory():
         # startTime will start at the very beginning, in START state
         self.startTime = -1
 
+        # Time elapsed from the current point added and the point before
         self.deltaTime = 0
 
 
-    def checkTrajTimeDuration(self):
-        # check when TRACKING state
+    def checkTrajTimeDuration(self) -> bool:
+        '''
+        Check if it is possibile to add other points into the trajectory 
+        queue given the self.trajTimeDuration. The begining of check
+        starts when TRACKING state is available.
+        '''
 
         # at the beginning 
         if self.startTimeTraj == -1:
@@ -61,8 +73,13 @@ class trajectory():
             return True
 
 
-    def checkIsPossibleAddPoint(self):
-        # check when START or TRACKING state
+    def checkIsPossibleAddPoint(self) -> bool:
+        '''
+        Check if it is possibile to add other points into the trajectory
+        queue given the self.skipEveryNsec. The beginning of check
+        starts when START state is available. This check works also in
+        TRACKING state. 
+        '''
 
         if self.startTime == -1:
             self.startTime = time.time()
@@ -84,11 +101,21 @@ class trajectory():
 
 
     def addTimeElapsed(self):
+        '''
+        Add time elapsed from self.startTime to the self.currentTime
+        in the dtime list.
+        '''
+        
         self.dtime.append(self.currentTime - self.startTime)
 
 
     def addPoint(self, x, y, z, roll, yaw, pitch):
-
+        '''
+        Add position (x,y,z) and orientation (roll,yaw,pitch) in their 
+        respective lists.
+        Compute also direction using point and orientation.
+        '''
+        
         self.trajPointsX.append(x)
         self.trajPointsY.append(y)
         self.trajPointsZ.append(z)
@@ -101,8 +128,11 @@ class trajectory():
 
 
     def computeDirection(self, x, y, z, roll, yaw, pitch):
+        '''
+        Compute direction given a point (x,y,z) and the orientation. 
+        '''
+        
         # this is vec=(1,0,0) in homogeneous coordinates
-
         vec = np.array([0,1,0,1])
 
         roll = -roll * np.pi / 180
@@ -110,9 +140,18 @@ class trajectory():
         pitch = -pitch * np.pi / 180
 
         # https://www.brainvoyager.com/bv/doc/UsersGuide/CoordsAndTransforms/SpatialTransformationMatrices.html
-        Matrix3dRotationX = np.array([[1, 0, 0, 0], [0, np.cos(pitch), np.sin(pitch), 0], [0, -np.sin(pitch), np.cos(pitch), 0], [0, 0, 0, 1]])
-        Matrix3dRotationY = np.array([[np.cos(roll), 0, -np.sin(roll), 0], [0, 1, 0, 0], [np.sin(roll), 0, np.cos(roll), 0], [0, 0, 0, 1]])
-        Matrix3dRotationZ = np.array([[np.cos(yaw), -np.sin(yaw), 0, 0], [np.sin(yaw), np.cos(yaw), 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]])
+        Matrix3dRotationX = np.array([[1, 0, 0, 0],
+                                     [0, np.cos(pitch), np.sin(pitch), 0],
+                                     [0, -np.sin(pitch), np.cos(pitch), 0],
+                                     [0, 0, 0, 1]])
+        Matrix3dRotationY = np.array([[np.cos(roll), 0, -np.sin(roll), 0],
+                                     [0, 1, 0, 0],
+                                     [np.sin(roll),0, np.cos(roll), 0],
+                                     [0, 0, 0, 1]])
+        Matrix3dRotationZ = np.array([[np.cos(yaw), -np.sin(yaw), 0, 0], 
+                                     [np.sin(yaw), np.cos(yaw), 0, 0],
+                                     [0, 0, 1, 0],
+                                     [0, 0, 0, 1]])
 
         vec = (Matrix3dRotationX @ vec.T).T
         vec = (Matrix3dRotationY @ vec.T).T
@@ -124,11 +163,17 @@ class trajectory():
 
 
     def setSpeed(self, speed):
+        '''
+        Add the norm of speed in the trajSpeed list.
+        '''
             
         self.trajSpeed.append(speed)
 
 
-    def computeIstantSpeed(self):
+    def computeIstantSpeed(self) -> float:
+        '''
+        Compute speed given the last two points added and the time self.deltaTime.
+        '''
         
         if self.deltaTime != 0:
             try:
@@ -152,6 +197,9 @@ class trajectory():
     
 
     def reset(self):
+        '''
+        This function permits to reset every component of the current object.
+        '''
 
         self.trajPointsX = []
         self.trajPointsY = []
@@ -175,11 +223,18 @@ class trajectory():
 
 
     def getData(self):
+        '''
+        Return all object components.
+        '''
 
         return self.trajPointsX, self.trajPointsY, self.trajPointsZ, self.directionx, self.directiony, self.directionz, self.dtime, self.trajSpeed
 
 
     def saveLastNValues(self, nPoints):
+        '''
+        This function is useful to take only the n frames during the START state,
+        because otherwise we loose some part of trajectory
+        '''
 
         lenTraj = len(self.trajPointsX) - 1
         takeOnly = lenTraj - nPoints 
@@ -205,6 +260,11 @@ class trajectory():
 
 
     def thumbsUpFix(self, numberKeyPoints):
+        '''
+        When we close the trajectory it is necessary a thumbs up gesture
+        but closer to that gesture some points are detected and are noises, therefore
+        we need to remove them (just few frames).
+        '''
 
         # remove last n keypoint because the movemente to thumbup
         self.trajPointsX = self.trajPointsX[:-numberKeyPoints]
