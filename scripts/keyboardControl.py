@@ -28,8 +28,6 @@ totTime = 0
 
 points = [(500, 500, 500)]
 
-# velocity (x,y,time)
-vels = np.array([[90,90, 3], [-90,90, 6], [-90,-90, 9], [90,-90, 12]])
 flag = True
 
 kp.init()
@@ -38,10 +36,10 @@ me = tello.Tello()
 # print(me.get_battery())
 #me.streamon() # to get the stream image
 
-def getKeyboardInput2():
-    global x, y, z, yaw, a, height, totTime, vels, flag
+def getKeyboardInput2(vels):
+    global x, y, z, yaw, a, height, totTime, flag
 
-    fSpeed = 117/10 # forward speed in cm/2     (15cm/s)
+    const = 117/10 # forward speed in cm/2     (15cm/s)
     interval = 0.25
     dInterval = fSpeed*interval
 
@@ -49,27 +47,22 @@ def getKeyboardInput2():
 
     for i, vel in enumerate(vels):
         # if first index of vels
-        if totTime < vels[0][2]:
-            lr, ud, _ = vels[0] * (1 / vels[0][2] )
-            
-            lr_interval_coef = lr/15
-            lr_interval = int(dInterval * lr_interval_coef)
-            ud_interval_coef = ud/15
-            ud_interval = int(dInterval * ud_interval_coef)
+        if totTime < vel[2]:
 
-        elif totTime < vel[2]:
-            dtime = vel[2] - vels[i-1][2] 
+            lr, ud, _, interval = vel
 
-            lr, ud, _ = vel * (1 / dtime )
-            lr_interval_coef = lr/15
-            lr_interval = int(dInterval * lr_interval_coef)
-            ud_interval_coef = ud/15
-            ud_interval = int(dInterval * ud_interval_coef)
+            lr_speed = (lr/15) * const
+            dInterval = lr_speed * interval
+            lr_interval = int(dInterval)
+
+            ud_speed = (ud/15) * const
+            dInterval = ud_speed * interval
+            ud_interval = int(dInterval)
 
             break
 
     if totTime > vels[-1][2] + 2 and flag:
-        me.land()
+        #me.land()
         flag = False
 
     sleep(interval)
@@ -196,43 +189,73 @@ def drawXZPoints(img, points):
 
 def normalizeData(resTraj):
 
-    y = resTraj[0] / np.mean(resTraj[0]) - 1
-    x = resTraj[1] / np.mean(resTraj[1]) - 1
-    z = resTraj[2] / np.mean(resTraj[2]) - 1
-    
+    y = np.zeros_like(resTraj[1])
+
+    xz = np.concatenate(([resTraj[0]], [resTraj[2]]), axis=0)
+    xz = xz / np.mean(xz) - 1
+
+   
     fig = plt.figure() 
     plt.subplot(1, 2, 1)
     plt.title('XY')
     plt.xlabel('x')
     plt.ylabel('Y')
-    plt.plot(x, y)
+    plt.ylim(-1, 1) 
+    plt.xlim(-1, 1)
+    plt.plot(xz[0], y)
 
     plt.subplot(1, 2, 2)
     plt.title('XZ')
     plt.xlabel('x')
     plt.ylabel('Z')
-    plt.plot(x, z)
+    plt.ylim(-1, 1) 
+    plt.xlim(-1, 1)
+    plt.plot(xz[0], xz[1])
 
     plt.show()
-    pdb.set_trace()
 
+    # move coordinates of traj in range from -50cm to 50cm
+    xz = xz * 100
 
-# me.takeoff(); 
-# sleep(3)
-print("let's start")
+    # delta space in cm
+    dspace = np.diff(xz)
+
+    # scale time from 0 to 10
+    #istTime = resTraj[6] / np.max(resTraj[6]) * 10
+    istTime = resTraj[6]
+
+    # delta time in secs
+    dtime = np.diff(istTime)
+    dtime[0] = istTime[1]
+
+    # cm / s
+    vels = dspace / dtime
+
+    # we add time as last coordinate
+    vels = np.concatenate( (vels, [istTime[1:]], [dtime] )).T
+
+    return vels
+
 
 fullControll = fullControllModule.FullControll()
 
+# Reset values
+fullControll.autoSet()
+
+# Get data from hand
+resTraj = fullControll.run()
+
+velocities = normalizeData(resTraj)
+
+# volaaaaaa
+# me.takeoff(); 
+# sleep(3)
+# print("let's start")
+
 while True:
-    # Reset values
-    fullControll.autoSet()
 
-    # Get data from hand
-    resTraj = fullControll.run()
-
-    normalizeData(resTraj)
-
-    vals = getKeyboardInput2()
+    vals = getKeyboardInput2(velocities)
+    #vals = getKeyboardInput()
     imgXY = np.zeros((1000,1000,3), dtype=np.uint8) # 0 - 256
     imgXZ = np.zeros((1000,1000,3), dtype=np.uint8) # 0 - 256
     
