@@ -1,4 +1,5 @@
 from djitellopy import tello
+from hamcrest import none
 import keyPressModule as kp
 import time
 import cv2
@@ -55,7 +56,7 @@ class FullControll():
         return [lr, fb, ud, yv]
 
 
-    def isWebcamOrDrone(self):
+    def isWebcamOrDrone(self, me):
         """
         This function set parameters to work with webcam or drone camera
         """
@@ -93,13 +94,10 @@ class FullControll():
             else:
                 success = False
 
-            return img, cap, None
+            return img, cap
 
         else:
             kp.init()
-            me = tello.Tello()
-            me.connect()
-            me.streamon() # to get the stream image
 
             # set size
             img = me.get_frame_read().frame
@@ -109,10 +107,10 @@ class FullControll():
                 height, width, _ = img.shape
                 self.tracking.setSize(height, width)
 
-            return img, None, me
+            return img, None
             
 
-    def run(self):
+    def run(self, me=None):
         """
         Execute the algorithm to detect the 3D trajectories from 2D hand landmarks
         """
@@ -121,7 +119,7 @@ class FullControll():
         pTime = 0
         cTime = 0
 
-        img, cap, me = self.isWebcamOrDrone()
+        img, cap = self.isWebcamOrDrone(me)
 
         while True:
 
@@ -190,10 +188,10 @@ class FullControll():
                 break
 
 
-    def autoSet(self):
+    def autoSet(self, isWebcam=True, me=None):
         # Set if webcam or drone camera source
         # True is webcam, False is drone camera
-        getFromWebcam = True
+        getFromWebcam = isWebcam
 
         # Set name window of imshow
         nameWindowWebcam = "Image"
@@ -238,9 +236,20 @@ class FullControll():
 
 def main():
 
+    isWebcam = True
+    me = tello.Tello()
+    
+    if not isWebcam:
+        me.connect()
+        print(me.get_battery())
+
     fullControll = FullControll()
-    fullControll.autoSet()                  
-    fullControll.run()
+    fullControll.autoSet(isWebcam)  
+
+    fullControll.run(me)
+
+    if not isWebcam:
+        me.streamoff()
 
 
 if __name__ == "__main__":

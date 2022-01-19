@@ -1,7 +1,7 @@
 from djitellopy import tello
 from sqlalchemy import false
 import keyPressModule as kp
-from time import sleep
+import time
 import cv2
 import numpy as np
 import math
@@ -30,12 +30,6 @@ points = [(500, 500, 500)]
 
 flag = True
 
-kp.init()
-me = tello.Tello()
-# me.connect()
-# print(me.get_battery())
-#me.streamon() # to get the stream image
-
 def getKeyboardInput2(vels):
     global x, y, z, yaw, a, height, totTime, flag
 
@@ -62,10 +56,10 @@ def getKeyboardInput2(vels):
             break
 
     if totTime > vels[-1][2] + 2 and flag:
-        #me.land()
+        me.land()
         flag = False
 
-    sleep(interval)
+    time.sleep(interval)
     totTime += interval
 
     lr = int(lr)
@@ -81,7 +75,7 @@ def getKeyboardInput2(vels):
     return [lr, fb, ud, yv, x, y, z]
     
 
-def getKeyboardInput():
+def getKeyboardInput(img):
     #left-right, foward-back, up-down, yaw veloity
     lr, fb, ud, yv = 0, 0, 0, 0
     speed = 15
@@ -126,10 +120,14 @@ def getKeyboardInput():
         yv = aSpeed
         yaw += aInterval
 
-    if kp.getKey("e"): me.takeoff(); sleep(3) # this allows the drone to takeoff
+    if kp.getKey("e"): me.takeoff(); time.sleep(3) # this allows the drone to takeoff
     if kp.getKey("q"): me.land() # this allows the drone to land
 
-    sleep(interval)
+    if kp.getKey('z'):
+        cv2.imwrite(f'src/tello_screenshots/{time.time()}.jpg', img)
+        time.sleep(0.3)
+
+    time.sleep(interval)
     totTime += interval
 
     a += yaw
@@ -194,7 +192,6 @@ def normalizeData(resTraj):
     xz = np.concatenate(([resTraj[0]], [resTraj[2]]), axis=0)
     xz = xz / np.mean(xz) - 1
 
-   
     fig = plt.figure() 
     plt.subplot(1, 2, 1)
     plt.title('XY')
@@ -237,20 +234,31 @@ def normalizeData(resTraj):
     return vels
 
 
+isWebcam = True
 fullControll = fullControllModule.FullControll()
 
+me = tello.Tello()
+
+if not isWebcam:
+    me.connect()
+    print(me.get_battery())
+
+    me.takeoff(); 
+    time.sleep(3)
+    me.move_up(30)
+    me.streamon() # to get the stream image
+    print("let's start")
+
 # Reset values
-fullControll.autoSet()
+fullControll.autoSet(isWebcam)
 
 # Get data from hand
-resTraj = fullControll.run()
+resTraj = fullControll.run(me)
+
+if not isWebcam:
+    me.streamoff()
 
 velocities = normalizeData(resTraj)
-
-# volaaaaaa
-# me.takeoff(); 
-# sleep(3)
-# print("let's start")
 
 while True:
 
