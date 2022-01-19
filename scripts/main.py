@@ -1,5 +1,4 @@
 from djitellopy import tello
-from hamcrest import none
 import keyPressModule as kp
 import time
 import cv2
