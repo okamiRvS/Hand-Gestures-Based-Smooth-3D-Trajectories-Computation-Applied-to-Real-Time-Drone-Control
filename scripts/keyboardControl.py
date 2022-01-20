@@ -204,27 +204,27 @@ def normalizeData(resTraj):
     xz = np.concatenate(([resTraj[0]], [resTraj[2]]), axis=0)
     xz = xz / np.mean(xz) - 1
 
-    fig = plt.figure() 
-    plt.subplot(1, 2, 1)
-    plt.title('XY')
-    plt.xlabel('x')
-    plt.ylabel('Y')
-    plt.ylim(-1, 1) 
-    plt.xlim(-1, 1)
-    plt.plot(xz[0], y)
+    # fig = plt.figure() 
+    # plt.subplot(1, 2, 1)
+    # plt.title('XY')
+    # plt.xlabel('x')
+    # plt.ylabel('Y')
+    # plt.ylim(-1, 1) 
+    # plt.xlim(-1, 1)
+    # plt.plot(xz[0], y)
 
-    plt.subplot(1, 2, 2)
-    plt.title('XZ')
-    plt.xlabel('x')
-    plt.ylabel('Z')
-    plt.ylim(-1, 1) 
-    plt.xlim(-1, 1)
-    plt.plot(xz[0], xz[1])
+    # plt.subplot(1, 2, 2)
+    # plt.title('XZ')
+    # plt.xlabel('x')
+    # plt.ylabel('Z')
+    # plt.ylim(-1, 1) 
+    # plt.xlim(-1, 1)
+    # plt.plot(xz[0], xz[1])
 
-    plt.show()
+    # plt.show()
 
     # move coordinates of traj in range from -50cm to 50cm
-    xz = xz * 100
+    xz = xz * 200
 
     # delta space in cm
     dspace = np.diff(xz)
@@ -247,6 +247,7 @@ def normalizeData(resTraj):
 
 
 isWebcam = False
+log3dplot = False
 fullControll = fullControllModule.FullControll()
 
 me = tello.Tello()
@@ -262,11 +263,11 @@ if not isWebcam:
 
     me.takeoff(); 
     time.sleep(3)
-    me.send_rc_control(0, 0, 15, 0)
+    me.send_rc_control(0, 0, 20, 0)
     print("let's start")
 
 # Reset values
-fullControll.autoSet(isWebcam)
+fullControll.autoSet(isWebcam, log3dplot)
 
 # Get data from hand
 resTraj = fullControll.run(me)
@@ -287,8 +288,8 @@ while True:
         points.append((vals[4], vals[5], vals[6]))
 
     me.send_rc_control(vals[0], vals[1], vals[2], vals[3])
-    drawXYPoints(imgXY, points)
+    #drawXYPoints(imgXY, points)
     drawXZPoints(imgXZ, points)
-    cv2.imshow("imgXY",imgXY)
+    #cv2.imshow("imgXY",imgXY)
     cv2.imshow("imgXZ",imgXZ)
     cv2.waitKey(1)

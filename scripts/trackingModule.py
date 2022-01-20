@@ -222,7 +222,7 @@ class tracking():
                     self.currentState = "INIZIALIZATION"
 
             elif self.tolleranceSTART < checkStart < self.tolleranceSTART+100 and self.queueObj.checkGesture("stop"):
-                self.traj.saveLastNValues(nPoints = 20) # take only the last 20 points
+                self.traj.saveLastNValues(nPoints = 5) # take only the last 20 points
                 xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed = self.traj.getData()
 
                 if len(xdata) > 1: # because otherwise could give index out of range

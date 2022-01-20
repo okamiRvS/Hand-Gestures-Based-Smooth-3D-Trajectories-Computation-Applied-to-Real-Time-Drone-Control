@@ -169,7 +169,8 @@ class FullControll():
                 if res is not None:
                     return res
             else:
-                self.tracking.justDrawLast2dTraj(img)
+                #self.tracking.justDrawLast2dTraj(img)
+                print("h")
 
 
             cTime = time.time()
@@ -187,7 +188,7 @@ class FullControll():
                 break
 
 
-    def autoSet(self, isWebcam=True, me=None):
+    def autoSet(self, isWebcam=True, log3dplot=True):
 
         # Set if webcam or drone camera source
         # True is webcam, False is drone camera
@@ -215,7 +216,7 @@ class FullControll():
         queue = qm.queueObj(lenMaxQueue=35)
 
         # Instantite tracking obj
-        showPlot = True
+        showPlot = log3dplot
         tracking = tm.tracking(queue, 
                                 skipEveryNsec=0.25, #0
                                 skipEveryNpoints=2, #4
