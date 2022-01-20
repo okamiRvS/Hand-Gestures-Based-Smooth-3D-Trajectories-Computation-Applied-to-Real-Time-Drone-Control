@@ -254,6 +254,10 @@ me = tello.Tello()
 if not isWebcam:
     me.connect()
     print(me.get_battery())
+
+    # me.set_video_bitrate(1)
+    # me.set_video_resolution('low')
+    # me.set_video_resolution('high')
     me.streamon() # to get the stream image
 
     me.takeoff(); 
