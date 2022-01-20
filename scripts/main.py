@@ -188,7 +188,11 @@ class FullControll():
                 break
 
 
-    def autoSet(self, isWebcam=True, log3dplot=True):
+    def getResolution(self):
+        return self.tracking.height, self.tracking.width
+
+
+    def autoSet(self, isWebcam=True, resize = False, showPlot=True):
 
         # Set if webcam or drone camera source
         # True is webcam, False is drone camera
@@ -199,7 +203,6 @@ class FullControll():
 
         # Set if resize input img
         # if resize is True then width = xResize and height = yResize
-        resize = False
         xResize = 360
         yResize = 240
 
@@ -216,7 +219,6 @@ class FullControll():
         queue = qm.queueObj(lenMaxQueue=35)
 
         # Instantite tracking obj
-        showPlot = log3dplot
         tracking = tm.tracking(queue, 
                                 skipEveryNsec=0.25, #0
                                 skipEveryNpoints=2, #4
@@ -245,7 +247,7 @@ def main():
         print(me.get_battery())
 
     fullControll = FullControll()
-    fullControll.autoSet(isWebcam)  
+    fullControll.autoSet(isWebcam=isWebcam, resize = False, showPlot=True)
 
     fullControll.run(me)
 

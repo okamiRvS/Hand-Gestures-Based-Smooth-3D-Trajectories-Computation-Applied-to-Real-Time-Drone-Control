@@ -197,34 +197,63 @@ def drawXZPoints(img, points):
             (0,255,0),
             1) # this give us position in meters not in cm
 
-def normalizeData(resTraj):
+def normalizeData(resTraj, height, width):
 
     y = np.zeros_like(resTraj[1])
 
+    # traslate everything to the origin, remember that x and y (so resTraj[0] and
+    # resTraj[2]) are values between 0 and 1
     xz = np.concatenate(([resTraj[0]], [resTraj[2]]), axis=0)
-    xz = xz / np.mean(xz) - 1
+    xz[0] = xz[0] - xz[0][0]
+    xz[1] = xz[1] - xz[1][0]
 
-    # fig = plt.figure() 
-    # plt.subplot(1, 2, 1)
-    # plt.title('XY')
-    # plt.xlabel('x')
-    # plt.ylabel('Y')
-    # plt.ylim(-1, 1) 
-    # plt.xlim(-1, 1)
-    # plt.plot(xz[0], y)
+    # Scale x,z coordinates wrt max value (is just one, the biggest)
+    maxXZ = np.max(np.abs(xz))
+    xz = xz / maxXZ
 
-    # plt.subplot(1, 2, 2)
-    # plt.title('XZ')
-    # plt.xlabel('x')
-    # plt.ylabel('Z')
-    # plt.ylim(-1, 1) 
-    # plt.xlim(-1, 1)
-    # plt.plot(xz[0], xz[1])
+    # Remember that width could be different from height, therefore 
+    # we need to scale width axis wrt aspect ratio
+    aspectRatio = width/height
+    xz[1] = xz[1] / aspectRatio 
 
-    # plt.show()
+    fig = plt.figure() 
+    plt.subplot(2, 2, 1)
+    plt.title('XY')
+    plt.xlabel('x')
+    plt.ylabel('Y')
+    plt.xlim(-1, 1)
+    plt.ylim(-1/aspectRatio, 1/aspectRatio) 
+    plt.plot(xz[0], y)
+
+    plt.subplot(2, 2, 2)
+    plt.title('XZ')
+    plt.xlabel('x')
+    plt.ylabel('Z')
+    plt.xlim(-1, 1) 
+    plt.ylim(-1/aspectRatio, 1/aspectRatio) 
+    plt.plot(xz[0], xz[1])
 
     # move coordinates of traj in range from -50cm to 50cm
-    xz = xz * 200
+    range = 150
+    xz = xz * range
+
+    plt.subplot(2, 2, 3)
+    plt.title('XZ')
+    plt.xlabel('x')
+    plt.ylabel('Z')
+    plt.xlim(-range, range)
+    plt.ylim(-range/aspectRatio, range/aspectRatio) 
+    plt.plot(xz[0], y)
+
+    plt.subplot(2, 2, 4)
+    plt.title('XZ')
+    plt.xlabel('x')
+    plt.ylabel('Z')
+    plt.xlim(-range, range)
+    plt.ylim(-range, range) 
+    plt.plot(xz[0], xz[1])
+
+    plt.show()
 
     # delta space in cm
     dspace = np.diff(xz)
@@ -246,8 +275,7 @@ def normalizeData(resTraj):
     return vels
 
 
-isWebcam = False
-log3dplot = False
+isWebcam = True
 fullControll = fullControllModule.FullControll()
 
 me = tello.Tello()
@@ -267,15 +295,18 @@ if not isWebcam:
     print("let's start")
 
 # Reset values
-fullControll.autoSet(isWebcam, log3dplot)
+fullControll.autoSet(isWebcam=isWebcam, resize = False, showPlot=False)
 
 # Get data from hand
 resTraj = fullControll.run(me)
 
+# Get resolution
+height, width = fullControll.getResolution()
+
 if not isWebcam:
     me.streamoff()
 
-velocities = normalizeData(resTraj)
+velocities = normalizeData(resTraj, height, width)
 
 while True:
 
