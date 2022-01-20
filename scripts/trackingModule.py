@@ -225,7 +225,7 @@ class tracking():
                 self.traj.saveLastNValues(nPoints = 20) # take only the last 20 points
                 xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed = self.traj.getData()
 
-                if len(xdata) > 0: # because otherwise could give index out of range
+                if len(xdata) > 1: # because otherwise could give index out of range
                     self.currentState = "TRACKING"
                     self.startingPoint = ( int( xdata[1] * self.height),
                                            int( (1- zdata[1]) * self.width) )

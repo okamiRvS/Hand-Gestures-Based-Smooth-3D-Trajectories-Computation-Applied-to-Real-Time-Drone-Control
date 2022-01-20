@@ -246,10 +246,8 @@ def normalizeData(resTraj):
     return vels
 
 
-isWebcam = True
+isWebcam = False
 fullControll = fullControllModule.FullControll()
-
-kp.init()
 
 me = tello.Tello()
 
@@ -260,7 +258,7 @@ if not isWebcam:
 
     me.takeoff(); 
     time.sleep(3)
-    me.move_up(30)
+    me.send_rc_control(0, 0, 15, 0)
     print("let's start")
 
 # Reset values
@@ -275,12 +273,6 @@ if not isWebcam:
 velocities = normalizeData(resTraj)
 
 while True:
-
-    # Control with joystick
-    vals = getKeyboardInput()
-    if not (vals[0] == vals[1] == vals[2] == vals[3] == 0):
-        me.send_rc_control(vals[0], vals[1], vals[2], vals[3])
-        time.sleep(0.05)
 
     # Control with detected trajectory
     vals = getKeyboardInput2(velocities)

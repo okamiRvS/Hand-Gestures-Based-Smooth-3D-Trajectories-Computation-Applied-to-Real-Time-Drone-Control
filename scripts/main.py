@@ -19,6 +19,40 @@ from screeninfo import get_monitors
 
 class FullControll():
 
+    def getKeyboardInput(self, me: tello.Tello, img: np.array) -> list:
+        """
+        Get keyboard input to move the drone a fixed speed using a controller.
+        Speed can be increased or decresed dinamically.
+        Arguments:
+            me: this permits to takeoff or land the drone
+            img: save this img if getKey('z')
+        """
+
+        #left-right, foward-back, up-down, yaw velocity
+        lr, fb, ud, yv = 0, 0, 0, 0
+        speed = 30
+
+        if kp.getKey("LEFT"): lr = -speed
+        elif kp.getKey("RIGHT"): lr = speed
+
+        if kp.getKey("UP"): fb = speed
+        elif kp.getKey("DOWN"): fb = -speed
+
+        if kp.getKey("w"): ud = speed
+        elif kp.getKey("s"): ud = -speed
+
+        if kp.getKey("a"): yv = speed
+        elif kp.getKey("d"): yv = -speed
+
+        if kp.getKey("e"): me.takeoff(); time.sleep(3) # this allows the drone to takeoff
+        if kp.getKey("q"): me.land() # this allows the drone to land
+
+        if kp.getKey('z'):
+            cv2.imwrite(f'src/tello_screenshots/{time.time()}.jpg', img)
+            time.sleep(0.3)
+
+        return [lr, fb, ud, yv]
+
     def isWebcamOrDrone(self, me):
         """
         This function set parameters to work with webcam or drone camera
@@ -76,6 +110,8 @@ class FullControll():
         Execute the algorithm to detect the 3D trajectories from 2D hand landmarks
         """
 
+        kp.init()
+
         # define variable to compute framerate
         pTime = 0
         cTime = 0
@@ -109,6 +145,12 @@ class FullControll():
             if self.resize:
                 img = cv2.resize(img, (self.xResize, self.yResize)) # comment to get bigger frames
                 img = cv2.flip(img, 1)
+
+            
+            # Control with joystick
+            vals = self.getKeyboardInput(me, img)
+            me.send_rc_control(vals[0], vals[1], vals[2], vals[3])
+            print(f"vals are :{vals[0]}, {vals[1]}, {vals[2]}, {vals[3]}")
             
             img = self.detector.findHands(img)
             lmList = self.detector.findPosition(img, draw=False)
@@ -146,6 +188,7 @@ class FullControll():
 
 
     def autoSet(self, isWebcam=True, me=None):
+
         # Set if webcam or drone camera source
         # True is webcam, False is drone camera
         getFromWebcam = isWebcam
