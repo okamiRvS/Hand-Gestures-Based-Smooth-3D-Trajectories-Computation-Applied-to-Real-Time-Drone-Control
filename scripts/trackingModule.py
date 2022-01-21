@@ -16,7 +16,7 @@ class tracking():
 
         self.queueObj = queueObj 
         self.currentState = "INIZIALIZATION"
-        self.tolleranceSTART = 80
+        self.tolleranceSTART = -1
         self.tolleranceTRACKING = 500 # 100 before
         self.nlastMovements = 5
         self.scale = 0
@@ -98,19 +98,16 @@ class tracking():
 
     def addTrajectoryPointAndSpeed(self, lmList, val, roll, yaw, pitch):
 
-        if self.previous_mean_distance == -1:
-            self.previous_mean_distance = self.distanceFromMeanPoint(lmList, val)
+        # mean of all distances from mean point val and hand landmark in lmList
+        current_mean_dist = self.distanceFromMeanPoint(lmList, val)
+
+        if current_mean_dist > self.previous_mean_distance:
+            self.scale += 1 * abs(current_mean_dist - self.previous_mean_distance) # greater if the difference is high
         else:
-            # mean of all distances from mean point val and hand landmark in lmList
-            current_mean_dist = self.distanceFromMeanPoint(lmList, val)
+            self.scale -= 1 * abs(current_mean_dist - self.previous_mean_distance) # same
 
-            if current_mean_dist > self.previous_mean_distance:
-                self.scale += 1 * abs(current_mean_dist - self.previous_mean_distance) # greater if the difference is high
-            else:
-                self.scale -= 1 * abs(current_mean_dist - self.previous_mean_distance) # same
-
-            #print(self.scale)
-            self.previous_mean_distance = current_mean_dist
+        #print(self.scale)
+        self.previous_mean_distance = current_mean_dist
 
         # collect data to draw the 3d trajectory
         # scale X,Z data from 0 to 1; about scale factor I consider 50 values, but maybe it requires some major details...
@@ -184,10 +181,16 @@ class tracking():
             cv2.circle(img, (x_mean,y_mean), radius=3, color=(255,0,0), thickness=3)
             checkStart = math.sqrt( (x_mean - val[0] )**2 + (y_mean - val[1])**2 )
 
+            # initialize self.previous_mean_distance to get information about
+            # distance camera-hand. Set 
+            if self.previous_mean_distance == -1:
+                self.previous_mean_distance = self.distanceFromMeanPoint(lmList, val)
+                self.tolleranceSTART = int(self.previous_mean_distance)
+
             if checkStart < self.tolleranceSTART and self.queueObj.checkGesture("stop"):
                 self.idxPoint = 0
                 cv2.circle(img, (val[0], val[1]), radius=self.tolleranceSTART, color=(0,0,255), thickness=1) # draw the tollerance inside 
-                cv2.circle(img, (val[0], val[1]), radius=self.tolleranceSTART+100, color=(0,255,0), thickness=1) # draw the tollerance outside 
+                cv2.circle(img, (val[0], val[1]), radius=self.tolleranceSTART*2, color=(0,255,0), thickness=1) # draw the tollerance outside 
                 
                 if self.traj.checkIsPossibleAddPoint():
                     self.addTrajectoryPointAndSpeed(lmList, val, roll, yaw, pitch)
@@ -221,7 +224,7 @@ class tracking():
                     self.cleanTraj()
                     self.currentState = "INIZIALIZATION"
 
-            elif self.tolleranceSTART < checkStart < self.tolleranceSTART+100 and self.queueObj.checkGesture("stop"):
+            elif self.tolleranceSTART < checkStart < self.tolleranceSTART*2 and self.queueObj.checkGesture("stop"):
                 self.traj.saveLastNValues(nPoints = 5) # take only the last 20 points
                 xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed = self.traj.getData()
 

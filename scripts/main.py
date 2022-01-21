@@ -144,13 +144,11 @@ class FullControll():
 
             if self.resize:
                 img = cv2.resize(img, (self.xResize, self.yResize)) # comment to get bigger frames
-                img = cv2.flip(img, 1)
-
             
             # Control with joystick
             vals = self.getKeyboardInput(me, img)
             me.send_rc_control(vals[0], vals[1], vals[2], vals[3])
-            print(f"vals are :{vals[0]}, {vals[1]}, {vals[2]}, {vals[3]}")
+            #print(f"vals are :{vals[0]}, {vals[1]}, {vals[2]}, {vals[3]}")
             
             img = self.detector.findHands(img)
             lmList = self.detector.findPosition(img, draw=False)

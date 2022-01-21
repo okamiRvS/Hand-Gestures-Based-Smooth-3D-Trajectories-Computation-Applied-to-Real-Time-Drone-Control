@@ -41,9 +41,9 @@ def getKeyboardInput2(vels):
 
     for i, vel in enumerate(vels):
         # if first index of vels
-        if totTime < vel[2]:
+        if totTime < vel[3]:
 
-            lr, ud, _, _ = vel
+            lr, ud, fb, _, _ = vel
 
             lr_speed = (lr/15) * const * interval
             lr_interval = int(lr_speed)
@@ -51,11 +51,14 @@ def getKeyboardInput2(vels):
             ud_speed = (ud/15) * const * interval
             ud_interval = int(ud_speed)
 
+            fb_speed = (fb/15) * const * interval
+            fb_interval = int(fb_speed)
+
             break
 
     print(interval)
 
-    if totTime > vels[-1][2] + 2 and flag and not isWebcam:
+    if totTime > vels[-1][3] + 2 and flag and not isWebcam:
         me.land()
         flag = False
 
@@ -63,14 +66,15 @@ def getKeyboardInput2(vels):
     totTime += interval
 
     lr = int(lr)
+    fb = int(fb)
     ud = int(ud)
 
-    if lr !=0 and ud !=0:
+    if lr !=0 and fb!=0 and ud !=0:
         x += lr_interval
+        y += fb_interval
         z -= ud_interval
     
     print(lr, fb, ud, yv, x, y, z)
-    # print(lr_interval, ud_interval)
 
     return [lr, fb, ud, yv, x, y, z]
     
@@ -197,16 +201,18 @@ def drawXZPoints(img, points):
             (0,255,0),
             1) # this give us position in meters not in cm
 
+
 def normalizeData(resTraj, height, width):
 
-    y = np.zeros_like(resTraj[1])
+    #y = np.zeros_like(resTraj[1])
 
     # traslate everything to the origin, remember that x and y (so resTraj[0] and
     # resTraj[2]) are values between 0 and 1
     xz = np.concatenate(([resTraj[0]], [resTraj[2]]), axis=0)
     xz[0] = xz[0] - xz[0][0]
     xz[1] = xz[1] - xz[1][0]
-
+    y = resTraj[1] - resTraj[1][0] ###################################
+    
     # Scale x,z coordinates wrt max value (is just one, the biggest)
     maxXZ = np.max(np.abs(xz))
     xz = xz / maxXZ
@@ -219,35 +225,36 @@ def normalizeData(resTraj, height, width):
     fig = plt.figure() 
     plt.subplot(2, 2, 1)
     plt.title('XY')
-    plt.xlabel('x')
+    plt.xlabel('X')
     plt.ylabel('Y')
     plt.xlim(-1, 1)
-    plt.ylim(-1/aspectRatio, 1/aspectRatio) 
+    plt.ylim(-1, 1) 
     plt.plot(xz[0], y)
 
     plt.subplot(2, 2, 2)
     plt.title('XZ')
-    plt.xlabel('x')
+    plt.xlabel('X')
     plt.ylabel('Z')
     plt.xlim(-1, 1) 
     plt.ylim(-1/aspectRatio, 1/aspectRatio) 
     plt.plot(xz[0], xz[1])
 
-    # move coordinates of traj in range from -50cm to 50cm
+    # move coordinates of traj in range from -range cm to range cm
     range = 150
     xz = xz * range
+    y = y * (range/2) # reduce range of z space... ########################################
 
     plt.subplot(2, 2, 3)
     plt.title('XZ')
-    plt.xlabel('x')
-    plt.ylabel('Z')
+    plt.xlabel('X')
+    plt.ylabel('Y')
     plt.xlim(-range, range)
-    plt.ylim(-range/aspectRatio, range/aspectRatio) 
+    plt.ylim(-range, range) 
     plt.plot(xz[0], y)
 
     plt.subplot(2, 2, 4)
     plt.title('XZ')
-    plt.xlabel('x')
+    plt.xlabel('X')
     plt.ylabel('Z')
     plt.xlim(-range, range)
     plt.ylim(-range, range) 
@@ -255,18 +262,19 @@ def normalizeData(resTraj, height, width):
 
     plt.show()
 
-    # delta space in cm
-    dspace = np.diff(xz)
+    # delta space in cm  
+    xyz = np.concatenate((xz, [y]), axis=0)
+    dspace = np.diff(xyz)
 
     # scale time from 0 to 10
-    istTime = resTraj[6] / np.max(resTraj[6]) * 10
+    istTime = resTraj[6] - resTraj[6][0]
+    istTime = istTime / np.max(istTime) * 10
     #istTime = resTraj[6]
 
     # delta time in secs
     dtime = np.diff(istTime)
-    dtime[0] = istTime[1]
 
-    # cm / s
+    # vels (x,y,z) in cm / s
     vels = dspace / dtime
 
     # we add time as last coordinate
@@ -295,7 +303,7 @@ if not isWebcam:
     print("let's start")
 
 # Reset values
-fullControll.autoSet(isWebcam=isWebcam, resize = False, showPlot=False)
+fullControll.autoSet(isWebcam=isWebcam, resize=False, showPlot=False)
 
 # Get data from hand
 resTraj = fullControll.run(me)
@@ -319,8 +327,8 @@ while True:
         points.append((vals[4], vals[5], vals[6]))
 
     me.send_rc_control(vals[0], vals[1], vals[2], vals[3])
-    #drawXYPoints(imgXY, points)
+    drawXYPoints(imgXY, points)
     drawXZPoints(imgXZ, points)
-    #cv2.imshow("imgXY",imgXY)
+    cv2.imshow("imgXY",imgXY)
     cv2.imshow("imgXZ",imgXZ)
     cv2.waitKey(1)
