@@ -6,6 +6,7 @@ tello_ros_gazebo
 src/known_faces/*
 src/unknown_faces/*
 src/tello_screenshots/*
+src/video_src/*
 src/dataHandGesture/imgData/*
 scripts/test.py
 tfod

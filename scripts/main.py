@@ -168,6 +168,7 @@ class FullControll():
                 res = self.tracking.run(img, self.normalizedPoints, outputClass, probability)
                 
                 if res is not None:
+                    kp.close()
                     return res
             else:
                 self.tracking.justDrawLast2dTraj(img)

@@ -17,6 +17,9 @@ def getKey(keyname):
     pygame.display.update()
     return ans
 
+def close():
+    pygame.quit()
+
 def main():
     if getKey("LEFT"):
         print("Left key pressed")

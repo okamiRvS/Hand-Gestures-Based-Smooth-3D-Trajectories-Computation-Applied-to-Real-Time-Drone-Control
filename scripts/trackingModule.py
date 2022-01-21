@@ -34,7 +34,7 @@ class tracking():
         self.height = 0
         self.width = 0
 
-        self.timeToCatchAnotherTraj = 5
+        self.timeToCatchAnotherTraj = 2
 
         self.idxPoint = 0
         self.delayToExecuteTrajectory = 50
@@ -187,7 +187,7 @@ class tracking():
             # distance camera-hand. Set 
             if self.previous_mean_distance == -1:
                 self.previous_mean_distance = self.distanceFromMeanPoint(lmList, val)
-                self.tolleranceSTART = int(self.previous_mean_distance)
+                self.tolleranceSTART = int(self.previous_mean_distance) + 20
 
             if checkStart < self.tolleranceSTART and self.queueObj.checkGesture("stop"):
                 self.idxPoint = 0
@@ -288,16 +288,24 @@ class tracking():
 
 
         elif "EXIT" == self.currentState:
-            currentTime = time.time()
-            if self.waitForNewTraj < currentTime and self.queueObj.checkGesture("stop"):
-                self.cleanTraj()
-                self.currentState = "INIZIALIZATION"
-            
+
             #xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed = self.trajCOMPLETE[-1].getData()
             xdata, ydata, zdata, rolldata, yawdata, pitchdata, dtime, speed = self.smoothing.smoothCalculation()
             
             # export data as csv
             #pd.DataFrame(np.array([xdata, ydata, zdata, rolldata, yawdata, pitchdata, dtime, speed])).to_csv("data.csv", index=False, header=None)
+
+            # if passed a few time from TRAKING state
+            if self.waitForNewTraj < time.time():
+
+                # if stop gesture then reset
+                if self.queueObj.checkGesture("stop"):
+                    self.cleanTraj()
+                    self.currentState = "INIZIALIZATION"
+
+                # if thumbsup then execute action
+                elif self.queueObj.checkGesture("thumbsup"):
+                    return xdata, ydata, zdata, rolldata, yawdata, pitchdata, dtime, speed
                         
             self.draw2dTraj(img, xdata, zdata)
 
