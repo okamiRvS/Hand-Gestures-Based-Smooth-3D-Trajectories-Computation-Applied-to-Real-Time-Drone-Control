@@ -1,261 +1,408 @@
 from djitellopy import tello
 import keyPressModule as kp
+import recordVideoModule as recVid
 import time
 import cv2
-import handTrackingModule as htm
-import handGestureModule as hgm
-import queueModule as qm
-import trackingModule as tm
-import normalizePointsModule as normalize
-from numba import jit
 import numpy as np
+import math
 import pdb
-import os
-
+import fullControllModule
 import matplotlib.pyplot as plt
 
-from screeninfo import get_monitors
+
+class keyboardControl:
+
+    def __init__(self, isWebcam=True):
+
+        ######################################################
+        # PARAMETERS
+        fSpeed = 117/10 # forward speed in cm/2     (15cm/s)
+        aSpeed = 360/10 # angular speed degrees/s   (50d/s)
+        self.interval = 0.25
+
+        self.dInterval = fSpeed*self.interval
+        self.aInterval = aSpeed*self.interval
+
+        ######################################################
+        self.x, self.y, self.z = 500, 500, 500
+        self.a = 0
+        self.yaw = 0
+        height = 0
+        self.totTime = 0
+
+        self.points = [(500, 500, 500)]
+
+        self.flag = True       
+        self.isWebcam = isWebcam
 
 
-class FullControll():
+    def getKeyboardInput2(self, vels):
+        const = 117/10 # forward speed in cm/2     (15cm/s)
+        dInterval = const*self.interval
 
-    def getKeyboardInput(self, me: tello.Tello, img: np.array) -> list:
+        lr, fb, ud, yv = 0, 0, 0, 0
+
+        for i, vel in enumerate(vels):
+            # if first index of vels
+            if self.totTime < vel[3]:
+
+                lr, ud, fb, _, _ = vel
+
+                lr_speed = (lr/15) * const * self.interval
+                lr_interval = int(lr_speed)
+
+                ud_speed = (ud/15) * const * self.interval
+                ud_interval = int(ud_speed)
+
+                fb_speed = (fb/15) * const * self.interval
+                fb_interval = int(fb_speed)
+
+                break
+
+        # If end trajectory then set self.flag to false for land and stop rec
+        if self.totTime > vels[-1][3] + 2 and self.flag and not self.isWebcam:
+            self.flag = False
+
+        time.sleep(self.interval)
+        self.totTime += self.interval
+
+        lr = int(lr)
+        fb = int(fb)
+        ud = int(ud)
+
+        if lr !=0 and fb!=0 and ud !=0:
+            self.x += lr_interval
+            self.y += fb_interval
+            self.z -= ud_interval
+        
+        print(lr, fb, ud, yv, self.x, self.y, self.z)
+
+        return [lr, fb, ud, yv, self.x, self.y, self.z]
+        
+
+    def getKeyboardInput(self, me) -> list:
         """
         Get keyboard input to move the drone a fixed speed using a controller.
         Speed can be increased or decresed dinamically.
+
         Arguments:
             me: this permits to takeoff or land the drone
             img: save this img if getKey('z')
         """
 
-        #left-right, foward-back, up-down, yaw velocity
+        #left-right, foward-back, up-down, yaw veloity
         lr, fb, ud, yv = 0, 0, 0, 0
-        speed = 30
+        speed = 15
+        aSpeed = 50
+        d = 0 # distance will be reset each time
+        height = 0 #height will be reset each time
 
-        if kp.getKey("LEFT"): lr = -speed
-        elif kp.getKey("RIGHT"): lr = speed
+        if kp.getKey("LEFT"): 
+            lr = -speed
+            d = self.dInterval
+            a = -180
 
-        if kp.getKey("UP"): fb = speed
-        elif kp.getKey("DOWN"): fb = -speed
+        elif kp.getKey("RIGHT"): 
+            lr = speed
+            d = -self.dInterval
+            a = 180
 
-        if kp.getKey("w"): ud = speed
-        elif kp.getKey("s"): ud = -speed
+        if kp.getKey("UP"):  # this is forward, not up...
+            fb = speed
+            d = self.dInterval
+            a = 270
 
-        if kp.getKey("a"): yv = speed
-        elif kp.getKey("d"): yv = -speed
+        elif kp.getKey("DOWN"): # this is backward, not down...
+            fb = -speed
+            d = -self.dInterval
+            a = -90
+
+        if kp.getKey("w"): 
+            ud = speed
+            height = -self.dInterval
+
+        elif kp.getKey("s"): 
+            ud = -speed
+            height = self.dInterval
+
+        if kp.getKey("a"): 
+            yv = -aSpeed
+            self.yaw -= self.aInterval
+
+        elif kp.getKey("d"): 
+            yv = aSpeed
+            self.yaw += self.aInterval
 
         if kp.getKey("e"): me.takeoff(); time.sleep(3) # this allows the drone to takeoff
         if kp.getKey("q"): me.land() # this allows the drone to land
 
         if kp.getKey('z'):
+            img = me.get_frame_read().frame
+            img = cv2.flip(img, 1)
             cv2.imwrite(f'src/tello_screenshots/{time.time()}.jpg', img)
             time.sleep(0.3)
+            return [lr, fb, ud, yv, self.x, self.y, self.z]
 
-        return [lr, fb, ud, yv]
+        time.sleep(self.interval)
+        self.totTime += self.interval
 
-    def isWebcamOrDrone(self, me):
-        """
-        This function set parameters to work with webcam or drone camera
-        """
+        self.a += self.yaw
+        self.x += int(d*math.cos(math.radians(a)))
+        self.y += int(d*math.sin(math.radians(a)))
+        self.z += int(height)
 
-        # HERE MAYBE COULD BE USEFUL USE A FACTORY FUNCTION (FROM SOFTWARE ENGENEERING)
-        if self.getFromWebcam:
+        return [lr, fb, ud, yv, self.x, self.y, self.z]
+
+
+    def drawXYPoints(self, img):
+        for point in self.points:
+            cv2.circle(img, (point[0], point[1]), 5, (0,0,255), cv2.FILLED)
+        
+        # print last point in green
+        cv2.circle(img, (self.points[-1][0], self.points[-1][1]), 8, (0,255,0), cv2.FILLED)
+
+        # print coordinate of the last position
+        cv2.putText(img,
+                    f"({ (self.points[-1][0] - 500) / 100}, { (self.points[-1][1] - 500) /100}, { (self.points[-1][2] - 500) /100})m",
+                    ( self.points[-1][0]+10, self.points[-1][1]+30 ),
+                    cv2.FONT_HERSHEY_PLAIN,
+                    1,
+                    (255,0,255),
+                    1) # this give us position in meters not in cm
+
+        # print totTime
+        cv2.putText(img, f"{self.totTime}s",
+                ( 10, 30 ),
+                cv2.FONT_HERSHEY_PLAIN,
+                3,
+                (0,255,0),
+                1) # this give us position in meters not in cm
+
+    def drawXZPoints(self, img):
+        for point in self.points:
+            cv2.circle(img, (point[0], point[2]), 5, (0,0,255), cv2.FILLED)
+        
+        # print last point in green
+        cv2.circle(img, (self.points[-1][0], self.points[-1][2]), 8, (0,255,0), cv2.FILLED)
+
+        # print coordinate of the last position
+        cv2.putText(img,
+                    f"({ (self.points[-1][0] - 500) / 100}, { (self.points[-1][1] - 500) /100}, { (self.points[-1][2] - 500) /100})m",
+                    ( self.points[-1][0]+10, self.points[-1][2]+30 ),
+                    cv2.FONT_HERSHEY_PLAIN,
+                    1,
+                    (255,0,255),
+                    1) # this give us position in meters not in cm
+
+        # print totTime
+        cv2.putText(img, f"{self.totTime}s",
+                ( 10, 30 ),
+                cv2.FONT_HERSHEY_PLAIN,
+                3,
+                (0,255,0),
+                1) # this give us position in meters not in cm
+
+
+    def normalizeData(self, resTraj, height, width, log=True):
+
+        #y = np.zeros_like(resTraj[1])
+
+        # traslate everything to the origin, remember that x and y (so resTraj[0] and
+        # resTraj[2]) are values between 0 and 1
+        xz = np.concatenate(([resTraj[0]], [resTraj[2]]), axis=0)
+        xz[0] = xz[0] - xz[0][0]
+        xz[1] = xz[1] - xz[1][0]
+        y = resTraj[1] - resTraj[1][0] ###################################
+        
+        # Scale x,z coordinates wrt max value (is just one, the biggest)
+        maxXZ = np.max(np.abs(xz))
+        xz = xz / maxXZ
+
+        # Remember that width could be different from height, therefore 
+        # we need to scale width axis wrt aspect ratio
+        aspectRatio = width/height
+        xz[1] = xz[1] / aspectRatio 
+
+        if log:
+            fig = plt.figure() 
+            plt.subplot(2, 2, 1)
+            plt.title('XY')
+            plt.xlabel('X')
+            plt.ylabel('Y')
+            plt.xlim(-1, 1)
+            plt.ylim(-1, 1) 
+            plt.plot(xz[0], y)
+
+            plt.subplot(2, 2, 2)
+            plt.title('XZ')
+            plt.xlabel('X')
+            plt.ylabel('Z')
+            plt.xlim(-1, 1) 
+            plt.ylim(-1/aspectRatio, 1/aspectRatio) 
+            plt.plot(xz[0], xz[1])
+
+        # move coordinates of traj in range from -range cm to range cm
+        range = 130
+        xz = xz * range
+        y = y * (range/2) # reduce range of z space... ########################################
+
+        if log:
+            plt.subplot(2, 2, 3)
+            plt.title('XZ')
+            plt.xlabel('X cm')
+            plt.ylabel('Y cm')
+            plt.xlim(-range, range)
+            plt.ylim(-range, range) 
+            plt.plot(xz[0], y)
+
+            plt.subplot(2, 2, 4)
+            plt.title('XZ')
+            plt.xlabel('X cm')
+            plt.ylabel('Z cm')
+            plt.xlim(-range, range)
+            plt.ylim(-range, range) 
+            plt.plot(xz[0], xz[1])
+
+            plt.show()
+
+        # delta space in cm  
+        xyz = np.concatenate((xz, [y]), axis=0)
+        dspace = np.diff(xyz)
+
+        # scale time from 0 to 10
+        istTime = resTraj[6] - resTraj[6][0]
+        istTime = istTime / np.max(istTime) * 10
+        #istTime = resTraj[6]
+
+        # delta time in secs
+        dtime = np.diff(istTime)
+
+        # vels (x,y,z) in cm / s
+        vels = dspace / dtime
+
+        # we add time as last coordinate
+        vels = np.concatenate( (vels, [istTime[1:]], [dtime] )).T
+
+        return vels
+
+
+    def run(self):
+
+        fullControll = fullControllModule.FullControll()
+
+        me = tello.Tello()
+
+        if not self.isWebcam:
+            me.connect()
+            print(me.get_battery())
+            me.streamon() # to get the stream image
+            me.takeoff(); 
+            time.sleep(3)
+            rec = recVid.recordVideo(me)
+            rec.run()
+            me.send_rc_control(0, 0, 20, 0)
+            print("Let's start")
+
+        # Reset values
+        fullControll.autoSet(isWebcam=self.isWebcam, resize=False, showPlot=False)
+
+        # Get data from hand
+        resTraj = fullControll.run(me)
+
+        # Get resolution
+        height, width = fullControll.getResolution()
+
+        velocities = self.normalizeData(resTraj, height, width, log=False)
+
+        while self.flag:
+
+            # Control with detected trajectory
+            vals = self.getKeyboardInput2(velocities)
+
+            imgXY = np.zeros((1000,1000,3), dtype=np.uint8) # 0 - 256
+            imgXZ = np.zeros((1000,1000,3), dtype=np.uint8) # 0 - 256
             
-            # OPEN WEBCAM
-            cv2.namedWindow(self.nameWindowWebcam)
+            if self.points[-1][0] != vals[4] or self.points[-1][1] != vals[5] or self.points[-1][2] != vals[6]:
+                self.points.append((vals[4], vals[5], vals[6]))
 
-            cv2.moveWindow(self.nameWindowWebcam, 0, int( get_monitors()[0].height / 2 ) + 10)
+            me.send_rc_control(vals[0], vals[1], vals[2], vals[3])
+            self.drawXYPoints(imgXY)
+            self.drawXZPoints(imgXZ)
+            cv2.imshow("imgXY",imgXY)
+            cv2.imshow("imgXZ",imgXZ)
+            cv2.waitKey(1)
 
-            # For Linux, make sure OpenCV is built using the WITH_V4L (with video for linux).
-            # sudo apt install v4l-utils
-            # https://www.youtube.com/watch?v=ec4-1gF-cNU
-            if os.name == 'posix': # if linux system
-                cap = cv2.VideoCapture(0)
-            elif os.name == 'nt': # if windows system
-                cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
+        # Destroying all the windows
+        cv2.destroyAllWindows()
 
-            #Check if camera was opened correctly
-            if cap.isOpened():
+        # Stop recording
+        rec.stop()
+        me.streamoff()
 
-                # try to get the first frame
-                success, img = cap.read()
 
-                # set size
-                if self.resize:
-                    self.tracking.setSize(self.xResize, self.yResize)
-                    self.normalizedPoints.setSize(self.xResize, self.yResize)
-                else:
-                    height, width, _ = img.shape
-                    self.tracking.setSize(height, width)
-                    self.normalizedPoints.setSize(height, width)
-            else:
-                success = False
+    def test(self):
 
-            return img, cap
+        # THIS TEST IS WITHOUT FLY
 
-        else:
-            # set size
-            img = me.get_frame_read().frame
-            if self.resize:
-                self.tracking.setSize(self.xResize, self.yResize)
-            else:
-                height, width, _ = img.shape
-                self.tracking.setSize(height, width)
+        self.isWebcam = False
 
-            return img, None
+        fullControll = fullControllModule.FullControll()
+
+        me = tello.Tello()
+        me.connect()
+        print(me.get_battery())
+
+        # Start rec video
+        me.streamon() # to get the stream image
+        time.sleep(3)
+        rec = recVid.recordVideo(me)
+        rec.run()
+
+        # Reset values
+        fullControll.autoSet(isWebcam=self.isWebcam, resize=False, showPlot=False)
+
+        # Get data from hand
+        resTraj = fullControll.run(me)
+
+        # Get resolution
+        height, width = fullControll.getResolution()
+
+        velocities = self.normalizeData(resTraj, height, width, log=True)
+
+        while self.flag:
+
+            # Control with detected trajectory
+            vals = self.getKeyboardInput2(velocities)
+
+            imgXY = np.zeros((1000,1000,3), dtype=np.uint8) # 0 - 256
+            imgXZ = np.zeros((1000,1000,3), dtype=np.uint8) # 0 - 256
             
+            if self.points[-1][0] != vals[4] or self.points[-1][1] != vals[5] or self.points[-1][2] != vals[6]:
+                self.points.append((vals[4], vals[5], vals[6]))
 
-    def run(self, me=None):
-        """
-        Execute the algorithm to detect the 3D trajectories from 2D hand landmarks
-        """
+            self.drawXYPoints(imgXY)
+            self.drawXZPoints(imgXZ)
+            cv2.imshow("imgXY",imgXY)
+            cv2.imshow("imgXZ",imgXZ)
+            cv2.waitKey(1)
 
-        if not self.isSimulation:
-            kp.init()
+        # Destroying all the windows
+        cv2.destroyAllWindows()
 
-        # define variable to compute framerate
-        pTime = 0
-        cTime = 0
-
-        img, cap = self.isWebcamOrDrone(me)
-
-        while True:
-
-            if self.getFromWebcam:
-                success, img = cap.read()
-                img = cv2.flip(img, 1)
-
-            else:
-
-                img = me.get_frame_read().frame
-                img = cv2.flip(img, 1)
-
-                # print drone battery on screen
-                fontScale = 1
-                font = cv2.FONT_HERSHEY_DUPLEX
-                thickness = 1
-                color = (0,0,255)
-                img = cv2.putText(img, 
-                                    f"Battery: {me.get_battery()}", 
-                                    (10, self.tracking.height-5),
-                                    font, 
-                                    fontScale, 
-                                    color, 
-                                    thickness)
-
-            if self.resize:
-                img = cv2.resize(img, (self.xResize, self.yResize)) # comment to get bigger frames
-            
-            # Control with joystick
-            if not self.isSimulation:
-                vals = self.getKeyboardInput(me, img)
-                me.send_rc_control(vals[0], vals[1], vals[2], vals[3])
-                #print(f"vals are :{vals[0]}, {vals[1]}, {vals[2]}, {vals[3]}")
-            
-            img = self.detector.findHands(img)
-            lmList = self.detector.findPosition(img, draw=False)
-
-            if len(lmList) != 0:
-                # setArray, computeMean, normalize points, and draw
-                self.normalizedPoints.setArray(lmList)
-                self.normalizedPoints.normalize()
-                if self.allHandTransformed:
-                    self.normalizedPoints.drawAllHandTransformed(img)
-                self.normalizedPoints.removeHomogeneousCoordinate()
-
-                # hand gesture recognition
-                img, outputClass, probability = self.gestureDetector.processHands(img, self.normalizedPoints)
-                res = self.tracking.run(img, self.normalizedPoints, outputClass, probability)
-                
-                if res is not None:
-                    kp.close()
-                    return res
-            else:
-                self.tracking.justDrawLast2dTraj(img)
-
-            # Update framerate
-            cTime = time.time()
-            fps = 1/(cTime-pTime)
-            pTime = cTime
-
-            fontScale = 1
-            font = cv2.FONT_HERSHEY_DUPLEX
-            thickness = 1
-            cv2.putText(img, f"FPS: {int(fps)}", (10,40), font, fontScale, (255,0,255), thickness) # print fps
-
-            cv2.imshow(self.nameWindowWebcam, img)
-            key = cv2.waitKey(1)
-            if key == 27: # exit on ESC
-                break
-
-
-    def getResolution(self):
-        return self.tracking.height, self.tracking.width
-
-
-    def autoSet(self, isWebcam=True, resize=False, showPlot=True, isSimulation=False, allHandTransformed=False):
-
-        # Set if webcam or drone camera source
-        # True is webcam, False is drone camera
-        getFromWebcam = isWebcam
-
-        # Set name window of imshow
-        nameWindowWebcam = "Image"
-
-        # Set if resize input img
-        # if resize is True then width = xResize and height = yResize
-        xResize = 360
-        yResize = 240
-
-        # Istantiate handDetector obj
-        detector = htm.handDetector()
-
-        #Istantiate handGestureRecognition obj
-        gestureDetector = hgm.handGestureRecognition()
-
-        # Istantiate normalizePoints obj
-        normalizedPoints = normalize.normalizePoints()
-
-        # Create a queue obj of a certain length 
-        queue = qm.queueObj(lenMaxQueue=35)
-
-        # Instantite tracking obj
-        tracking = tm.tracking(queue, 
-                                skipEveryNsec=0.25, #0
-                                skipEveryNpoints=2, #4
-                                trajTimeDuration=20, # trajTimeDuration is in seconds
-                                log3D=showPlot) 
-
-        # set variable
-        self.getFromWebcam = getFromWebcam
-        self.nameWindowWebcam = nameWindowWebcam
-        self.resize = resize
-        self.xResize = xResize
-        self.yResize = yResize
-        self.detector = detector
-        self.gestureDetector = gestureDetector
-        self.normalizedPoints = normalizedPoints
-        self.tracking = tracking
-        self.isSimulation = isSimulation
-        self.allHandTransformed = allHandTransformed
+        # Stop recording
+        rec.stop()
+        me.streamoff()
 
 
 def main():
 
-    isWebcam = True
-    me = tello.Tello()
-    
-    if not isWebcam:
-        me.connect()
-        print(me.get_battery())
+    # isWebcam=True IF YOU WANT TO USE WEBCAM
+    kc = keyboardControl(isWebcam=True)
 
-    fullControll = FullControll()
-    fullControll.autoSet(isWebcam=isWebcam, resize=True, showPlot=True)
+    # THIS IS TEST, IS ALWAY isWebcam=FALSE
+    kc.test()
 
-    fullControll.run(me)
-
-    if not isWebcam:
-        me.streamoff()
+    #kc.run()
 
 
 if __name__ == "__main__":
