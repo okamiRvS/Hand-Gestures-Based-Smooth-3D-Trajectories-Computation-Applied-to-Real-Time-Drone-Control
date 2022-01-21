@@ -110,7 +110,8 @@ class FullControll():
         Execute the algorithm to detect the 3D trajectories from 2D hand landmarks
         """
 
-        kp.init()
+        if not self.isSimulation:
+            kp.init()
 
         # define variable to compute framerate
         pTime = 0
@@ -158,7 +159,8 @@ class FullControll():
                 # setArray, computeMean, normalize points, and draw
                 self.normalizedPoints.setArray(lmList)
                 self.normalizedPoints.normalize()
-                self.normalizedPoints.drawAllHandTransformed(img)
+                if self.allHandTransformed:
+                    self.normalizedPoints.drawAllHandTransformed(img)
                 self.normalizedPoints.removeHomogeneousCoordinate()
 
                 # hand gesture recognition
@@ -171,7 +173,7 @@ class FullControll():
                 #self.tracking.justDrawLast2dTraj(img)
                 print("h")
 
-
+            # Update framerate
             cTime = time.time()
             fps = 1/(cTime-pTime)
             pTime = cTime
@@ -191,7 +193,7 @@ class FullControll():
         return self.tracking.height, self.tracking.width
 
 
-    def autoSet(self, isWebcam=True, resize = False, showPlot=True, isSimulation=False):
+    def autoSet(self, isWebcam=True, resize = False, showPlot=True, isSimulation=False, allHandTransformed=False):
 
         # Set if webcam or drone camera source
         # True is webcam, False is drone camera
@@ -235,6 +237,7 @@ class FullControll():
         self.normalizedPoints = normalizedPoints
         self.tracking = tracking
         self.isSimulation = isSimulation
+        self.allHandTransformed = allHandTransformed
 
 
 def main():
