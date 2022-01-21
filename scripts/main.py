@@ -146,9 +146,10 @@ class FullControll():
                 img = cv2.resize(img, (self.xResize, self.yResize)) # comment to get bigger frames
             
             # Control with joystick
-            vals = self.getKeyboardInput(me, img)
-            me.send_rc_control(vals[0], vals[1], vals[2], vals[3])
-            #print(f"vals are :{vals[0]}, {vals[1]}, {vals[2]}, {vals[3]}")
+            if not self.isSimulation:
+                vals = self.getKeyboardInput(me, img)
+                me.send_rc_control(vals[0], vals[1], vals[2], vals[3])
+                #print(f"vals are :{vals[0]}, {vals[1]}, {vals[2]}, {vals[3]}")
             
             img = self.detector.findHands(img)
             lmList = self.detector.findPosition(img, draw=False)
@@ -190,7 +191,7 @@ class FullControll():
         return self.tracking.height, self.tracking.width
 
 
-    def autoSet(self, isWebcam=True, resize = False, showPlot=True):
+    def autoSet(self, isWebcam=True, resize = False, showPlot=True, isSimulation=False):
 
         # Set if webcam or drone camera source
         # True is webcam, False is drone camera
@@ -233,6 +234,7 @@ class FullControll():
         self.gestureDetector = gestureDetector
         self.normalizedPoints = normalizedPoints
         self.tracking = tracking
+        self.isSimulation = isSimulation
 
 
 def main():
