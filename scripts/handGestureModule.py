@@ -9,7 +9,9 @@ import pdb
 
 class handGestureRecognition():
 
-    lastModel = "1637667098" # COPY THE FOLDER NAME OF Tensorflow/workspace/models/my_hand_gesture_model
+    # To train a new model look at "3. Hand gesture recognition.ipynb" use as kernel tfod
+
+    lastModel = "1642800231" # COPY THE FOLDER NAME OF Tensorflow/workspace/models/my_hand_gesture_model
     
     if os.name == 'posix': # if linux system
         export_path = str.encode(os.path.join("/home/usiusi/catkin_ws/src/DJI-Tello-3D-Hand-Gesture-control/Tensorflow/workspace/models/my_hand_gesture_model", lastModel)) # must be in bytes

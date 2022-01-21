@@ -21017,8 +21017,8 @@ node {
   }
 }
 node {
-  name: "dnn/hiddenlayer_0/Relu"
-  op: "Relu"
+  name: "dnn/hiddenlayer_0/LeakyRelu"
+  op: "LeakyRelu"
   input: "dnn/hiddenlayer_0/BiasAdd"
   attr {
     key: "T"
@@ -21041,11 +21041,17 @@ node {
       }
     }
   }
+  attr {
+    key: "alpha"
+    value {
+      f: 0.009999999776482582
+    }
+  }
 }
 node {
   name: "dnn/zero_fraction/Size"
   op: "Size"
-  input: "dnn/hiddenlayer_0/Relu"
+  input: "dnn/hiddenlayer_0/LeakyRelu"
   attr {
     key: "T"
     value {
@@ -21123,7 +21129,7 @@ node {
   name: "dnn/zero_fraction/cond"
   op: "StatelessIf"
   input: "dnn/zero_fraction/LessEqual"
-  input: "dnn/hiddenlayer_0/Relu"
+  input: "dnn/hiddenlayer_0/LeakyRelu"
   attr {
     key: "Tcond"
     value {
@@ -21550,7 +21556,7 @@ node {
   name: "dnn/hiddenlayer_0/activation"
   op: "HistogramSummary"
   input: "dnn/hiddenlayer_0/activation/tag"
-  input: "dnn/hiddenlayer_0/Relu"
+  input: "dnn/hiddenlayer_0/LeakyRelu"
   attr {
     key: "T"
     value {
@@ -22127,7 +22133,7 @@ node {
 node {
   name: "dnn/hiddenlayer_1/MatMul"
   op: "MatMul"
-  input: "dnn/hiddenlayer_0/Relu"
+  input: "dnn/hiddenlayer_0/LeakyRelu"
   input: "dnn/hiddenlayer_1/MatMul/ReadVariableOp"
   attr {
     key: "T"
@@ -22220,8 +22226,8 @@ node {
   }
 }
 node {
-  name: "dnn/hiddenlayer_1/Relu"
-  op: "Relu"
+  name: "dnn/hiddenlayer_1/LeakyRelu"
+  op: "LeakyRelu"
   input: "dnn/hiddenlayer_1/BiasAdd"
   attr {
     key: "T"
@@ -22244,11 +22250,17 @@ node {
       }
     }
   }
+  attr {
+    key: "alpha"
+    value {
+      f: 0.009999999776482582
+    }
+  }
 }
 node {
   name: "dnn/zero_fraction_1/Size"
   op: "Size"
-  input: "dnn/hiddenlayer_1/Relu"
+  input: "dnn/hiddenlayer_1/LeakyRelu"
   attr {
     key: "T"
     value {
@@ -22326,7 +22338,7 @@ node {
   name: "dnn/zero_fraction_1/cond"
   op: "StatelessIf"
   input: "dnn/zero_fraction_1/LessEqual"
-  input: "dnn/hiddenlayer_1/Relu"
+  input: "dnn/hiddenlayer_1/LeakyRelu"
   attr {
     key: "Tcond"
     value {
@@ -22753,7 +22765,7 @@ node {
   name: "dnn/hiddenlayer_1/activation"
   op: "HistogramSummary"
   input: "dnn/hiddenlayer_1/activation/tag"
-  input: "dnn/hiddenlayer_1/Relu"
+  input: "dnn/hiddenlayer_1/LeakyRelu"
   attr {
     key: "T"
     value {
@@ -23330,7 +23342,7 @@ node {
 node {
   name: "dnn/logits/MatMul"
   op: "MatMul"
-  input: "dnn/hiddenlayer_1/Relu"
+  input: "dnn/hiddenlayer_1/LeakyRelu"
   input: "dnn/logits/MatMul/ReadVariableOp"
   attr {
     key: "T"
@@ -25412,6 +25424,243 @@ node {
           dim {
             size: -1
           }
+        }
+      }
+    }
+  }
+}
+node {
+  name: "ExponentialDecay/initial_learning_rate"
+  op: "Const"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "value"
+    value {
+      tensor {
+        dtype: DT_FLOAT
+        tensor_shape {
+        }
+        float_val: 0.10000000149011612
+      }
+    }
+  }
+}
+node {
+  name: "ExponentialDecay/Cast/x"
+  op: "Const"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_INT32
+    }
+  }
+  attr {
+    key: "value"
+    value {
+      tensor {
+        dtype: DT_INT32
+        tensor_shape {
+        }
+        int_val: 10000
+      }
+    }
+  }
+}
+node {
+  name: "ExponentialDecay/Cast"
+  op: "Cast"
+  input: "ExponentialDecay/Cast/x"
+  attr {
+    key: "DstT"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "SrcT"
+    value {
+      type: DT_INT32
+    }
+  }
+  attr {
+    key: "Truncate"
+    value {
+      b: false
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "ExponentialDecay/Cast_1/x"
+  op: "Const"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "value"
+    value {
+      tensor {
+        dtype: DT_FLOAT
+        tensor_shape {
+        }
+        float_val: 0.9599999785423279
+      }
+    }
+  }
+}
+node {
+  name: "ExponentialDecay/Cast_2/ReadVariableOp"
+  op: "ReadVariableOp"
+  input: "global_step"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_INT64
+    }
+  }
+}
+node {
+  name: "ExponentialDecay/Cast_2"
+  op: "Cast"
+  input: "ExponentialDecay/Cast_2/ReadVariableOp"
+  attr {
+    key: "DstT"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "SrcT"
+    value {
+      type: DT_INT64
+    }
+  }
+  attr {
+    key: "Truncate"
+    value {
+      b: false
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "ExponentialDecay/truediv"
+  op: "RealDiv"
+  input: "ExponentialDecay/Cast_2"
+  input: "ExponentialDecay/Cast"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "ExponentialDecay/Pow"
+  op: "Pow"
+  input: "ExponentialDecay/Cast_1/x"
+  input: "ExponentialDecay/truediv"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "ExponentialDecay"
+  op: "Mul"
+  input: "ExponentialDecay/initial_learning_rate"
+  input: "ExponentialDecay/Pow"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
         }
       }
     }
@@ -29004,7 +29253,7 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/Shape"
+  name: "training/Adam/gradients/gradients/Shape"
   op: "Const"
   attr {
     key: "_output_shapes"
@@ -29037,7 +29286,7 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/grad_ys_0/Const"
+  name: "training/Adam/gradients/gradients/grad_ys_0/Const"
   op: "Const"
   attr {
     key: "_output_shapes"
@@ -29067,10 +29316,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/grad_ys_0"
+  name: "training/Adam/gradients/gradients/grad_ys_0"
   op: "Fill"
-  input: "training/Adagrad/gradients/gradients/Shape"
-  input: "training/Adagrad/gradients/gradients/grad_ys_0/Const"
+  input: "training/Adam/gradients/gradients/Shape"
+  input: "training/Adam/gradients/gradients/grad_ys_0/Const"
   attr {
     key: "T"
     value {
@@ -29094,7 +29343,7 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/value_grad/Shape"
+  name: "training/Adam/gradients/gradients/head/losses/weighted_loss/value_grad/Shape"
   op: "Const"
   attr {
     key: "_output_shapes"
@@ -29127,7 +29376,7 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/value_grad/Shape_1"
+  name: "training/Adam/gradients/gradients/head/losses/weighted_loss/value_grad/Shape_1"
   op: "Const"
   attr {
     key: "_output_shapes"
@@ -29160,10 +29409,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/value_grad/BroadcastGradientArgs"
+  name: "training/Adam/gradients/gradients/head/losses/weighted_loss/value_grad/BroadcastGradientArgs"
   op: "BroadcastGradientArgs"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/value_grad/Shape"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/value_grad/Shape_1"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/value_grad/Shape"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/value_grad/Shape_1"
   attr {
     key: "T"
     value {
@@ -29189,9 +29438,9 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/value_grad/div_no_nan"
+  name: "training/Adam/gradients/gradients/head/losses/weighted_loss/value_grad/div_no_nan"
   op: "DivNoNan"
-  input: "training/Adagrad/gradients/gradients/grad_ys_0"
+  input: "training/Adam/gradients/gradients/grad_ys_0"
   input: "head/losses/weighted_loss/num_elements/Cast"
   attr {
     key: "T"
@@ -29210,10 +29459,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/value_grad/Sum"
+  name: "training/Adam/gradients/gradients/head/losses/weighted_loss/value_grad/Sum"
   op: "Sum"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/value_grad/div_no_nan"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/value_grad/BroadcastGradientArgs"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/value_grad/div_no_nan"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/value_grad/BroadcastGradientArgs"
   attr {
     key: "T"
     value {
@@ -29243,10 +29492,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/value_grad/Reshape"
+  name: "training/Adam/gradients/gradients/head/losses/weighted_loss/value_grad/Reshape"
   op: "Reshape"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/value_grad/Sum"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/value_grad/Shape"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/value_grad/Sum"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/value_grad/Shape"
   attr {
     key: "T"
     value {
@@ -29270,7 +29519,7 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/value_grad/Neg"
+  name: "training/Adam/gradients/gradients/head/losses/weighted_loss/value_grad/Neg"
   op: "Neg"
   input: "head/losses/weighted_loss/Sum_1"
   attr {
@@ -29290,9 +29539,9 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/value_grad/div_no_nan_1"
+  name: "training/Adam/gradients/gradients/head/losses/weighted_loss/value_grad/div_no_nan_1"
   op: "DivNoNan"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/value_grad/Neg"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/value_grad/Neg"
   input: "head/losses/weighted_loss/num_elements/Cast"
   attr {
     key: "T"
@@ -29311,9 +29560,9 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/value_grad/div_no_nan_2"
+  name: "training/Adam/gradients/gradients/head/losses/weighted_loss/value_grad/div_no_nan_2"
   op: "DivNoNan"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/value_grad/div_no_nan_1"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/value_grad/div_no_nan_1"
   input: "head/losses/weighted_loss/num_elements/Cast"
   attr {
     key: "T"
@@ -29332,10 +29581,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/value_grad/mul"
+  name: "training/Adam/gradients/gradients/head/losses/weighted_loss/value_grad/mul"
   op: "Mul"
-  input: "training/Adagrad/gradients/gradients/grad_ys_0"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/value_grad/div_no_nan_2"
+  input: "training/Adam/gradients/gradients/grad_ys_0"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/value_grad/div_no_nan_2"
   attr {
     key: "T"
     value {
@@ -29353,10 +29602,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/value_grad/Sum_1"
+  name: "training/Adam/gradients/gradients/head/losses/weighted_loss/value_grad/Sum_1"
   op: "Sum"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/value_grad/mul"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/value_grad/BroadcastGradientArgs:1"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/value_grad/mul"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/value_grad/BroadcastGradientArgs:1"
   attr {
     key: "T"
     value {
@@ -29386,10 +29635,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/value_grad/Reshape_1"
+  name: "training/Adam/gradients/gradients/head/losses/weighted_loss/value_grad/Reshape_1"
   op: "Reshape"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/value_grad/Sum_1"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/value_grad/Shape_1"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/value_grad/Sum_1"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/value_grad/Shape_1"
   attr {
     key: "T"
     value {
@@ -29413,7 +29662,7 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Sum_1_grad/Reshape/shape"
+  name: "training/Adam/gradients/gradients/head/losses/weighted_loss/Sum_1_grad/Reshape/shape"
   op: "Const"
   attr {
     key: "_output_shapes"
@@ -29446,7 +29695,7 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Sum_1_grad/Reshape/shape_1"
+  name: "training/Adam/gradients/gradients/head/losses/weighted_loss/Sum_1_grad/Reshape/shape_1"
   op: "Const"
   attr {
     key: "_output_shapes"
@@ -29479,10 +29728,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Sum_1_grad/Reshape"
+  name: "training/Adam/gradients/gradients/head/losses/weighted_loss/Sum_1_grad/Reshape"
   op: "Reshape"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/value_grad/Reshape"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Sum_1_grad/Reshape/shape_1"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/value_grad/Reshape"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/Sum_1_grad/Reshape/shape_1"
   attr {
     key: "T"
     value {
@@ -29506,7 +29755,7 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Sum_1_grad/Const"
+  name: "training/Adam/gradients/gradients/head/losses/weighted_loss/Sum_1_grad/Const"
   op: "Const"
   attr {
     key: "_output_shapes"
@@ -29539,10 +29788,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Sum_1_grad/Tile"
+  name: "training/Adam/gradients/gradients/head/losses/weighted_loss/Sum_1_grad/Tile"
   op: "Tile"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Sum_1_grad/Reshape"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Sum_1_grad/Const"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/Sum_1_grad/Reshape"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/Sum_1_grad/Const"
   attr {
     key: "T"
     value {
@@ -29566,7 +29815,7 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Sum_grad/Reshape/shape"
+  name: "training/Adam/gradients/gradients/head/losses/weighted_loss/Sum_grad/Reshape/shape"
   op: "Const"
   attr {
     key: "_output_shapes"
@@ -29602,10 +29851,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Sum_grad/Reshape"
+  name: "training/Adam/gradients/gradients/head/losses/weighted_loss/Sum_grad/Reshape"
   op: "Reshape"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Sum_1_grad/Tile"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Sum_grad/Reshape/shape"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/Sum_1_grad/Tile"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/Sum_grad/Reshape/shape"
   attr {
     key: "T"
     value {
@@ -29635,7 +29884,7 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Sum_grad/Shape"
+  name: "training/Adam/gradients/gradients/head/losses/weighted_loss/Sum_grad/Shape"
   op: "Shape"
   input: "head/losses/weighted_loss/Mul"
   attr {
@@ -29664,10 +29913,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Sum_grad/Tile"
+  name: "training/Adam/gradients/gradients/head/losses/weighted_loss/Sum_grad/Tile"
   op: "Tile"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Sum_grad/Reshape"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Sum_grad/Shape"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/Sum_grad/Reshape"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/Sum_grad/Shape"
   attr {
     key: "T"
     value {
@@ -29697,7 +29946,7 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Mul_grad/Shape"
+  name: "training/Adam/gradients/gradients/head/losses/weighted_loss/Mul_grad/Shape"
   op: "Shape"
   input: "head/losses/ExpandDims"
   attr {
@@ -29726,7 +29975,7 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Mul_grad/Shape_1"
+  name: "training/Adam/gradients/gradients/head/losses/weighted_loss/Mul_grad/Shape_1"
   op: "Shape"
   input: "head/losses/weighted_loss/Const"
   attr {
@@ -29754,10 +30003,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Mul_grad/BroadcastGradientArgs"
+  name: "training/Adam/gradients/gradients/head/losses/weighted_loss/Mul_grad/BroadcastGradientArgs"
   op: "BroadcastGradientArgs"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Mul_grad/Shape"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Mul_grad/Shape_1"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/Mul_grad/Shape"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/Mul_grad/Shape_1"
   attr {
     key: "T"
     value {
@@ -29783,9 +30032,9 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Mul_grad/Mul"
+  name: "training/Adam/gradients/gradients/head/losses/weighted_loss/Mul_grad/Mul"
   op: "Mul"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Sum_grad/Tile"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/Sum_grad/Tile"
   input: "head/losses/weighted_loss/Const"
   attr {
     key: "T"
@@ -29810,10 +30059,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Mul_grad/Sum"
+  name: "training/Adam/gradients/gradients/head/losses/weighted_loss/Mul_grad/Sum"
   op: "Sum"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Mul_grad/Mul"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Mul_grad/BroadcastGradientArgs"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/Mul_grad/Mul"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/Mul_grad/BroadcastGradientArgs"
   attr {
     key: "T"
     value {
@@ -29844,10 +30093,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Mul_grad/Reshape"
+  name: "training/Adam/gradients/gradients/head/losses/weighted_loss/Mul_grad/Reshape"
   op: "Reshape"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Mul_grad/Sum"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Mul_grad/Shape"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/Mul_grad/Sum"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/Mul_grad/Shape"
   attr {
     key: "T"
     value {
@@ -29877,10 +30126,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Mul_grad/Mul_1"
+  name: "training/Adam/gradients/gradients/head/losses/weighted_loss/Mul_grad/Mul_1"
   op: "Mul"
   input: "head/losses/ExpandDims"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Sum_grad/Tile"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/Sum_grad/Tile"
   attr {
     key: "T"
     value {
@@ -29904,10 +30153,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Mul_grad/Sum_1"
+  name: "training/Adam/gradients/gradients/head/losses/weighted_loss/Mul_grad/Sum_1"
   op: "Sum"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Mul_grad/Mul_1"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Mul_grad/BroadcastGradientArgs:1"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/Mul_grad/Mul_1"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/Mul_grad/BroadcastGradientArgs:1"
   attr {
     key: "T"
     value {
@@ -29938,10 +30187,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Mul_grad/Reshape_1"
+  name: "training/Adam/gradients/gradients/head/losses/weighted_loss/Mul_grad/Reshape_1"
   op: "Reshape"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Mul_grad/Sum_1"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Mul_grad/Shape_1"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/Mul_grad/Sum_1"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/Mul_grad/Shape_1"
   attr {
     key: "T"
     value {
@@ -29965,7 +30214,7 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/ExpandDims_grad/Shape"
+  name: "training/Adam/gradients/gradients/head/losses/ExpandDims_grad/Shape"
   op: "Shape"
   input: "head/losses/sparse_softmax_cross_entropy_loss/Mul"
   attr {
@@ -29994,10 +30243,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/ExpandDims_grad/Reshape"
+  name: "training/Adam/gradients/gradients/head/losses/ExpandDims_grad/Reshape"
   op: "Reshape"
-  input: "training/Adagrad/gradients/gradients/head/losses/weighted_loss/Mul_grad/Reshape"
-  input: "training/Adagrad/gradients/gradients/head/losses/ExpandDims_grad/Shape"
+  input: "training/Adam/gradients/gradients/head/losses/weighted_loss/Mul_grad/Reshape"
+  input: "training/Adam/gradients/gradients/head/losses/ExpandDims_grad/Shape"
   attr {
     key: "T"
     value {
@@ -30024,7 +30273,7 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Shape"
+  name: "training/Adam/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Shape"
   op: "Shape"
   input: "head/losses/sparse_softmax_cross_entropy_loss/xentropy/xentropy"
   attr {
@@ -30053,7 +30302,7 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Shape_1"
+  name: "training/Adam/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Shape_1"
   op: "Shape"
   input: "head/losses/sparse_softmax_cross_entropy_loss/Const"
   attr {
@@ -30081,10 +30330,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/BroadcastGradientArgs"
+  name: "training/Adam/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/BroadcastGradientArgs"
   op: "BroadcastGradientArgs"
-  input: "training/Adagrad/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Shape"
-  input: "training/Adagrad/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Shape_1"
+  input: "training/Adam/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Shape"
+  input: "training/Adam/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Shape_1"
   attr {
     key: "T"
     value {
@@ -30110,9 +30359,9 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Mul"
+  name: "training/Adam/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Mul"
   op: "Mul"
-  input: "training/Adagrad/gradients/gradients/head/losses/ExpandDims_grad/Reshape"
+  input: "training/Adam/gradients/gradients/head/losses/ExpandDims_grad/Reshape"
   input: "head/losses/sparse_softmax_cross_entropy_loss/Const"
   attr {
     key: "T"
@@ -30134,10 +30383,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Sum"
+  name: "training/Adam/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Sum"
   op: "Sum"
-  input: "training/Adagrad/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Mul"
-  input: "training/Adagrad/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/BroadcastGradientArgs"
+  input: "training/Adam/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Mul"
+  input: "training/Adam/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/BroadcastGradientArgs"
   attr {
     key: "T"
     value {
@@ -30168,10 +30417,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Reshape"
+  name: "training/Adam/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Reshape"
   op: "Reshape"
-  input: "training/Adagrad/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Sum"
-  input: "training/Adagrad/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Shape"
+  input: "training/Adam/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Sum"
+  input: "training/Adam/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Shape"
   attr {
     key: "T"
     value {
@@ -30198,10 +30447,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Mul_1"
+  name: "training/Adam/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Mul_1"
   op: "Mul"
   input: "head/losses/sparse_softmax_cross_entropy_loss/xentropy/xentropy"
-  input: "training/Adagrad/gradients/gradients/head/losses/ExpandDims_grad/Reshape"
+  input: "training/Adam/gradients/gradients/head/losses/ExpandDims_grad/Reshape"
   attr {
     key: "T"
     value {
@@ -30222,10 +30471,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Sum_1"
+  name: "training/Adam/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Sum_1"
   op: "Sum"
-  input: "training/Adagrad/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Mul_1"
-  input: "training/Adagrad/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/BroadcastGradientArgs:1"
+  input: "training/Adam/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Mul_1"
+  input: "training/Adam/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/BroadcastGradientArgs:1"
   attr {
     key: "T"
     value {
@@ -30256,10 +30505,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Reshape_1"
+  name: "training/Adam/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Reshape_1"
   op: "Reshape"
-  input: "training/Adagrad/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Sum_1"
-  input: "training/Adagrad/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Shape_1"
+  input: "training/Adam/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Sum_1"
+  input: "training/Adam/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Shape_1"
   attr {
     key: "T"
     value {
@@ -30283,7 +30532,7 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/zeros_like"
+  name: "training/Adam/gradients/gradients/zeros_like"
   op: "ZerosLike"
   input: "head/losses/sparse_softmax_cross_entropy_loss/xentropy/xentropy:1"
   attr {
@@ -30309,7 +30558,7 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/xentropy/xentropy_grad/ExpandDims/dim"
+  name: "training/Adam/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/xentropy/xentropy_grad/ExpandDims/dim"
   op: "Const"
   attr {
     key: "_output_shapes"
@@ -30339,10 +30588,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/xentropy/xentropy_grad/ExpandDims"
+  name: "training/Adam/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/xentropy/xentropy_grad/ExpandDims"
   op: "ExpandDims"
-  input: "training/Adagrad/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Reshape"
-  input: "training/Adagrad/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/xentropy/xentropy_grad/ExpandDims/dim"
+  input: "training/Adam/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/Mul_grad/Reshape"
+  input: "training/Adam/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/xentropy/xentropy_grad/ExpandDims/dim"
   attr {
     key: "T"
     value {
@@ -30372,9 +30621,9 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/xentropy/xentropy_grad/mul"
+  name: "training/Adam/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/xentropy/xentropy_grad/mul"
   op: "Mul"
-  input: "training/Adagrad/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/xentropy/xentropy_grad/ExpandDims"
+  input: "training/Adam/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/xentropy/xentropy_grad/ExpandDims"
   input: "head/losses/sparse_softmax_cross_entropy_loss/xentropy/xentropy:1"
   attr {
     key: "T"
@@ -30399,9 +30648,9 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/dnn/logits/BiasAdd_grad/BiasAddGrad"
+  name: "training/Adam/gradients/gradients/dnn/logits/BiasAdd_grad/BiasAddGrad"
   op: "BiasAddGrad"
-  input: "training/Adagrad/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/xentropy/xentropy_grad/mul"
+  input: "training/Adam/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/xentropy/xentropy_grad/mul"
   attr {
     key: "T"
     value {
@@ -30428,9 +30677,9 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/dnn/logits/MatMul_grad/MatMul"
+  name: "training/Adam/gradients/gradients/dnn/logits/MatMul_grad/MatMul"
   op: "MatMul"
-  input: "training/Adagrad/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/xentropy/xentropy_grad/mul"
+  input: "training/Adam/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/xentropy/xentropy_grad/mul"
   input: "dnn/logits/MatMul/ReadVariableOp"
   attr {
     key: "T"
@@ -30467,10 +30716,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/dnn/logits/MatMul_grad/MatMul_1"
+  name: "training/Adam/gradients/gradients/dnn/logits/MatMul_grad/MatMul_1"
   op: "MatMul"
-  input: "dnn/hiddenlayer_1/Relu"
-  input: "training/Adagrad/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/xentropy/xentropy_grad/mul"
+  input: "dnn/hiddenlayer_1/LeakyRelu"
+  input: "training/Adam/gradients/gradients/head/losses/sparse_softmax_cross_entropy_loss/xentropy/xentropy_grad/mul"
   attr {
     key: "T"
     value {
@@ -30506,10 +30755,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/dnn/hiddenlayer_1/Relu_grad/ReluGrad"
-  op: "ReluGrad"
-  input: "training/Adagrad/gradients/gradients/dnn/logits/MatMul_grad/MatMul"
-  input: "dnn/hiddenlayer_1/Relu"
+  name: "training/Adam/gradients/gradients/dnn/hiddenlayer_1/LeakyRelu_grad/LeakyReluGrad"
+  op: "LeakyReluGrad"
+  input: "training/Adam/gradients/gradients/dnn/logits/MatMul_grad/MatMul"
+  input: "dnn/hiddenlayer_1/BiasAdd"
   attr {
     key: "T"
     value {
@@ -30531,11 +30780,17 @@ node {
       }
     }
   }
+  attr {
+    key: "alpha"
+    value {
+      f: 0.009999999776482582
+    }
+  }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/dnn/hiddenlayer_1/BiasAdd_grad/BiasAddGrad"
+  name: "training/Adam/gradients/gradients/dnn/hiddenlayer_1/BiasAdd_grad/BiasAddGrad"
   op: "BiasAddGrad"
-  input: "training/Adagrad/gradients/gradients/dnn/hiddenlayer_1/Relu_grad/ReluGrad"
+  input: "training/Adam/gradients/gradients/dnn/hiddenlayer_1/LeakyRelu_grad/LeakyReluGrad"
   attr {
     key: "T"
     value {
@@ -30562,9 +30817,9 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/dnn/hiddenlayer_1/MatMul_grad/MatMul"
+  name: "training/Adam/gradients/gradients/dnn/hiddenlayer_1/MatMul_grad/MatMul"
   op: "MatMul"
-  input: "training/Adagrad/gradients/gradients/dnn/hiddenlayer_1/Relu_grad/ReluGrad"
+  input: "training/Adam/gradients/gradients/dnn/hiddenlayer_1/LeakyRelu_grad/LeakyReluGrad"
   input: "dnn/hiddenlayer_1/MatMul/ReadVariableOp"
   attr {
     key: "T"
@@ -30601,10 +30856,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/dnn/hiddenlayer_1/MatMul_grad/MatMul_1"
+  name: "training/Adam/gradients/gradients/dnn/hiddenlayer_1/MatMul_grad/MatMul_1"
   op: "MatMul"
-  input: "dnn/hiddenlayer_0/Relu"
-  input: "training/Adagrad/gradients/gradients/dnn/hiddenlayer_1/Relu_grad/ReluGrad"
+  input: "dnn/hiddenlayer_0/LeakyRelu"
+  input: "training/Adam/gradients/gradients/dnn/hiddenlayer_1/LeakyRelu_grad/LeakyReluGrad"
   attr {
     key: "T"
     value {
@@ -30640,10 +30895,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/dnn/hiddenlayer_0/Relu_grad/ReluGrad"
-  op: "ReluGrad"
-  input: "training/Adagrad/gradients/gradients/dnn/hiddenlayer_1/MatMul_grad/MatMul"
-  input: "dnn/hiddenlayer_0/Relu"
+  name: "training/Adam/gradients/gradients/dnn/hiddenlayer_0/LeakyRelu_grad/LeakyReluGrad"
+  op: "LeakyReluGrad"
+  input: "training/Adam/gradients/gradients/dnn/hiddenlayer_1/MatMul_grad/MatMul"
+  input: "dnn/hiddenlayer_0/BiasAdd"
   attr {
     key: "T"
     value {
@@ -30665,11 +30920,17 @@ node {
       }
     }
   }
+  attr {
+    key: "alpha"
+    value {
+      f: 0.009999999776482582
+    }
+  }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/dnn/hiddenlayer_0/BiasAdd_grad/BiasAddGrad"
+  name: "training/Adam/gradients/gradients/dnn/hiddenlayer_0/BiasAdd_grad/BiasAddGrad"
   op: "BiasAddGrad"
-  input: "training/Adagrad/gradients/gradients/dnn/hiddenlayer_0/Relu_grad/ReluGrad"
+  input: "training/Adam/gradients/gradients/dnn/hiddenlayer_0/LeakyRelu_grad/LeakyReluGrad"
   attr {
     key: "T"
     value {
@@ -30696,9 +30957,9 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/dnn/hiddenlayer_0/MatMul_grad/MatMul"
+  name: "training/Adam/gradients/gradients/dnn/hiddenlayer_0/MatMul_grad/MatMul"
   op: "MatMul"
-  input: "training/Adagrad/gradients/gradients/dnn/hiddenlayer_0/Relu_grad/ReluGrad"
+  input: "training/Adam/gradients/gradients/dnn/hiddenlayer_0/LeakyRelu_grad/LeakyReluGrad"
   input: "dnn/hiddenlayer_0/MatMul/ReadVariableOp"
   attr {
     key: "T"
@@ -30735,10 +30996,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/gradients/gradients/dnn/hiddenlayer_0/MatMul_grad/MatMul_1"
+  name: "training/Adam/gradients/gradients/dnn/hiddenlayer_0/MatMul_grad/MatMul_1"
   op: "MatMul"
   input: "dnn/input_from_feature_columns/input_layer/concat"
-  input: "training/Adagrad/gradients/gradients/dnn/hiddenlayer_0/Relu_grad/ReluGrad"
+  input: "training/Adam/gradients/gradients/dnn/hiddenlayer_0/LeakyRelu_grad/LeakyReluGrad"
   attr {
     key: "T"
     value {
@@ -30774,13 +31035,287 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/decay/Initializer/initial_value"
+  name: "training/Adam/beta_1/Initializer/initial_value"
   op: "Const"
   attr {
     key: "_class"
     value {
       list {
-        s: "loc:@training/Adagrad/decay"
+        s: "loc:@training/Adam/beta_1"
+      }
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "value"
+    value {
+      tensor {
+        dtype: DT_FLOAT
+        tensor_shape {
+        }
+        float_val: 0.8999999761581421
+      }
+    }
+  }
+}
+node {
+  name: "training/Adam/beta_1"
+  op: "VarHandleOp"
+  attr {
+    key: "_class"
+    value {
+      list {
+        s: "loc:@training/Adam/beta_1"
+      }
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+  attr {
+    key: "allowed_devices"
+    value {
+      list {
+      }
+    }
+  }
+  attr {
+    key: "container"
+    value {
+      s: ""
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "shape"
+    value {
+      shape {
+      }
+    }
+  }
+  attr {
+    key: "shared_name"
+    value {
+      s: "training/Adam/beta_1"
+    }
+  }
+}
+node {
+  name: "training/Adam/beta_1/IsInitialized/VarIsInitializedOp"
+  op: "VarIsInitializedOp"
+  input: "training/Adam/beta_1"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "training/Adam/beta_1/Assign"
+  op: "AssignVariableOp"
+  input: "training/Adam/beta_1"
+  input: "training/Adam/beta_1/Initializer/initial_value"
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+}
+node {
+  name: "training/Adam/beta_1/Read/ReadVariableOp"
+  op: "ReadVariableOp"
+  input: "training/Adam/beta_1"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+}
+node {
+  name: "training/Adam/beta_2/Initializer/initial_value"
+  op: "Const"
+  attr {
+    key: "_class"
+    value {
+      list {
+        s: "loc:@training/Adam/beta_2"
+      }
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "value"
+    value {
+      tensor {
+        dtype: DT_FLOAT
+        tensor_shape {
+        }
+        float_val: 0.9990000128746033
+      }
+    }
+  }
+}
+node {
+  name: "training/Adam/beta_2"
+  op: "VarHandleOp"
+  attr {
+    key: "_class"
+    value {
+      list {
+        s: "loc:@training/Adam/beta_2"
+      }
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+  attr {
+    key: "allowed_devices"
+    value {
+      list {
+      }
+    }
+  }
+  attr {
+    key: "container"
+    value {
+      s: ""
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "shape"
+    value {
+      shape {
+      }
+    }
+  }
+  attr {
+    key: "shared_name"
+    value {
+      s: "training/Adam/beta_2"
+    }
+  }
+}
+node {
+  name: "training/Adam/beta_2/IsInitialized/VarIsInitializedOp"
+  op: "VarIsInitializedOp"
+  input: "training/Adam/beta_2"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "training/Adam/beta_2/Assign"
+  op: "AssignVariableOp"
+  input: "training/Adam/beta_2"
+  input: "training/Adam/beta_2/Initializer/initial_value"
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+}
+node {
+  name: "training/Adam/beta_2/Read/ReadVariableOp"
+  op: "ReadVariableOp"
+  input: "training/Adam/beta_2"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+}
+node {
+  name: "training/Adam/decay/Initializer/initial_value"
+  op: "Const"
+  attr {
+    key: "_class"
+    value {
+      list {
+        s: "loc:@training/Adam/decay"
       }
     }
   }
@@ -30812,13 +31347,13 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/decay"
+  name: "training/Adam/decay"
   op: "VarHandleOp"
   attr {
     key: "_class"
     value {
       list {
-        s: "loc:@training/Adagrad/decay"
+        s: "loc:@training/Adam/decay"
       }
     }
   }
@@ -30860,14 +31395,14 @@ node {
   attr {
     key: "shared_name"
     value {
-      s: "training/Adagrad/decay"
+      s: "training/Adam/decay"
     }
   }
 }
 node {
-  name: "training/Adagrad/decay/IsInitialized/VarIsInitializedOp"
+  name: "training/Adam/decay/IsInitialized/VarIsInitializedOp"
   op: "VarIsInitializedOp"
-  input: "training/Adagrad/decay"
+  input: "training/Adam/decay"
   attr {
     key: "_output_shapes"
     value {
@@ -30879,10 +31414,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/decay/Assign"
+  name: "training/Adam/decay/Assign"
   op: "AssignVariableOp"
-  input: "training/Adagrad/decay"
-  input: "training/Adagrad/decay/Initializer/initial_value"
+  input: "training/Adam/decay"
+  input: "training/Adam/decay/Initializer/initial_value"
   attr {
     key: "dtype"
     value {
@@ -30891,9 +31426,9 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/decay/Read/ReadVariableOp"
+  name: "training/Adam/decay/Read/ReadVariableOp"
   op: "ReadVariableOp"
-  input: "training/Adagrad/decay"
+  input: "training/Adam/decay"
   attr {
     key: "_output_shapes"
     value {
@@ -30911,13 +31446,57 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/learning_rate/Initializer/initial_value"
+  name: "training/Adam/dnn/hiddenlayer_0/kernel/m/Initializer/zeros/shape_as_tensor"
   op: "Const"
   attr {
     key: "_class"
     value {
       list {
-        s: "loc:@training/Adagrad/learning_rate"
+        s: "loc:@dnn/hiddenlayer_0/kernel"
+      }
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+          dim {
+            size: 2
+          }
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_INT32
+    }
+  }
+  attr {
+    key: "value"
+    value {
+      tensor {
+        dtype: DT_INT32
+        tensor_shape {
+          dim {
+            size: 2
+          }
+        }
+        tensor_content: "*\000\000\000\036\000\000\000"
+      }
+    }
+  }
+}
+node {
+  name: "training/Adam/dnn/hiddenlayer_0/kernel/m/Initializer/zeros/Const"
+  op: "Const"
+  attr {
+    key: "_class"
+    value {
+      list {
+        s: "loc:@dnn/hiddenlayer_0/kernel"
       }
     }
   }
@@ -30943,113 +31522,22 @@ node {
         dtype: DT_FLOAT
         tensor_shape {
         }
-        float_val: 0.0010000000474974513
+        float_val: 0.0
       }
     }
   }
 }
 node {
-  name: "training/Adagrad/learning_rate"
-  op: "VarHandleOp"
+  name: "training/Adam/dnn/hiddenlayer_0/kernel/m/Initializer/zeros"
+  op: "Fill"
+  input: "training/Adam/dnn/hiddenlayer_0/kernel/m/Initializer/zeros/shape_as_tensor"
+  input: "training/Adam/dnn/hiddenlayer_0/kernel/m/Initializer/zeros/Const"
   attr {
-    key: "_class"
-    value {
-      list {
-        s: "loc:@training/Adagrad/learning_rate"
-      }
-    }
-  }
-  attr {
-    key: "_output_shapes"
-    value {
-      list {
-        shape {
-        }
-      }
-    }
-  }
-  attr {
-    key: "allowed_devices"
-    value {
-      list {
-      }
-    }
-  }
-  attr {
-    key: "container"
-    value {
-      s: ""
-    }
-  }
-  attr {
-    key: "dtype"
+    key: "T"
     value {
       type: DT_FLOAT
     }
   }
-  attr {
-    key: "shape"
-    value {
-      shape {
-      }
-    }
-  }
-  attr {
-    key: "shared_name"
-    value {
-      s: "training/Adagrad/learning_rate"
-    }
-  }
-}
-node {
-  name: "training/Adagrad/learning_rate/IsInitialized/VarIsInitializedOp"
-  op: "VarIsInitializedOp"
-  input: "training/Adagrad/learning_rate"
-  attr {
-    key: "_output_shapes"
-    value {
-      list {
-        shape {
-        }
-      }
-    }
-  }
-}
-node {
-  name: "training/Adagrad/learning_rate/Assign"
-  op: "AssignVariableOp"
-  input: "training/Adagrad/learning_rate"
-  input: "training/Adagrad/learning_rate/Initializer/initial_value"
-  attr {
-    key: "dtype"
-    value {
-      type: DT_FLOAT
-    }
-  }
-}
-node {
-  name: "training/Adagrad/learning_rate/Read/ReadVariableOp"
-  op: "ReadVariableOp"
-  input: "training/Adagrad/learning_rate"
-  attr {
-    key: "_output_shapes"
-    value {
-      list {
-        shape {
-        }
-      }
-    }
-  }
-  attr {
-    key: "dtype"
-    value {
-      type: DT_FLOAT
-    }
-  }
-}
-node {
-  name: "training/Adagrad/dnn/hiddenlayer_0/kernel/accumulator/Initializer/Const"
-  op: "Const"
   attr {
     key: "_class"
     value {
@@ -31074,31 +31562,14 @@ node {
     }
   }
   attr {
-    key: "dtype"
+    key: "index_type"
     value {
-      type: DT_FLOAT
-    }
-  }
-  attr {
-    key: "value"
-    value {
-      tensor {
-        dtype: DT_FLOAT
-        tensor_shape {
-          dim {
-            size: 42
-          }
-          dim {
-            size: 30
-          }
-        }
-        float_val: 0.10000000149011612
-      }
+      type: DT_INT32
     }
   }
 }
 node {
-  name: "training/Adagrad/dnn/hiddenlayer_0/kernel/accumulator"
+  name: "training/Adam/dnn/hiddenlayer_0/kernel/m"
   op: "VarHandleOp"
   attr {
     key: "_class"
@@ -31152,14 +31623,14 @@ node {
   attr {
     key: "shared_name"
     value {
-      s: "training/Adagrad/dnn/hiddenlayer_0/kernel/accumulator"
+      s: "training/Adam/dnn/hiddenlayer_0/kernel/m"
     }
   }
 }
 node {
-  name: "training/Adagrad/dnn/hiddenlayer_0/kernel/accumulator/IsInitialized/VarIsInitializedOp"
+  name: "training/Adam/dnn/hiddenlayer_0/kernel/m/IsInitialized/VarIsInitializedOp"
   op: "VarIsInitializedOp"
-  input: "training/Adagrad/dnn/hiddenlayer_0/kernel/accumulator"
+  input: "training/Adam/dnn/hiddenlayer_0/kernel/m"
   attr {
     key: "_class"
     value {
@@ -31179,10 +31650,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/dnn/hiddenlayer_0/kernel/accumulator/Assign"
+  name: "training/Adam/dnn/hiddenlayer_0/kernel/m/Assign"
   op: "AssignVariableOp"
-  input: "training/Adagrad/dnn/hiddenlayer_0/kernel/accumulator"
-  input: "training/Adagrad/dnn/hiddenlayer_0/kernel/accumulator/Initializer/Const"
+  input: "training/Adam/dnn/hiddenlayer_0/kernel/m"
+  input: "training/Adam/dnn/hiddenlayer_0/kernel/m/Initializer/zeros"
   attr {
     key: "dtype"
     value {
@@ -31191,9 +31662,9 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/dnn/hiddenlayer_0/kernel/accumulator/Read/ReadVariableOp"
+  name: "training/Adam/dnn/hiddenlayer_0/kernel/m/Read/ReadVariableOp"
   op: "ReadVariableOp"
-  input: "training/Adagrad/dnn/hiddenlayer_0/kernel/accumulator"
+  input: "training/Adam/dnn/hiddenlayer_0/kernel/m"
   attr {
     key: "_class"
     value {
@@ -31225,7 +31696,7 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/dnn/hiddenlayer_0/bias/accumulator/Initializer/Const"
+  name: "training/Adam/dnn/hiddenlayer_0/bias/m/Initializer/zeros"
   op: "Const"
   attr {
     key: "_class"
@@ -31263,13 +31734,13 @@ node {
             size: 30
           }
         }
-        float_val: 0.10000000149011612
+        float_val: 0.0
       }
     }
   }
 }
 node {
-  name: "training/Adagrad/dnn/hiddenlayer_0/bias/accumulator"
+  name: "training/Adam/dnn/hiddenlayer_0/bias/m"
   op: "VarHandleOp"
   attr {
     key: "_class"
@@ -31320,14 +31791,14 @@ node {
   attr {
     key: "shared_name"
     value {
-      s: "training/Adagrad/dnn/hiddenlayer_0/bias/accumulator"
+      s: "training/Adam/dnn/hiddenlayer_0/bias/m"
     }
   }
 }
 node {
-  name: "training/Adagrad/dnn/hiddenlayer_0/bias/accumulator/IsInitialized/VarIsInitializedOp"
+  name: "training/Adam/dnn/hiddenlayer_0/bias/m/IsInitialized/VarIsInitializedOp"
   op: "VarIsInitializedOp"
-  input: "training/Adagrad/dnn/hiddenlayer_0/bias/accumulator"
+  input: "training/Adam/dnn/hiddenlayer_0/bias/m"
   attr {
     key: "_class"
     value {
@@ -31347,10 +31818,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/dnn/hiddenlayer_0/bias/accumulator/Assign"
+  name: "training/Adam/dnn/hiddenlayer_0/bias/m/Assign"
   op: "AssignVariableOp"
-  input: "training/Adagrad/dnn/hiddenlayer_0/bias/accumulator"
-  input: "training/Adagrad/dnn/hiddenlayer_0/bias/accumulator/Initializer/Const"
+  input: "training/Adam/dnn/hiddenlayer_0/bias/m"
+  input: "training/Adam/dnn/hiddenlayer_0/bias/m/Initializer/zeros"
   attr {
     key: "dtype"
     value {
@@ -31359,9 +31830,9 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/dnn/hiddenlayer_0/bias/accumulator/Read/ReadVariableOp"
+  name: "training/Adam/dnn/hiddenlayer_0/bias/m/Read/ReadVariableOp"
   op: "ReadVariableOp"
-  input: "training/Adagrad/dnn/hiddenlayer_0/bias/accumulator"
+  input: "training/Adam/dnn/hiddenlayer_0/bias/m"
   attr {
     key: "_class"
     value {
@@ -31390,7 +31861,7 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/dnn/hiddenlayer_1/kernel/accumulator/Initializer/Const"
+  name: "training/Adam/dnn/hiddenlayer_1/kernel/m/Initializer/zeros"
   op: "Const"
   attr {
     key: "_class"
@@ -31434,13 +31905,13 @@ node {
             size: 10
           }
         }
-        float_val: 0.10000000149011612
+        float_val: 0.0
       }
     }
   }
 }
 node {
-  name: "training/Adagrad/dnn/hiddenlayer_1/kernel/accumulator"
+  name: "training/Adam/dnn/hiddenlayer_1/kernel/m"
   op: "VarHandleOp"
   attr {
     key: "_class"
@@ -31494,14 +31965,14 @@ node {
   attr {
     key: "shared_name"
     value {
-      s: "training/Adagrad/dnn/hiddenlayer_1/kernel/accumulator"
+      s: "training/Adam/dnn/hiddenlayer_1/kernel/m"
     }
   }
 }
 node {
-  name: "training/Adagrad/dnn/hiddenlayer_1/kernel/accumulator/IsInitialized/VarIsInitializedOp"
+  name: "training/Adam/dnn/hiddenlayer_1/kernel/m/IsInitialized/VarIsInitializedOp"
   op: "VarIsInitializedOp"
-  input: "training/Adagrad/dnn/hiddenlayer_1/kernel/accumulator"
+  input: "training/Adam/dnn/hiddenlayer_1/kernel/m"
   attr {
     key: "_class"
     value {
@@ -31521,10 +31992,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/dnn/hiddenlayer_1/kernel/accumulator/Assign"
+  name: "training/Adam/dnn/hiddenlayer_1/kernel/m/Assign"
   op: "AssignVariableOp"
-  input: "training/Adagrad/dnn/hiddenlayer_1/kernel/accumulator"
-  input: "training/Adagrad/dnn/hiddenlayer_1/kernel/accumulator/Initializer/Const"
+  input: "training/Adam/dnn/hiddenlayer_1/kernel/m"
+  input: "training/Adam/dnn/hiddenlayer_1/kernel/m/Initializer/zeros"
   attr {
     key: "dtype"
     value {
@@ -31533,9 +32004,9 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/dnn/hiddenlayer_1/kernel/accumulator/Read/ReadVariableOp"
+  name: "training/Adam/dnn/hiddenlayer_1/kernel/m/Read/ReadVariableOp"
   op: "ReadVariableOp"
-  input: "training/Adagrad/dnn/hiddenlayer_1/kernel/accumulator"
+  input: "training/Adam/dnn/hiddenlayer_1/kernel/m"
   attr {
     key: "_class"
     value {
@@ -31567,7 +32038,7 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/dnn/hiddenlayer_1/bias/accumulator/Initializer/Const"
+  name: "training/Adam/dnn/hiddenlayer_1/bias/m/Initializer/zeros"
   op: "Const"
   attr {
     key: "_class"
@@ -31605,13 +32076,13 @@ node {
             size: 10
           }
         }
-        float_val: 0.10000000149011612
+        float_val: 0.0
       }
     }
   }
 }
 node {
-  name: "training/Adagrad/dnn/hiddenlayer_1/bias/accumulator"
+  name: "training/Adam/dnn/hiddenlayer_1/bias/m"
   op: "VarHandleOp"
   attr {
     key: "_class"
@@ -31662,14 +32133,14 @@ node {
   attr {
     key: "shared_name"
     value {
-      s: "training/Adagrad/dnn/hiddenlayer_1/bias/accumulator"
+      s: "training/Adam/dnn/hiddenlayer_1/bias/m"
     }
   }
 }
 node {
-  name: "training/Adagrad/dnn/hiddenlayer_1/bias/accumulator/IsInitialized/VarIsInitializedOp"
+  name: "training/Adam/dnn/hiddenlayer_1/bias/m/IsInitialized/VarIsInitializedOp"
   op: "VarIsInitializedOp"
-  input: "training/Adagrad/dnn/hiddenlayer_1/bias/accumulator"
+  input: "training/Adam/dnn/hiddenlayer_1/bias/m"
   attr {
     key: "_class"
     value {
@@ -31689,10 +32160,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/dnn/hiddenlayer_1/bias/accumulator/Assign"
+  name: "training/Adam/dnn/hiddenlayer_1/bias/m/Assign"
   op: "AssignVariableOp"
-  input: "training/Adagrad/dnn/hiddenlayer_1/bias/accumulator"
-  input: "training/Adagrad/dnn/hiddenlayer_1/bias/accumulator/Initializer/Const"
+  input: "training/Adam/dnn/hiddenlayer_1/bias/m"
+  input: "training/Adam/dnn/hiddenlayer_1/bias/m/Initializer/zeros"
   attr {
     key: "dtype"
     value {
@@ -31701,9 +32172,9 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/dnn/hiddenlayer_1/bias/accumulator/Read/ReadVariableOp"
+  name: "training/Adam/dnn/hiddenlayer_1/bias/m/Read/ReadVariableOp"
   op: "ReadVariableOp"
-  input: "training/Adagrad/dnn/hiddenlayer_1/bias/accumulator"
+  input: "training/Adam/dnn/hiddenlayer_1/bias/m"
   attr {
     key: "_class"
     value {
@@ -31732,7 +32203,7 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/dnn/logits/kernel/accumulator/Initializer/Const"
+  name: "training/Adam/dnn/logits/kernel/m/Initializer/zeros"
   op: "Const"
   attr {
     key: "_class"
@@ -31776,13 +32247,13 @@ node {
             size: 4
           }
         }
-        float_val: 0.10000000149011612
+        float_val: 0.0
       }
     }
   }
 }
 node {
-  name: "training/Adagrad/dnn/logits/kernel/accumulator"
+  name: "training/Adam/dnn/logits/kernel/m"
   op: "VarHandleOp"
   attr {
     key: "_class"
@@ -31836,14 +32307,14 @@ node {
   attr {
     key: "shared_name"
     value {
-      s: "training/Adagrad/dnn/logits/kernel/accumulator"
+      s: "training/Adam/dnn/logits/kernel/m"
     }
   }
 }
 node {
-  name: "training/Adagrad/dnn/logits/kernel/accumulator/IsInitialized/VarIsInitializedOp"
+  name: "training/Adam/dnn/logits/kernel/m/IsInitialized/VarIsInitializedOp"
   op: "VarIsInitializedOp"
-  input: "training/Adagrad/dnn/logits/kernel/accumulator"
+  input: "training/Adam/dnn/logits/kernel/m"
   attr {
     key: "_class"
     value {
@@ -31863,10 +32334,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/dnn/logits/kernel/accumulator/Assign"
+  name: "training/Adam/dnn/logits/kernel/m/Assign"
   op: "AssignVariableOp"
-  input: "training/Adagrad/dnn/logits/kernel/accumulator"
-  input: "training/Adagrad/dnn/logits/kernel/accumulator/Initializer/Const"
+  input: "training/Adam/dnn/logits/kernel/m"
+  input: "training/Adam/dnn/logits/kernel/m/Initializer/zeros"
   attr {
     key: "dtype"
     value {
@@ -31875,9 +32346,9 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/dnn/logits/kernel/accumulator/Read/ReadVariableOp"
+  name: "training/Adam/dnn/logits/kernel/m/Read/ReadVariableOp"
   op: "ReadVariableOp"
-  input: "training/Adagrad/dnn/logits/kernel/accumulator"
+  input: "training/Adam/dnn/logits/kernel/m"
   attr {
     key: "_class"
     value {
@@ -31909,7 +32380,7 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/dnn/logits/bias/accumulator/Initializer/Const"
+  name: "training/Adam/dnn/logits/bias/m/Initializer/zeros"
   op: "Const"
   attr {
     key: "_class"
@@ -31947,13 +32418,13 @@ node {
             size: 4
           }
         }
-        float_val: 0.10000000149011612
+        float_val: 0.0
       }
     }
   }
 }
 node {
-  name: "training/Adagrad/dnn/logits/bias/accumulator"
+  name: "training/Adam/dnn/logits/bias/m"
   op: "VarHandleOp"
   attr {
     key: "_class"
@@ -32004,14 +32475,14 @@ node {
   attr {
     key: "shared_name"
     value {
-      s: "training/Adagrad/dnn/logits/bias/accumulator"
+      s: "training/Adam/dnn/logits/bias/m"
     }
   }
 }
 node {
-  name: "training/Adagrad/dnn/logits/bias/accumulator/IsInitialized/VarIsInitializedOp"
+  name: "training/Adam/dnn/logits/bias/m/IsInitialized/VarIsInitializedOp"
   op: "VarIsInitializedOp"
-  input: "training/Adagrad/dnn/logits/bias/accumulator"
+  input: "training/Adam/dnn/logits/bias/m"
   attr {
     key: "_class"
     value {
@@ -32031,10 +32502,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/dnn/logits/bias/accumulator/Assign"
+  name: "training/Adam/dnn/logits/bias/m/Assign"
   op: "AssignVariableOp"
-  input: "training/Adagrad/dnn/logits/bias/accumulator"
-  input: "training/Adagrad/dnn/logits/bias/accumulator/Initializer/Const"
+  input: "training/Adam/dnn/logits/bias/m"
+  input: "training/Adam/dnn/logits/bias/m/Initializer/zeros"
   attr {
     key: "dtype"
     value {
@@ -32043,9 +32514,9 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/dnn/logits/bias/accumulator/Read/ReadVariableOp"
+  name: "training/Adam/dnn/logits/bias/m/Read/ReadVariableOp"
   op: "ReadVariableOp"
-  input: "training/Adagrad/dnn/logits/bias/accumulator"
+  input: "training/Adam/dnn/logits/bias/m"
   attr {
     key: "_class"
     value {
@@ -32074,9 +32545,60 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/Identity/ReadVariableOp"
-  op: "ReadVariableOp"
-  input: "training/Adagrad/learning_rate"
+  name: "training/Adam/dnn/hiddenlayer_0/kernel/v/Initializer/zeros/shape_as_tensor"
+  op: "Const"
+  attr {
+    key: "_class"
+    value {
+      list {
+        s: "loc:@dnn/hiddenlayer_0/kernel"
+      }
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+          dim {
+            size: 2
+          }
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_INT32
+    }
+  }
+  attr {
+    key: "value"
+    value {
+      tensor {
+        dtype: DT_INT32
+        tensor_shape {
+          dim {
+            size: 2
+          }
+        }
+        tensor_content: "*\000\000\000\036\000\000\000"
+      }
+    }
+  }
+}
+node {
+  name: "training/Adam/dnn/hiddenlayer_0/kernel/v/Initializer/zeros/Const"
+  op: "Const"
+  attr {
+    key: "_class"
+    value {
+      list {
+        s: "loc:@dnn/hiddenlayer_0/kernel"
+      }
+    }
+  }
   attr {
     key: "_output_shapes"
     value {
@@ -32092,11 +32614,1039 @@ node {
       type: DT_FLOAT
     }
   }
+  attr {
+    key: "value"
+    value {
+      tensor {
+        dtype: DT_FLOAT
+        tensor_shape {
+        }
+        float_val: 0.0
+      }
+    }
+  }
 }
 node {
-  name: "training/Adagrad/Identity"
+  name: "training/Adam/dnn/hiddenlayer_0/kernel/v/Initializer/zeros"
+  op: "Fill"
+  input: "training/Adam/dnn/hiddenlayer_0/kernel/v/Initializer/zeros/shape_as_tensor"
+  input: "training/Adam/dnn/hiddenlayer_0/kernel/v/Initializer/zeros/Const"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "_class"
+    value {
+      list {
+        s: "loc:@dnn/hiddenlayer_0/kernel"
+      }
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+          dim {
+            size: 42
+          }
+          dim {
+            size: 30
+          }
+        }
+      }
+    }
+  }
+  attr {
+    key: "index_type"
+    value {
+      type: DT_INT32
+    }
+  }
+}
+node {
+  name: "training/Adam/dnn/hiddenlayer_0/kernel/v"
+  op: "VarHandleOp"
+  attr {
+    key: "_class"
+    value {
+      list {
+        s: "loc:@dnn/hiddenlayer_0/kernel"
+      }
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+  attr {
+    key: "allowed_devices"
+    value {
+      list {
+      }
+    }
+  }
+  attr {
+    key: "container"
+    value {
+      s: ""
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "shape"
+    value {
+      shape {
+        dim {
+          size: 42
+        }
+        dim {
+          size: 30
+        }
+      }
+    }
+  }
+  attr {
+    key: "shared_name"
+    value {
+      s: "training/Adam/dnn/hiddenlayer_0/kernel/v"
+    }
+  }
+}
+node {
+  name: "training/Adam/dnn/hiddenlayer_0/kernel/v/IsInitialized/VarIsInitializedOp"
+  op: "VarIsInitializedOp"
+  input: "training/Adam/dnn/hiddenlayer_0/kernel/v"
+  attr {
+    key: "_class"
+    value {
+      list {
+        s: "loc:@dnn/hiddenlayer_0/kernel"
+      }
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "training/Adam/dnn/hiddenlayer_0/kernel/v/Assign"
+  op: "AssignVariableOp"
+  input: "training/Adam/dnn/hiddenlayer_0/kernel/v"
+  input: "training/Adam/dnn/hiddenlayer_0/kernel/v/Initializer/zeros"
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+}
+node {
+  name: "training/Adam/dnn/hiddenlayer_0/kernel/v/Read/ReadVariableOp"
+  op: "ReadVariableOp"
+  input: "training/Adam/dnn/hiddenlayer_0/kernel/v"
+  attr {
+    key: "_class"
+    value {
+      list {
+        s: "loc:@dnn/hiddenlayer_0/kernel"
+      }
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+          dim {
+            size: 42
+          }
+          dim {
+            size: 30
+          }
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+}
+node {
+  name: "training/Adam/dnn/hiddenlayer_0/bias/v/Initializer/zeros"
+  op: "Const"
+  attr {
+    key: "_class"
+    value {
+      list {
+        s: "loc:@dnn/hiddenlayer_0/bias"
+      }
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+          dim {
+            size: 30
+          }
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "value"
+    value {
+      tensor {
+        dtype: DT_FLOAT
+        tensor_shape {
+          dim {
+            size: 30
+          }
+        }
+        float_val: 0.0
+      }
+    }
+  }
+}
+node {
+  name: "training/Adam/dnn/hiddenlayer_0/bias/v"
+  op: "VarHandleOp"
+  attr {
+    key: "_class"
+    value {
+      list {
+        s: "loc:@dnn/hiddenlayer_0/bias"
+      }
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+  attr {
+    key: "allowed_devices"
+    value {
+      list {
+      }
+    }
+  }
+  attr {
+    key: "container"
+    value {
+      s: ""
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "shape"
+    value {
+      shape {
+        dim {
+          size: 30
+        }
+      }
+    }
+  }
+  attr {
+    key: "shared_name"
+    value {
+      s: "training/Adam/dnn/hiddenlayer_0/bias/v"
+    }
+  }
+}
+node {
+  name: "training/Adam/dnn/hiddenlayer_0/bias/v/IsInitialized/VarIsInitializedOp"
+  op: "VarIsInitializedOp"
+  input: "training/Adam/dnn/hiddenlayer_0/bias/v"
+  attr {
+    key: "_class"
+    value {
+      list {
+        s: "loc:@dnn/hiddenlayer_0/bias"
+      }
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "training/Adam/dnn/hiddenlayer_0/bias/v/Assign"
+  op: "AssignVariableOp"
+  input: "training/Adam/dnn/hiddenlayer_0/bias/v"
+  input: "training/Adam/dnn/hiddenlayer_0/bias/v/Initializer/zeros"
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+}
+node {
+  name: "training/Adam/dnn/hiddenlayer_0/bias/v/Read/ReadVariableOp"
+  op: "ReadVariableOp"
+  input: "training/Adam/dnn/hiddenlayer_0/bias/v"
+  attr {
+    key: "_class"
+    value {
+      list {
+        s: "loc:@dnn/hiddenlayer_0/bias"
+      }
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+          dim {
+            size: 30
+          }
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+}
+node {
+  name: "training/Adam/dnn/hiddenlayer_1/kernel/v/Initializer/zeros"
+  op: "Const"
+  attr {
+    key: "_class"
+    value {
+      list {
+        s: "loc:@dnn/hiddenlayer_1/kernel"
+      }
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+          dim {
+            size: 30
+          }
+          dim {
+            size: 10
+          }
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "value"
+    value {
+      tensor {
+        dtype: DT_FLOAT
+        tensor_shape {
+          dim {
+            size: 30
+          }
+          dim {
+            size: 10
+          }
+        }
+        float_val: 0.0
+      }
+    }
+  }
+}
+node {
+  name: "training/Adam/dnn/hiddenlayer_1/kernel/v"
+  op: "VarHandleOp"
+  attr {
+    key: "_class"
+    value {
+      list {
+        s: "loc:@dnn/hiddenlayer_1/kernel"
+      }
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+  attr {
+    key: "allowed_devices"
+    value {
+      list {
+      }
+    }
+  }
+  attr {
+    key: "container"
+    value {
+      s: ""
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "shape"
+    value {
+      shape {
+        dim {
+          size: 30
+        }
+        dim {
+          size: 10
+        }
+      }
+    }
+  }
+  attr {
+    key: "shared_name"
+    value {
+      s: "training/Adam/dnn/hiddenlayer_1/kernel/v"
+    }
+  }
+}
+node {
+  name: "training/Adam/dnn/hiddenlayer_1/kernel/v/IsInitialized/VarIsInitializedOp"
+  op: "VarIsInitializedOp"
+  input: "training/Adam/dnn/hiddenlayer_1/kernel/v"
+  attr {
+    key: "_class"
+    value {
+      list {
+        s: "loc:@dnn/hiddenlayer_1/kernel"
+      }
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "training/Adam/dnn/hiddenlayer_1/kernel/v/Assign"
+  op: "AssignVariableOp"
+  input: "training/Adam/dnn/hiddenlayer_1/kernel/v"
+  input: "training/Adam/dnn/hiddenlayer_1/kernel/v/Initializer/zeros"
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+}
+node {
+  name: "training/Adam/dnn/hiddenlayer_1/kernel/v/Read/ReadVariableOp"
+  op: "ReadVariableOp"
+  input: "training/Adam/dnn/hiddenlayer_1/kernel/v"
+  attr {
+    key: "_class"
+    value {
+      list {
+        s: "loc:@dnn/hiddenlayer_1/kernel"
+      }
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+          dim {
+            size: 30
+          }
+          dim {
+            size: 10
+          }
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+}
+node {
+  name: "training/Adam/dnn/hiddenlayer_1/bias/v/Initializer/zeros"
+  op: "Const"
+  attr {
+    key: "_class"
+    value {
+      list {
+        s: "loc:@dnn/hiddenlayer_1/bias"
+      }
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+          dim {
+            size: 10
+          }
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "value"
+    value {
+      tensor {
+        dtype: DT_FLOAT
+        tensor_shape {
+          dim {
+            size: 10
+          }
+        }
+        float_val: 0.0
+      }
+    }
+  }
+}
+node {
+  name: "training/Adam/dnn/hiddenlayer_1/bias/v"
+  op: "VarHandleOp"
+  attr {
+    key: "_class"
+    value {
+      list {
+        s: "loc:@dnn/hiddenlayer_1/bias"
+      }
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+  attr {
+    key: "allowed_devices"
+    value {
+      list {
+      }
+    }
+  }
+  attr {
+    key: "container"
+    value {
+      s: ""
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "shape"
+    value {
+      shape {
+        dim {
+          size: 10
+        }
+      }
+    }
+  }
+  attr {
+    key: "shared_name"
+    value {
+      s: "training/Adam/dnn/hiddenlayer_1/bias/v"
+    }
+  }
+}
+node {
+  name: "training/Adam/dnn/hiddenlayer_1/bias/v/IsInitialized/VarIsInitializedOp"
+  op: "VarIsInitializedOp"
+  input: "training/Adam/dnn/hiddenlayer_1/bias/v"
+  attr {
+    key: "_class"
+    value {
+      list {
+        s: "loc:@dnn/hiddenlayer_1/bias"
+      }
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "training/Adam/dnn/hiddenlayer_1/bias/v/Assign"
+  op: "AssignVariableOp"
+  input: "training/Adam/dnn/hiddenlayer_1/bias/v"
+  input: "training/Adam/dnn/hiddenlayer_1/bias/v/Initializer/zeros"
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+}
+node {
+  name: "training/Adam/dnn/hiddenlayer_1/bias/v/Read/ReadVariableOp"
+  op: "ReadVariableOp"
+  input: "training/Adam/dnn/hiddenlayer_1/bias/v"
+  attr {
+    key: "_class"
+    value {
+      list {
+        s: "loc:@dnn/hiddenlayer_1/bias"
+      }
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+          dim {
+            size: 10
+          }
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+}
+node {
+  name: "training/Adam/dnn/logits/kernel/v/Initializer/zeros"
+  op: "Const"
+  attr {
+    key: "_class"
+    value {
+      list {
+        s: "loc:@dnn/logits/kernel"
+      }
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+          dim {
+            size: 10
+          }
+          dim {
+            size: 4
+          }
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "value"
+    value {
+      tensor {
+        dtype: DT_FLOAT
+        tensor_shape {
+          dim {
+            size: 10
+          }
+          dim {
+            size: 4
+          }
+        }
+        float_val: 0.0
+      }
+    }
+  }
+}
+node {
+  name: "training/Adam/dnn/logits/kernel/v"
+  op: "VarHandleOp"
+  attr {
+    key: "_class"
+    value {
+      list {
+        s: "loc:@dnn/logits/kernel"
+      }
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+  attr {
+    key: "allowed_devices"
+    value {
+      list {
+      }
+    }
+  }
+  attr {
+    key: "container"
+    value {
+      s: ""
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "shape"
+    value {
+      shape {
+        dim {
+          size: 10
+        }
+        dim {
+          size: 4
+        }
+      }
+    }
+  }
+  attr {
+    key: "shared_name"
+    value {
+      s: "training/Adam/dnn/logits/kernel/v"
+    }
+  }
+}
+node {
+  name: "training/Adam/dnn/logits/kernel/v/IsInitialized/VarIsInitializedOp"
+  op: "VarIsInitializedOp"
+  input: "training/Adam/dnn/logits/kernel/v"
+  attr {
+    key: "_class"
+    value {
+      list {
+        s: "loc:@dnn/logits/kernel"
+      }
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "training/Adam/dnn/logits/kernel/v/Assign"
+  op: "AssignVariableOp"
+  input: "training/Adam/dnn/logits/kernel/v"
+  input: "training/Adam/dnn/logits/kernel/v/Initializer/zeros"
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+}
+node {
+  name: "training/Adam/dnn/logits/kernel/v/Read/ReadVariableOp"
+  op: "ReadVariableOp"
+  input: "training/Adam/dnn/logits/kernel/v"
+  attr {
+    key: "_class"
+    value {
+      list {
+        s: "loc:@dnn/logits/kernel"
+      }
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+          dim {
+            size: 10
+          }
+          dim {
+            size: 4
+          }
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+}
+node {
+  name: "training/Adam/dnn/logits/bias/v/Initializer/zeros"
+  op: "Const"
+  attr {
+    key: "_class"
+    value {
+      list {
+        s: "loc:@dnn/logits/bias"
+      }
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+          dim {
+            size: 4
+          }
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "value"
+    value {
+      tensor {
+        dtype: DT_FLOAT
+        tensor_shape {
+          dim {
+            size: 4
+          }
+        }
+        float_val: 0.0
+      }
+    }
+  }
+}
+node {
+  name: "training/Adam/dnn/logits/bias/v"
+  op: "VarHandleOp"
+  attr {
+    key: "_class"
+    value {
+      list {
+        s: "loc:@dnn/logits/bias"
+      }
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+  attr {
+    key: "allowed_devices"
+    value {
+      list {
+      }
+    }
+  }
+  attr {
+    key: "container"
+    value {
+      s: ""
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "shape"
+    value {
+      shape {
+        dim {
+          size: 4
+        }
+      }
+    }
+  }
+  attr {
+    key: "shared_name"
+    value {
+      s: "training/Adam/dnn/logits/bias/v"
+    }
+  }
+}
+node {
+  name: "training/Adam/dnn/logits/bias/v/IsInitialized/VarIsInitializedOp"
+  op: "VarIsInitializedOp"
+  input: "training/Adam/dnn/logits/bias/v"
+  attr {
+    key: "_class"
+    value {
+      list {
+        s: "loc:@dnn/logits/bias"
+      }
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "training/Adam/dnn/logits/bias/v/Assign"
+  op: "AssignVariableOp"
+  input: "training/Adam/dnn/logits/bias/v"
+  input: "training/Adam/dnn/logits/bias/v/Initializer/zeros"
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+}
+node {
+  name: "training/Adam/dnn/logits/bias/v/Read/ReadVariableOp"
+  op: "ReadVariableOp"
+  input: "training/Adam/dnn/logits/bias/v"
+  attr {
+    key: "_class"
+    value {
+      list {
+        s: "loc:@dnn/logits/bias"
+      }
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+          dim {
+            size: 4
+          }
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+}
+node {
+  name: "training/Adam/Identity"
   op: "Identity"
-  input: "training/Adagrad/Identity/ReadVariableOp"
+  input: "ExponentialDecay"
   attr {
     key: "T"
     value {
@@ -32114,7 +33664,396 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/Const"
+  name: "training/Adam/ReadVariableOp"
+  op: "ReadVariableOp"
+  input: "global_step"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_INT64
+    }
+  }
+}
+node {
+  name: "training/Adam/add/y"
+  op: "Const"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_INT64
+    }
+  }
+  attr {
+    key: "value"
+    value {
+      tensor {
+        dtype: DT_INT64
+        tensor_shape {
+        }
+        int64_val: 1
+      }
+    }
+  }
+}
+node {
+  name: "training/Adam/add"
+  op: "AddV2"
+  input: "training/Adam/ReadVariableOp"
+  input: "training/Adam/add/y"
+  attr {
+    key: "T"
+    value {
+      type: DT_INT64
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "training/Adam/Cast"
+  op: "Cast"
+  input: "training/Adam/add"
+  attr {
+    key: "DstT"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "SrcT"
+    value {
+      type: DT_INT64
+    }
+  }
+  attr {
+    key: "Truncate"
+    value {
+      b: false
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "training/Adam/Identity_1/ReadVariableOp"
+  op: "ReadVariableOp"
+  input: "training/Adam/beta_1"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+}
+node {
+  name: "training/Adam/Identity_1"
+  op: "Identity"
+  input: "training/Adam/Identity_1/ReadVariableOp"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "training/Adam/Identity_2/ReadVariableOp"
+  op: "ReadVariableOp"
+  input: "training/Adam/beta_2"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+}
+node {
+  name: "training/Adam/Identity_2"
+  op: "Identity"
+  input: "training/Adam/Identity_2/ReadVariableOp"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "training/Adam/Pow"
+  op: "Pow"
+  input: "training/Adam/Identity_1"
+  input: "training/Adam/Cast"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "training/Adam/Pow_1"
+  op: "Pow"
+  input: "training/Adam/Identity_2"
+  input: "training/Adam/Cast"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "training/Adam/sub/x"
+  op: "Const"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "value"
+    value {
+      tensor {
+        dtype: DT_FLOAT
+        tensor_shape {
+        }
+        float_val: 1.0
+      }
+    }
+  }
+}
+node {
+  name: "training/Adam/sub"
+  op: "Sub"
+  input: "training/Adam/sub/x"
+  input: "training/Adam/Pow_1"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "training/Adam/Sqrt"
+  op: "Sqrt"
+  input: "training/Adam/sub"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "training/Adam/sub_1/x"
+  op: "Const"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "value"
+    value {
+      tensor {
+        dtype: DT_FLOAT
+        tensor_shape {
+        }
+        float_val: 1.0
+      }
+    }
+  }
+}
+node {
+  name: "training/Adam/sub_1"
+  op: "Sub"
+  input: "training/Adam/sub_1/x"
+  input: "training/Adam/Pow"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "training/Adam/truediv"
+  op: "RealDiv"
+  input: "training/Adam/Sqrt"
+  input: "training/Adam/sub_1"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "training/Adam/mul"
+  op: "Mul"
+  input: "training/Adam/Identity"
+  input: "training/Adam/truediv"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "training/Adam/Const"
   op: "Const"
   attr {
     key: "_output_shapes"
@@ -32144,9 +34083,40 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/Neg"
-  op: "Neg"
-  input: "training/Adagrad/Identity"
+  name: "training/Adam/sub_2/x"
+  op: "Const"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "value"
+    value {
+      tensor {
+        dtype: DT_FLOAT
+        tensor_shape {
+        }
+        float_val: 1.0
+      }
+    }
+  }
+}
+node {
+  name: "training/Adam/sub_2"
+  op: "Sub"
+  input: "training/Adam/sub_2/x"
+  input: "training/Adam/Identity_1"
   attr {
     key: "T"
     value {
@@ -32164,7 +34134,7 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/zeros"
+  name: "training/Adam/sub_3/x"
   op: "Const"
   attr {
     key: "_output_shapes"
@@ -32178,29 +34148,55 @@ node {
   attr {
     key: "dtype"
     value {
-      type: DT_INT64
+      type: DT_FLOAT
     }
   }
   attr {
     key: "value"
     value {
       tensor {
-        dtype: DT_INT64
+        dtype: DT_FLOAT
         tensor_shape {
         }
-        int64_val: 0
+        float_val: 1.0
       }
     }
   }
 }
 node {
-  name: "training/Adagrad/Adagrad/update_dnn/hiddenlayer_0/kernel/ResourceApplyAdagradV2"
-  op: "ResourceApplyAdagradV2"
+  name: "training/Adam/sub_3"
+  op: "Sub"
+  input: "training/Adam/sub_3/x"
+  input: "training/Adam/Identity_2"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "training/Adam/Adam/update_dnn/hiddenlayer_0/kernel/ResourceApplyAdam"
+  op: "ResourceApplyAdam"
   input: "dnn/hiddenlayer_0/kernel"
-  input: "training/Adagrad/dnn/hiddenlayer_0/kernel/accumulator"
-  input: "training/Adagrad/Identity"
-  input: "training/Adagrad/Const"
-  input: "training/Adagrad/gradients/gradients/dnn/hiddenlayer_0/MatMul_grad/MatMul_1"
+  input: "training/Adam/dnn/hiddenlayer_0/kernel/m"
+  input: "training/Adam/dnn/hiddenlayer_0/kernel/v"
+  input: "training/Adam/Pow"
+  input: "training/Adam/Pow_1"
+  input: "training/Adam/Identity"
+  input: "training/Adam/Identity_1"
+  input: "training/Adam/Identity_2"
+  input: "training/Adam/Const"
+  input: "training/Adam/gradients/gradients/dnn/hiddenlayer_0/MatMul_grad/MatMul_1"
   attr {
     key: "T"
     value {
@@ -32216,26 +34212,31 @@ node {
     }
   }
   attr {
-    key: "update_slots"
-    value {
-      b: true
-    }
-  }
-  attr {
     key: "use_locking"
     value {
       b: true
     }
   }
+  attr {
+    key: "use_nesterov"
+    value {
+      b: false
+    }
+  }
 }
 node {
-  name: "training/Adagrad/Adagrad/update_dnn/hiddenlayer_0/bias/ResourceApplyAdagradV2"
-  op: "ResourceApplyAdagradV2"
+  name: "training/Adam/Adam/update_dnn/hiddenlayer_0/bias/ResourceApplyAdam"
+  op: "ResourceApplyAdam"
   input: "dnn/hiddenlayer_0/bias"
-  input: "training/Adagrad/dnn/hiddenlayer_0/bias/accumulator"
-  input: "training/Adagrad/Identity"
-  input: "training/Adagrad/Const"
-  input: "training/Adagrad/gradients/gradients/dnn/hiddenlayer_0/BiasAdd_grad/BiasAddGrad"
+  input: "training/Adam/dnn/hiddenlayer_0/bias/m"
+  input: "training/Adam/dnn/hiddenlayer_0/bias/v"
+  input: "training/Adam/Pow"
+  input: "training/Adam/Pow_1"
+  input: "training/Adam/Identity"
+  input: "training/Adam/Identity_1"
+  input: "training/Adam/Identity_2"
+  input: "training/Adam/Const"
+  input: "training/Adam/gradients/gradients/dnn/hiddenlayer_0/BiasAdd_grad/BiasAddGrad"
   attr {
     key: "T"
     value {
@@ -32251,26 +34252,31 @@ node {
     }
   }
   attr {
-    key: "update_slots"
-    value {
-      b: true
-    }
-  }
-  attr {
     key: "use_locking"
     value {
       b: true
     }
   }
+  attr {
+    key: "use_nesterov"
+    value {
+      b: false
+    }
+  }
 }
 node {
-  name: "training/Adagrad/Adagrad/update_dnn/hiddenlayer_1/kernel/ResourceApplyAdagradV2"
-  op: "ResourceApplyAdagradV2"
+  name: "training/Adam/Adam/update_dnn/hiddenlayer_1/kernel/ResourceApplyAdam"
+  op: "ResourceApplyAdam"
   input: "dnn/hiddenlayer_1/kernel"
-  input: "training/Adagrad/dnn/hiddenlayer_1/kernel/accumulator"
-  input: "training/Adagrad/Identity"
-  input: "training/Adagrad/Const"
-  input: "training/Adagrad/gradients/gradients/dnn/hiddenlayer_1/MatMul_grad/MatMul_1"
+  input: "training/Adam/dnn/hiddenlayer_1/kernel/m"
+  input: "training/Adam/dnn/hiddenlayer_1/kernel/v"
+  input: "training/Adam/Pow"
+  input: "training/Adam/Pow_1"
+  input: "training/Adam/Identity"
+  input: "training/Adam/Identity_1"
+  input: "training/Adam/Identity_2"
+  input: "training/Adam/Const"
+  input: "training/Adam/gradients/gradients/dnn/hiddenlayer_1/MatMul_grad/MatMul_1"
   attr {
     key: "T"
     value {
@@ -32286,26 +34292,31 @@ node {
     }
   }
   attr {
-    key: "update_slots"
-    value {
-      b: true
-    }
-  }
-  attr {
     key: "use_locking"
     value {
       b: true
     }
   }
+  attr {
+    key: "use_nesterov"
+    value {
+      b: false
+    }
+  }
 }
 node {
-  name: "training/Adagrad/Adagrad/update_dnn/hiddenlayer_1/bias/ResourceApplyAdagradV2"
-  op: "ResourceApplyAdagradV2"
+  name: "training/Adam/Adam/update_dnn/hiddenlayer_1/bias/ResourceApplyAdam"
+  op: "ResourceApplyAdam"
   input: "dnn/hiddenlayer_1/bias"
-  input: "training/Adagrad/dnn/hiddenlayer_1/bias/accumulator"
-  input: "training/Adagrad/Identity"
-  input: "training/Adagrad/Const"
-  input: "training/Adagrad/gradients/gradients/dnn/hiddenlayer_1/BiasAdd_grad/BiasAddGrad"
+  input: "training/Adam/dnn/hiddenlayer_1/bias/m"
+  input: "training/Adam/dnn/hiddenlayer_1/bias/v"
+  input: "training/Adam/Pow"
+  input: "training/Adam/Pow_1"
+  input: "training/Adam/Identity"
+  input: "training/Adam/Identity_1"
+  input: "training/Adam/Identity_2"
+  input: "training/Adam/Const"
+  input: "training/Adam/gradients/gradients/dnn/hiddenlayer_1/BiasAdd_grad/BiasAddGrad"
   attr {
     key: "T"
     value {
@@ -32321,26 +34332,31 @@ node {
     }
   }
   attr {
-    key: "update_slots"
-    value {
-      b: true
-    }
-  }
-  attr {
     key: "use_locking"
     value {
       b: true
     }
   }
+  attr {
+    key: "use_nesterov"
+    value {
+      b: false
+    }
+  }
 }
 node {
-  name: "training/Adagrad/Adagrad/update_dnn/logits/kernel/ResourceApplyAdagradV2"
-  op: "ResourceApplyAdagradV2"
+  name: "training/Adam/Adam/update_dnn/logits/kernel/ResourceApplyAdam"
+  op: "ResourceApplyAdam"
   input: "dnn/logits/kernel"
-  input: "training/Adagrad/dnn/logits/kernel/accumulator"
-  input: "training/Adagrad/Identity"
-  input: "training/Adagrad/Const"
-  input: "training/Adagrad/gradients/gradients/dnn/logits/MatMul_grad/MatMul_1"
+  input: "training/Adam/dnn/logits/kernel/m"
+  input: "training/Adam/dnn/logits/kernel/v"
+  input: "training/Adam/Pow"
+  input: "training/Adam/Pow_1"
+  input: "training/Adam/Identity"
+  input: "training/Adam/Identity_1"
+  input: "training/Adam/Identity_2"
+  input: "training/Adam/Const"
+  input: "training/Adam/gradients/gradients/dnn/logits/MatMul_grad/MatMul_1"
   attr {
     key: "T"
     value {
@@ -32356,26 +34372,31 @@ node {
     }
   }
   attr {
-    key: "update_slots"
-    value {
-      b: true
-    }
-  }
-  attr {
     key: "use_locking"
     value {
       b: true
     }
   }
+  attr {
+    key: "use_nesterov"
+    value {
+      b: false
+    }
+  }
 }
 node {
-  name: "training/Adagrad/Adagrad/update_dnn/logits/bias/ResourceApplyAdagradV2"
-  op: "ResourceApplyAdagradV2"
+  name: "training/Adam/Adam/update_dnn/logits/bias/ResourceApplyAdam"
+  op: "ResourceApplyAdam"
   input: "dnn/logits/bias"
-  input: "training/Adagrad/dnn/logits/bias/accumulator"
-  input: "training/Adagrad/Identity"
-  input: "training/Adagrad/Const"
-  input: "training/Adagrad/gradients/gradients/dnn/logits/BiasAdd_grad/BiasAddGrad"
+  input: "training/Adam/dnn/logits/bias/m"
+  input: "training/Adam/dnn/logits/bias/v"
+  input: "training/Adam/Pow"
+  input: "training/Adam/Pow_1"
+  input: "training/Adam/Identity"
+  input: "training/Adam/Identity_1"
+  input: "training/Adam/Identity_2"
+  input: "training/Adam/Const"
+  input: "training/Adam/gradients/gradients/dnn/logits/BiasAdd_grad/BiasAddGrad"
   attr {
     key: "T"
     value {
@@ -32391,32 +34412,32 @@ node {
     }
   }
   attr {
-    key: "update_slots"
-    value {
-      b: true
-    }
-  }
-  attr {
     key: "use_locking"
     value {
       b: true
     }
   }
+  attr {
+    key: "use_nesterov"
+    value {
+      b: false
+    }
+  }
 }
 node {
-  name: "training/Adagrad/Adagrad/group_deps"
+  name: "training/Adam/Adam/group_deps"
   op: "NoOp"
-  input: "^training/Adagrad/Adagrad/update_dnn/hiddenlayer_0/bias/ResourceApplyAdagradV2"
-  input: "^training/Adagrad/Adagrad/update_dnn/hiddenlayer_0/kernel/ResourceApplyAdagradV2"
-  input: "^training/Adagrad/Adagrad/update_dnn/hiddenlayer_1/bias/ResourceApplyAdagradV2"
-  input: "^training/Adagrad/Adagrad/update_dnn/hiddenlayer_1/kernel/ResourceApplyAdagradV2"
-  input: "^training/Adagrad/Adagrad/update_dnn/logits/bias/ResourceApplyAdagradV2"
-  input: "^training/Adagrad/Adagrad/update_dnn/logits/kernel/ResourceApplyAdagradV2"
+  input: "^training/Adam/Adam/update_dnn/hiddenlayer_0/bias/ResourceApplyAdam"
+  input: "^training/Adam/Adam/update_dnn/hiddenlayer_0/kernel/ResourceApplyAdam"
+  input: "^training/Adam/Adam/update_dnn/hiddenlayer_1/bias/ResourceApplyAdam"
+  input: "^training/Adam/Adam/update_dnn/hiddenlayer_1/kernel/ResourceApplyAdam"
+  input: "^training/Adam/Adam/update_dnn/logits/bias/ResourceApplyAdam"
+  input: "^training/Adam/Adam/update_dnn/logits/kernel/ResourceApplyAdam"
 }
 node {
-  name: "training/Adagrad/Adagrad/Const"
+  name: "training/Adam/Adam/Const"
   op: "Const"
-  input: "^training/Adagrad/Adagrad/group_deps"
+  input: "^training/Adam/Adam/group_deps"
   attr {
     key: "_output_shapes"
     value {
@@ -32445,10 +34466,10 @@ node {
   }
 }
 node {
-  name: "training/Adagrad/Adagrad/AssignAddVariableOp"
+  name: "training/Adam/Adam/AssignAddVariableOp"
   op: "AssignAddVariableOp"
   input: "global_step"
-  input: "training/Adagrad/Adagrad/Const"
+  input: "training/Adam/Adam/Const"
   attr {
     key: "dtype"
     value {
@@ -32459,7 +34480,7 @@ node {
 node {
   name: "training/group_deps"
   op: "NoOp"
-  input: "^training/Adagrad/Adagrad/AssignAddVariableOp"
+  input: "^training/Adam/Adam/AssignAddVariableOp"
 }
 node {
   name: "loss/tags"
@@ -32522,14 +34543,21 @@ node {
   input: "^dnn/logits/bias/Assign"
   input: "^dnn/logits/kernel/Assign"
   input: "^global_step/Assign"
-  input: "^training/Adagrad/decay/Assign"
-  input: "^training/Adagrad/dnn/hiddenlayer_0/bias/accumulator/Assign"
-  input: "^training/Adagrad/dnn/hiddenlayer_0/kernel/accumulator/Assign"
-  input: "^training/Adagrad/dnn/hiddenlayer_1/bias/accumulator/Assign"
-  input: "^training/Adagrad/dnn/hiddenlayer_1/kernel/accumulator/Assign"
-  input: "^training/Adagrad/dnn/logits/bias/accumulator/Assign"
-  input: "^training/Adagrad/dnn/logits/kernel/accumulator/Assign"
-  input: "^training/Adagrad/learning_rate/Assign"
+  input: "^training/Adam/beta_1/Assign"
+  input: "^training/Adam/beta_2/Assign"
+  input: "^training/Adam/decay/Assign"
+  input: "^training/Adam/dnn/hiddenlayer_0/bias/m/Assign"
+  input: "^training/Adam/dnn/hiddenlayer_0/bias/v/Assign"
+  input: "^training/Adam/dnn/hiddenlayer_0/kernel/m/Assign"
+  input: "^training/Adam/dnn/hiddenlayer_0/kernel/v/Assign"
+  input: "^training/Adam/dnn/hiddenlayer_1/bias/m/Assign"
+  input: "^training/Adam/dnn/hiddenlayer_1/bias/v/Assign"
+  input: "^training/Adam/dnn/hiddenlayer_1/kernel/m/Assign"
+  input: "^training/Adam/dnn/hiddenlayer_1/kernel/v/Assign"
+  input: "^training/Adam/dnn/logits/bias/m/Assign"
+  input: "^training/Adam/dnn/logits/bias/v/Assign"
+  input: "^training/Adam/dnn/logits/kernel/m/Assign"
+  input: "^training/Adam/dnn/logits/kernel/v/Assign"
 }
 node {
   name: "init_1"
@@ -32642,7 +34670,7 @@ node {
 node {
   name: "report_uninitialized_variables/VarIsInitializedOp_7"
   op: "VarIsInitializedOp"
-  input: "training/Adagrad/decay"
+  input: "training/Adam/beta_1"
   attr {
     key: "_output_shapes"
     value {
@@ -32656,7 +34684,7 @@ node {
 node {
   name: "report_uninitialized_variables/VarIsInitializedOp_8"
   op: "VarIsInitializedOp"
-  input: "training/Adagrad/learning_rate"
+  input: "training/Adam/beta_2"
   attr {
     key: "_output_shapes"
     value {
@@ -32670,7 +34698,7 @@ node {
 node {
   name: "report_uninitialized_variables/VarIsInitializedOp_9"
   op: "VarIsInitializedOp"
-  input: "training/Adagrad/dnn/hiddenlayer_0/kernel/accumulator"
+  input: "training/Adam/decay"
   attr {
     key: "_output_shapes"
     value {
@@ -32684,7 +34712,7 @@ node {
 node {
   name: "report_uninitialized_variables/VarIsInitializedOp_10"
   op: "VarIsInitializedOp"
-  input: "training/Adagrad/dnn/hiddenlayer_0/bias/accumulator"
+  input: "training/Adam/dnn/hiddenlayer_0/kernel/m"
   attr {
     key: "_output_shapes"
     value {
@@ -32698,7 +34726,7 @@ node {
 node {
   name: "report_uninitialized_variables/VarIsInitializedOp_11"
   op: "VarIsInitializedOp"
-  input: "training/Adagrad/dnn/hiddenlayer_1/kernel/accumulator"
+  input: "training/Adam/dnn/hiddenlayer_0/bias/m"
   attr {
     key: "_output_shapes"
     value {
@@ -32712,7 +34740,7 @@ node {
 node {
   name: "report_uninitialized_variables/VarIsInitializedOp_12"
   op: "VarIsInitializedOp"
-  input: "training/Adagrad/dnn/hiddenlayer_1/bias/accumulator"
+  input: "training/Adam/dnn/hiddenlayer_1/kernel/m"
   attr {
     key: "_output_shapes"
     value {
@@ -32726,7 +34754,7 @@ node {
 node {
   name: "report_uninitialized_variables/VarIsInitializedOp_13"
   op: "VarIsInitializedOp"
-  input: "training/Adagrad/dnn/logits/kernel/accumulator"
+  input: "training/Adam/dnn/hiddenlayer_1/bias/m"
   attr {
     key: "_output_shapes"
     value {
@@ -32740,7 +34768,105 @@ node {
 node {
   name: "report_uninitialized_variables/VarIsInitializedOp_14"
   op: "VarIsInitializedOp"
-  input: "training/Adagrad/dnn/logits/bias/accumulator"
+  input: "training/Adam/dnn/logits/kernel/m"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "report_uninitialized_variables/VarIsInitializedOp_15"
+  op: "VarIsInitializedOp"
+  input: "training/Adam/dnn/logits/bias/m"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "report_uninitialized_variables/VarIsInitializedOp_16"
+  op: "VarIsInitializedOp"
+  input: "training/Adam/dnn/hiddenlayer_0/kernel/v"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "report_uninitialized_variables/VarIsInitializedOp_17"
+  op: "VarIsInitializedOp"
+  input: "training/Adam/dnn/hiddenlayer_0/bias/v"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "report_uninitialized_variables/VarIsInitializedOp_18"
+  op: "VarIsInitializedOp"
+  input: "training/Adam/dnn/hiddenlayer_1/kernel/v"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "report_uninitialized_variables/VarIsInitializedOp_19"
+  op: "VarIsInitializedOp"
+  input: "training/Adam/dnn/hiddenlayer_1/bias/v"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "report_uninitialized_variables/VarIsInitializedOp_20"
+  op: "VarIsInitializedOp"
+  input: "training/Adam/dnn/logits/kernel/v"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "report_uninitialized_variables/VarIsInitializedOp_21"
+  op: "VarIsInitializedOp"
+  input: "training/Adam/dnn/logits/bias/v"
   attr {
     key: "_output_shapes"
     value {
@@ -32769,11 +34895,18 @@ node {
   input: "report_uninitialized_variables/VarIsInitializedOp_12"
   input: "report_uninitialized_variables/VarIsInitializedOp_13"
   input: "report_uninitialized_variables/VarIsInitializedOp_14"
+  input: "report_uninitialized_variables/VarIsInitializedOp_15"
+  input: "report_uninitialized_variables/VarIsInitializedOp_16"
+  input: "report_uninitialized_variables/VarIsInitializedOp_17"
+  input: "report_uninitialized_variables/VarIsInitializedOp_18"
+  input: "report_uninitialized_variables/VarIsInitializedOp_19"
+  input: "report_uninitialized_variables/VarIsInitializedOp_20"
+  input: "report_uninitialized_variables/VarIsInitializedOp_21"
   device: "/device:CPU:0"
   attr {
     key: "N"
     value {
-      i: 15
+      i: 22
     }
   }
   attr {
@@ -32788,7 +34921,7 @@ node {
       list {
         shape {
           dim {
-            size: 15
+            size: 22
           }
         }
       }
@@ -32812,7 +34945,7 @@ node {
       list {
         shape {
           dim {
-            size: 15
+            size: 22
           }
         }
       }
@@ -32829,7 +34962,7 @@ node {
       list {
         shape {
           dim {
-            size: 15
+            size: 22
           }
         }
       }
@@ -32848,7 +34981,7 @@ node {
         dtype: DT_STRING
         tensor_shape {
           dim {
-            size: 15
+            size: 22
           }
         }
         string_val: "global_step"
@@ -32858,14 +34991,21 @@ node {
         string_val: "dnn/hiddenlayer_1/bias"
         string_val: "dnn/logits/kernel"
         string_val: "dnn/logits/bias"
-        string_val: "training/Adagrad/decay"
-        string_val: "training/Adagrad/learning_rate"
-        string_val: "training/Adagrad/dnn/hiddenlayer_0/kernel/accumulator"
-        string_val: "training/Adagrad/dnn/hiddenlayer_0/bias/accumulator"
-        string_val: "training/Adagrad/dnn/hiddenlayer_1/kernel/accumulator"
-        string_val: "training/Adagrad/dnn/hiddenlayer_1/bias/accumulator"
-        string_val: "training/Adagrad/dnn/logits/kernel/accumulator"
-        string_val: "training/Adagrad/dnn/logits/bias/accumulator"
+        string_val: "training/Adam/beta_1"
+        string_val: "training/Adam/beta_2"
+        string_val: "training/Adam/decay"
+        string_val: "training/Adam/dnn/hiddenlayer_0/kernel/m"
+        string_val: "training/Adam/dnn/hiddenlayer_0/bias/m"
+        string_val: "training/Adam/dnn/hiddenlayer_1/kernel/m"
+        string_val: "training/Adam/dnn/hiddenlayer_1/bias/m"
+        string_val: "training/Adam/dnn/logits/kernel/m"
+        string_val: "training/Adam/dnn/logits/bias/m"
+        string_val: "training/Adam/dnn/hiddenlayer_0/kernel/v"
+        string_val: "training/Adam/dnn/hiddenlayer_0/bias/v"
+        string_val: "training/Adam/dnn/hiddenlayer_1/kernel/v"
+        string_val: "training/Adam/dnn/hiddenlayer_1/bias/v"
+        string_val: "training/Adam/dnn/logits/kernel/v"
+        string_val: "training/Adam/dnn/logits/bias/v"
       }
     }
   }
@@ -32902,7 +35042,7 @@ node {
             size: 1
           }
         }
-        int_val: 15
+        int_val: 22
       }
     }
   }
@@ -33184,7 +35324,7 @@ node {
             size: 1
           }
         }
-        int_val: 15
+        int_val: 22
       }
     }
   }
@@ -33394,7 +35534,7 @@ node {
             size: 1
           }
         }
-        int_val: 15
+        int_val: 22
       }
     }
   }
@@ -33702,7 +35842,7 @@ node {
       list {
         shape {
           dim {
-            size: 15
+            size: 22
           }
         }
       }
@@ -33770,7 +35910,7 @@ node {
       list {
         shape {
           dim {
-            size: 15
+            size: 22
           }
         }
       }
@@ -34113,7 +36253,7 @@ node {
 node {
   name: "report_uninitialized_variables_1/VarIsInitializedOp_7"
   op: "VarIsInitializedOp"
-  input: "training/Adagrad/decay"
+  input: "training/Adam/beta_1"
   attr {
     key: "_output_shapes"
     value {
@@ -34127,7 +36267,7 @@ node {
 node {
   name: "report_uninitialized_variables_1/VarIsInitializedOp_8"
   op: "VarIsInitializedOp"
-  input: "training/Adagrad/learning_rate"
+  input: "training/Adam/beta_2"
   attr {
     key: "_output_shapes"
     value {
@@ -34141,7 +36281,7 @@ node {
 node {
   name: "report_uninitialized_variables_1/VarIsInitializedOp_9"
   op: "VarIsInitializedOp"
-  input: "training/Adagrad/dnn/hiddenlayer_0/kernel/accumulator"
+  input: "training/Adam/decay"
   attr {
     key: "_output_shapes"
     value {
@@ -34155,7 +36295,7 @@ node {
 node {
   name: "report_uninitialized_variables_1/VarIsInitializedOp_10"
   op: "VarIsInitializedOp"
-  input: "training/Adagrad/dnn/hiddenlayer_0/bias/accumulator"
+  input: "training/Adam/dnn/hiddenlayer_0/kernel/m"
   attr {
     key: "_output_shapes"
     value {
@@ -34169,7 +36309,7 @@ node {
 node {
   name: "report_uninitialized_variables_1/VarIsInitializedOp_11"
   op: "VarIsInitializedOp"
-  input: "training/Adagrad/dnn/hiddenlayer_1/kernel/accumulator"
+  input: "training/Adam/dnn/hiddenlayer_0/bias/m"
   attr {
     key: "_output_shapes"
     value {
@@ -34183,7 +36323,7 @@ node {
 node {
   name: "report_uninitialized_variables_1/VarIsInitializedOp_12"
   op: "VarIsInitializedOp"
-  input: "training/Adagrad/dnn/hiddenlayer_1/bias/accumulator"
+  input: "training/Adam/dnn/hiddenlayer_1/kernel/m"
   attr {
     key: "_output_shapes"
     value {
@@ -34197,7 +36337,7 @@ node {
 node {
   name: "report_uninitialized_variables_1/VarIsInitializedOp_13"
   op: "VarIsInitializedOp"
-  input: "training/Adagrad/dnn/logits/kernel/accumulator"
+  input: "training/Adam/dnn/hiddenlayer_1/bias/m"
   attr {
     key: "_output_shapes"
     value {
@@ -34211,7 +36351,105 @@ node {
 node {
   name: "report_uninitialized_variables_1/VarIsInitializedOp_14"
   op: "VarIsInitializedOp"
-  input: "training/Adagrad/dnn/logits/bias/accumulator"
+  input: "training/Adam/dnn/logits/kernel/m"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "report_uninitialized_variables_1/VarIsInitializedOp_15"
+  op: "VarIsInitializedOp"
+  input: "training/Adam/dnn/logits/bias/m"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "report_uninitialized_variables_1/VarIsInitializedOp_16"
+  op: "VarIsInitializedOp"
+  input: "training/Adam/dnn/hiddenlayer_0/kernel/v"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "report_uninitialized_variables_1/VarIsInitializedOp_17"
+  op: "VarIsInitializedOp"
+  input: "training/Adam/dnn/hiddenlayer_0/bias/v"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "report_uninitialized_variables_1/VarIsInitializedOp_18"
+  op: "VarIsInitializedOp"
+  input: "training/Adam/dnn/hiddenlayer_1/kernel/v"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "report_uninitialized_variables_1/VarIsInitializedOp_19"
+  op: "VarIsInitializedOp"
+  input: "training/Adam/dnn/hiddenlayer_1/bias/v"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "report_uninitialized_variables_1/VarIsInitializedOp_20"
+  op: "VarIsInitializedOp"
+  input: "training/Adam/dnn/logits/kernel/v"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "report_uninitialized_variables_1/VarIsInitializedOp_21"
+  op: "VarIsInitializedOp"
+  input: "training/Adam/dnn/logits/bias/v"
   attr {
     key: "_output_shapes"
     value {
@@ -34240,11 +36478,18 @@ node {
   input: "report_uninitialized_variables_1/VarIsInitializedOp_12"
   input: "report_uninitialized_variables_1/VarIsInitializedOp_13"
   input: "report_uninitialized_variables_1/VarIsInitializedOp_14"
+  input: "report_uninitialized_variables_1/VarIsInitializedOp_15"
+  input: "report_uninitialized_variables_1/VarIsInitializedOp_16"
+  input: "report_uninitialized_variables_1/VarIsInitializedOp_17"
+  input: "report_uninitialized_variables_1/VarIsInitializedOp_18"
+  input: "report_uninitialized_variables_1/VarIsInitializedOp_19"
+  input: "report_uninitialized_variables_1/VarIsInitializedOp_20"
+  input: "report_uninitialized_variables_1/VarIsInitializedOp_21"
   device: "/device:CPU:0"
   attr {
     key: "N"
     value {
-      i: 15
+      i: 22
     }
   }
   attr {
@@ -34259,7 +36504,7 @@ node {
       list {
         shape {
           dim {
-            size: 15
+            size: 22
           }
         }
       }
@@ -34283,7 +36528,7 @@ node {
       list {
         shape {
           dim {
-            size: 15
+            size: 22
           }
         }
       }
@@ -34300,7 +36545,7 @@ node {
       list {
         shape {
           dim {
-            size: 15
+            size: 22
           }
         }
       }
@@ -34319,7 +36564,7 @@ node {
         dtype: DT_STRING
         tensor_shape {
           dim {
-            size: 15
+            size: 22
           }
         }
         string_val: "global_step"
@@ -34329,14 +36574,21 @@ node {
         string_val: "dnn/hiddenlayer_1/bias"
         string_val: "dnn/logits/kernel"
         string_val: "dnn/logits/bias"
-        string_val: "training/Adagrad/decay"
-        string_val: "training/Adagrad/learning_rate"
-        string_val: "training/Adagrad/dnn/hiddenlayer_0/kernel/accumulator"
-        string_val: "training/Adagrad/dnn/hiddenlayer_0/bias/accumulator"
-        string_val: "training/Adagrad/dnn/hiddenlayer_1/kernel/accumulator"
-        string_val: "training/Adagrad/dnn/hiddenlayer_1/bias/accumulator"
-        string_val: "training/Adagrad/dnn/logits/kernel/accumulator"
-        string_val: "training/Adagrad/dnn/logits/bias/accumulator"
+        string_val: "training/Adam/beta_1"
+        string_val: "training/Adam/beta_2"
+        string_val: "training/Adam/decay"
+        string_val: "training/Adam/dnn/hiddenlayer_0/kernel/m"
+        string_val: "training/Adam/dnn/hiddenlayer_0/bias/m"
+        string_val: "training/Adam/dnn/hiddenlayer_1/kernel/m"
+        string_val: "training/Adam/dnn/hiddenlayer_1/bias/m"
+        string_val: "training/Adam/dnn/logits/kernel/m"
+        string_val: "training/Adam/dnn/logits/bias/m"
+        string_val: "training/Adam/dnn/hiddenlayer_0/kernel/v"
+        string_val: "training/Adam/dnn/hiddenlayer_0/bias/v"
+        string_val: "training/Adam/dnn/hiddenlayer_1/kernel/v"
+        string_val: "training/Adam/dnn/hiddenlayer_1/bias/v"
+        string_val: "training/Adam/dnn/logits/kernel/v"
+        string_val: "training/Adam/dnn/logits/bias/v"
       }
     }
   }
@@ -34373,7 +36625,7 @@ node {
             size: 1
           }
         }
-        int_val: 15
+        int_val: 22
       }
     }
   }
@@ -34655,7 +36907,7 @@ node {
             size: 1
           }
         }
-        int_val: 15
+        int_val: 22
       }
     }
   }
@@ -34865,7 +37117,7 @@ node {
             size: 1
           }
         }
-        int_val: 15
+        int_val: 22
       }
     }
   }
@@ -35173,7 +37425,7 @@ node {
       list {
         shape {
           dim {
-            size: 15
+            size: 22
           }
         }
       }
@@ -35241,7 +37493,7 @@ node {
       list {
         shape {
           dim {
-            size: 15
+            size: 22
           }
         }
       }
@@ -35834,7 +38086,7 @@ node {
       list {
         shape {
           dim {
-            size: 15
+            size: 22
           }
         }
       }
@@ -35853,7 +38105,7 @@ node {
         dtype: DT_STRING
         tensor_shape {
           dim {
-            size: 15
+            size: 22
           }
         }
         string_val: "dnn/hiddenlayer_0/bias"
@@ -35863,14 +38115,21 @@ node {
         string_val: "dnn/logits/bias"
         string_val: "dnn/logits/kernel"
         string_val: "global_step"
-        string_val: "training/Adagrad/decay"
-        string_val: "training/Adagrad/dnn/hiddenlayer_0/bias/accumulator"
-        string_val: "training/Adagrad/dnn/hiddenlayer_0/kernel/accumulator"
-        string_val: "training/Adagrad/dnn/hiddenlayer_1/bias/accumulator"
-        string_val: "training/Adagrad/dnn/hiddenlayer_1/kernel/accumulator"
-        string_val: "training/Adagrad/dnn/logits/bias/accumulator"
-        string_val: "training/Adagrad/dnn/logits/kernel/accumulator"
-        string_val: "training/Adagrad/learning_rate"
+        string_val: "training/Adam/beta_1"
+        string_val: "training/Adam/beta_2"
+        string_val: "training/Adam/decay"
+        string_val: "training/Adam/dnn/hiddenlayer_0/bias/m"
+        string_val: "training/Adam/dnn/hiddenlayer_0/bias/v"
+        string_val: "training/Adam/dnn/hiddenlayer_0/kernel/m"
+        string_val: "training/Adam/dnn/hiddenlayer_0/kernel/v"
+        string_val: "training/Adam/dnn/hiddenlayer_1/bias/m"
+        string_val: "training/Adam/dnn/hiddenlayer_1/bias/v"
+        string_val: "training/Adam/dnn/hiddenlayer_1/kernel/m"
+        string_val: "training/Adam/dnn/hiddenlayer_1/kernel/v"
+        string_val: "training/Adam/dnn/logits/bias/m"
+        string_val: "training/Adam/dnn/logits/bias/v"
+        string_val: "training/Adam/dnn/logits/kernel/m"
+        string_val: "training/Adam/dnn/logits/kernel/v"
       }
     }
   }
@@ -35885,7 +38144,7 @@ node {
       list {
         shape {
           dim {
-            size: 15
+            size: 22
           }
         }
       }
@@ -35904,9 +38163,16 @@ node {
         dtype: DT_STRING
         tensor_shape {
           dim {
-            size: 15
+            size: 22
           }
         }
+        string_val: ""
+        string_val: ""
+        string_val: ""
+        string_val: ""
+        string_val: ""
+        string_val: ""
+        string_val: ""
         string_val: ""
         string_val: ""
         string_val: ""
@@ -35939,14 +38205,21 @@ node {
   input: "dnn/logits/bias/Read/ReadVariableOp"
   input: "dnn/logits/kernel/Read/ReadVariableOp"
   input: "global_step/Read/ReadVariableOp"
-  input: "training/Adagrad/decay/Read/ReadVariableOp"
-  input: "training/Adagrad/dnn/hiddenlayer_0/bias/accumulator/Read/ReadVariableOp"
-  input: "training/Adagrad/dnn/hiddenlayer_0/kernel/accumulator/Read/ReadVariableOp"
-  input: "training/Adagrad/dnn/hiddenlayer_1/bias/accumulator/Read/ReadVariableOp"
-  input: "training/Adagrad/dnn/hiddenlayer_1/kernel/accumulator/Read/ReadVariableOp"
-  input: "training/Adagrad/dnn/logits/bias/accumulator/Read/ReadVariableOp"
-  input: "training/Adagrad/dnn/logits/kernel/accumulator/Read/ReadVariableOp"
-  input: "training/Adagrad/learning_rate/Read/ReadVariableOp"
+  input: "training/Adam/beta_1/Read/ReadVariableOp"
+  input: "training/Adam/beta_2/Read/ReadVariableOp"
+  input: "training/Adam/decay/Read/ReadVariableOp"
+  input: "training/Adam/dnn/hiddenlayer_0/bias/m/Read/ReadVariableOp"
+  input: "training/Adam/dnn/hiddenlayer_0/bias/v/Read/ReadVariableOp"
+  input: "training/Adam/dnn/hiddenlayer_0/kernel/m/Read/ReadVariableOp"
+  input: "training/Adam/dnn/hiddenlayer_0/kernel/v/Read/ReadVariableOp"
+  input: "training/Adam/dnn/hiddenlayer_1/bias/m/Read/ReadVariableOp"
+  input: "training/Adam/dnn/hiddenlayer_1/bias/v/Read/ReadVariableOp"
+  input: "training/Adam/dnn/hiddenlayer_1/kernel/m/Read/ReadVariableOp"
+  input: "training/Adam/dnn/hiddenlayer_1/kernel/v/Read/ReadVariableOp"
+  input: "training/Adam/dnn/logits/bias/m/Read/ReadVariableOp"
+  input: "training/Adam/dnn/logits/bias/v/Read/ReadVariableOp"
+  input: "training/Adam/dnn/logits/kernel/m/Read/ReadVariableOp"
+  input: "training/Adam/dnn/logits/kernel/v/Read/ReadVariableOp"
   device: "/device:CPU:0"
   attr {
     key: "dtypes"
@@ -35959,6 +38232,13 @@ node {
         type: DT_FLOAT
         type: DT_FLOAT
         type: DT_INT64
+        type: DT_FLOAT
+        type: DT_FLOAT
+        type: DT_FLOAT
+        type: DT_FLOAT
+        type: DT_FLOAT
+        type: DT_FLOAT
+        type: DT_FLOAT
         type: DT_FLOAT
         type: DT_FLOAT
         type: DT_FLOAT
@@ -36084,7 +38364,7 @@ node {
       list {
         shape {
           dim {
-            size: 15
+            size: 22
           }
         }
       }
@@ -36103,7 +38383,7 @@ node {
         dtype: DT_STRING
         tensor_shape {
           dim {
-            size: 15
+            size: 22
           }
         }
         string_val: "dnn/hiddenlayer_0/bias"
@@ -36113,14 +38393,21 @@ node {
         string_val: "dnn/logits/bias"
         string_val: "dnn/logits/kernel"
         string_val: "global_step"
-        string_val: "training/Adagrad/decay"
-        string_val: "training/Adagrad/dnn/hiddenlayer_0/bias/accumulator"
-        string_val: "training/Adagrad/dnn/hiddenlayer_0/kernel/accumulator"
-        string_val: "training/Adagrad/dnn/hiddenlayer_1/bias/accumulator"
-        string_val: "training/Adagrad/dnn/hiddenlayer_1/kernel/accumulator"
-        string_val: "training/Adagrad/dnn/logits/bias/accumulator"
-        string_val: "training/Adagrad/dnn/logits/kernel/accumulator"
-        string_val: "training/Adagrad/learning_rate"
+        string_val: "training/Adam/beta_1"
+        string_val: "training/Adam/beta_2"
+        string_val: "training/Adam/decay"
+        string_val: "training/Adam/dnn/hiddenlayer_0/bias/m"
+        string_val: "training/Adam/dnn/hiddenlayer_0/bias/v"
+        string_val: "training/Adam/dnn/hiddenlayer_0/kernel/m"
+        string_val: "training/Adam/dnn/hiddenlayer_0/kernel/v"
+        string_val: "training/Adam/dnn/hiddenlayer_1/bias/m"
+        string_val: "training/Adam/dnn/hiddenlayer_1/bias/v"
+        string_val: "training/Adam/dnn/hiddenlayer_1/kernel/m"
+        string_val: "training/Adam/dnn/hiddenlayer_1/kernel/v"
+        string_val: "training/Adam/dnn/logits/bias/m"
+        string_val: "training/Adam/dnn/logits/bias/v"
+        string_val: "training/Adam/dnn/logits/kernel/m"
+        string_val: "training/Adam/dnn/logits/kernel/v"
       }
     }
   }
@@ -36135,7 +38422,7 @@ node {
       list {
         shape {
           dim {
-            size: 15
+            size: 22
           }
         }
       }
@@ -36154,9 +38441,16 @@ node {
         dtype: DT_STRING
         tensor_shape {
           dim {
-            size: 15
+            size: 22
           }
         }
+        string_val: ""
+        string_val: ""
+        string_val: ""
+        string_val: ""
+        string_val: ""
+        string_val: ""
+        string_val: ""
         string_val: ""
         string_val: ""
         string_val: ""
@@ -36232,6 +38526,27 @@ node {
         shape {
           unknown_rank: true
         }
+        shape {
+          unknown_rank: true
+        }
+        shape {
+          unknown_rank: true
+        }
+        shape {
+          unknown_rank: true
+        }
+        shape {
+          unknown_rank: true
+        }
+        shape {
+          unknown_rank: true
+        }
+        shape {
+          unknown_rank: true
+        }
+        shape {
+          unknown_rank: true
+        }
       }
     }
   }
@@ -36246,6 +38561,13 @@ node {
         type: DT_FLOAT
         type: DT_FLOAT
         type: DT_INT64
+        type: DT_FLOAT
+        type: DT_FLOAT
+        type: DT_FLOAT
+        type: DT_FLOAT
+        type: DT_FLOAT
+        type: DT_FLOAT
+        type: DT_FLOAT
         type: DT_FLOAT
         type: DT_FLOAT
         type: DT_FLOAT
@@ -36513,7 +38835,7 @@ node {
 node {
   name: "save/AssignVariableOp_7"
   op: "AssignVariableOp"
-  input: "training/Adagrad/decay"
+  input: "training/Adam/beta_1"
   input: "save/Identity_8"
   attr {
     key: "dtype"
@@ -36546,7 +38868,7 @@ node {
 node {
   name: "save/AssignVariableOp_8"
   op: "AssignVariableOp"
-  input: "training/Adagrad/dnn/hiddenlayer_0/bias/accumulator"
+  input: "training/Adam/beta_2"
   input: "save/Identity_9"
   attr {
     key: "dtype"
@@ -36579,7 +38901,7 @@ node {
 node {
   name: "save/AssignVariableOp_9"
   op: "AssignVariableOp"
-  input: "training/Adagrad/dnn/hiddenlayer_0/kernel/accumulator"
+  input: "training/Adam/decay"
   input: "save/Identity_10"
   attr {
     key: "dtype"
@@ -36612,7 +38934,7 @@ node {
 node {
   name: "save/AssignVariableOp_10"
   op: "AssignVariableOp"
-  input: "training/Adagrad/dnn/hiddenlayer_1/bias/accumulator"
+  input: "training/Adam/dnn/hiddenlayer_0/bias/m"
   input: "save/Identity_11"
   attr {
     key: "dtype"
@@ -36645,7 +38967,7 @@ node {
 node {
   name: "save/AssignVariableOp_11"
   op: "AssignVariableOp"
-  input: "training/Adagrad/dnn/hiddenlayer_1/kernel/accumulator"
+  input: "training/Adam/dnn/hiddenlayer_0/bias/v"
   input: "save/Identity_12"
   attr {
     key: "dtype"
@@ -36678,7 +39000,7 @@ node {
 node {
   name: "save/AssignVariableOp_12"
   op: "AssignVariableOp"
-  input: "training/Adagrad/dnn/logits/bias/accumulator"
+  input: "training/Adam/dnn/hiddenlayer_0/kernel/m"
   input: "save/Identity_13"
   attr {
     key: "dtype"
@@ -36711,7 +39033,7 @@ node {
 node {
   name: "save/AssignVariableOp_13"
   op: "AssignVariableOp"
-  input: "training/Adagrad/dnn/logits/kernel/accumulator"
+  input: "training/Adam/dnn/hiddenlayer_0/kernel/v"
   input: "save/Identity_14"
   attr {
     key: "dtype"
@@ -36744,8 +39066,239 @@ node {
 node {
   name: "save/AssignVariableOp_14"
   op: "AssignVariableOp"
-  input: "training/Adagrad/learning_rate"
+  input: "training/Adam/dnn/hiddenlayer_1/bias/m"
   input: "save/Identity_15"
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+}
+node {
+  name: "save/Identity_16"
+  op: "Identity"
+  input: "save/RestoreV2:15"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+          unknown_rank: true
+        }
+      }
+    }
+  }
+}
+node {
+  name: "save/AssignVariableOp_15"
+  op: "AssignVariableOp"
+  input: "training/Adam/dnn/hiddenlayer_1/bias/v"
+  input: "save/Identity_16"
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+}
+node {
+  name: "save/Identity_17"
+  op: "Identity"
+  input: "save/RestoreV2:16"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+          unknown_rank: true
+        }
+      }
+    }
+  }
+}
+node {
+  name: "save/AssignVariableOp_16"
+  op: "AssignVariableOp"
+  input: "training/Adam/dnn/hiddenlayer_1/kernel/m"
+  input: "save/Identity_17"
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+}
+node {
+  name: "save/Identity_18"
+  op: "Identity"
+  input: "save/RestoreV2:17"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+          unknown_rank: true
+        }
+      }
+    }
+  }
+}
+node {
+  name: "save/AssignVariableOp_17"
+  op: "AssignVariableOp"
+  input: "training/Adam/dnn/hiddenlayer_1/kernel/v"
+  input: "save/Identity_18"
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+}
+node {
+  name: "save/Identity_19"
+  op: "Identity"
+  input: "save/RestoreV2:18"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+          unknown_rank: true
+        }
+      }
+    }
+  }
+}
+node {
+  name: "save/AssignVariableOp_18"
+  op: "AssignVariableOp"
+  input: "training/Adam/dnn/logits/bias/m"
+  input: "save/Identity_19"
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+}
+node {
+  name: "save/Identity_20"
+  op: "Identity"
+  input: "save/RestoreV2:19"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+          unknown_rank: true
+        }
+      }
+    }
+  }
+}
+node {
+  name: "save/AssignVariableOp_19"
+  op: "AssignVariableOp"
+  input: "training/Adam/dnn/logits/bias/v"
+  input: "save/Identity_20"
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+}
+node {
+  name: "save/Identity_21"
+  op: "Identity"
+  input: "save/RestoreV2:20"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+          unknown_rank: true
+        }
+      }
+    }
+  }
+}
+node {
+  name: "save/AssignVariableOp_20"
+  op: "AssignVariableOp"
+  input: "training/Adam/dnn/logits/kernel/m"
+  input: "save/Identity_21"
+  attr {
+    key: "dtype"
+    value {
+      type: DT_FLOAT
+    }
+  }
+}
+node {
+  name: "save/Identity_22"
+  op: "Identity"
+  input: "save/RestoreV2:21"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+          unknown_rank: true
+        }
+      }
+    }
+  }
+}
+node {
+  name: "save/AssignVariableOp_21"
+  op: "AssignVariableOp"
+  input: "training/Adam/dnn/logits/kernel/v"
+  input: "save/Identity_22"
   attr {
     key: "dtype"
     value {
@@ -36763,7 +39316,14 @@ node {
   input: "^save/AssignVariableOp_12"
   input: "^save/AssignVariableOp_13"
   input: "^save/AssignVariableOp_14"
+  input: "^save/AssignVariableOp_15"
+  input: "^save/AssignVariableOp_16"
+  input: "^save/AssignVariableOp_17"
+  input: "^save/AssignVariableOp_18"
+  input: "^save/AssignVariableOp_19"
   input: "^save/AssignVariableOp_2"
+  input: "^save/AssignVariableOp_20"
+  input: "^save/AssignVariableOp_21"
   input: "^save/AssignVariableOp_3"
   input: "^save/AssignVariableOp_4"
   input: "^save/AssignVariableOp_5"
@@ -36782,7 +39342,7 @@ library {
     signature {
       name: "dnn_zero_fraction_cond_false_613"
       input_arg {
-        name: "count_nonzero_notequal_dnn_hiddenlayer_0_relu"
+        name: "count_nonzero_notequal_dnn_hiddenlayer_0_leakyrelu"
         type: DT_FLOAT
       }
       output_arg {
@@ -36846,7 +39406,7 @@ library {
     node_def {
       name: "count_nonzero/NotEqual"
       op: "NotEqual"
-      input: "count_nonzero_notequal_dnn_hiddenlayer_0_relu"
+      input: "count_nonzero_notequal_dnn_hiddenlayer_0_leakyrelu"
       input: "count_nonzero/zeros:output:0"
       attr {
         key: "T"
@@ -37566,7 +40126,7 @@ library {
     signature {
       name: "dnn_zero_fraction_cond_true_612"
       input_arg {
-        name: "count_nonzero_notequal_dnn_hiddenlayer_0_relu"
+        name: "count_nonzero_notequal_dnn_hiddenlayer_0_leakyrelu"
         type: DT_FLOAT
       }
       output_arg {
@@ -37630,7 +40190,7 @@ library {
     node_def {
       name: "count_nonzero/NotEqual"
       op: "NotEqual"
-      input: "count_nonzero_notequal_dnn_hiddenlayer_0_relu"
+      input: "count_nonzero_notequal_dnn_hiddenlayer_0_leakyrelu"
       input: "count_nonzero/zeros:output:0"
       attr {
         key: "T"
@@ -38002,7 +40562,7 @@ library {
     signature {
       name: "dnn_zero_fraction_1_cond_false_683"
       input_arg {
-        name: "count_nonzero_notequal_dnn_hiddenlayer_1_relu"
+        name: "count_nonzero_notequal_dnn_hiddenlayer_1_leakyrelu"
         type: DT_FLOAT
       }
       output_arg {
@@ -38066,7 +40626,7 @@ library {
     node_def {
       name: "count_nonzero/NotEqual"
       op: "NotEqual"
-      input: "count_nonzero_notequal_dnn_hiddenlayer_1_relu"
+      input: "count_nonzero_notequal_dnn_hiddenlayer_1_leakyrelu"
       input: "count_nonzero/zeros:output:0"
       attr {
         key: "T"
@@ -38876,7 +41436,7 @@ library {
     signature {
       name: "dnn_zero_fraction_1_cond_true_682"
       input_arg {
-        name: "count_nonzero_notequal_dnn_hiddenlayer_1_relu"
+        name: "count_nonzero_notequal_dnn_hiddenlayer_1_leakyrelu"
         type: DT_FLOAT
       }
       output_arg {
@@ -38940,7 +41500,7 @@ library {
     node_def {
       name: "count_nonzero/NotEqual"
       op: "NotEqual"
-      input: "count_nonzero_notequal_dnn_hiddenlayer_1_relu"
+      input: "count_nonzero_notequal_dnn_hiddenlayer_1_leakyrelu"
       input: "count_nonzero/zeros:output:0"
       attr {
         key: "T"

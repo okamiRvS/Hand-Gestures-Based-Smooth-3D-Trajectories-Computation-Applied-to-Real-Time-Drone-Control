@@ -20,14 +20,6 @@ class ThymioController(object):
         self.velocity_publisher = rospy.Publisher("/cmd_vel", Twist, queue_size=10)
         self.pose_subscriber = rospy.Subscriber(f"/tello/odom", Odometry, self.log_odometry)
         
-        # we need enable the motors to move the drone in the simulation
-        rospy.wait_for_service("/enable_motors") # wait until service isn't running
-        try:
-            fan = rospy.ServiceProxy("/enable_motors", EnableMotors)
-            fan(enable=True)
-        except rospy.ServiceException as e:
-            print("Service call failed: %s"%e)
-
         self.pose2d = Pose2D() # we should delete this
         self.vel_msg = Twist()
         rospy.on_shutdown(self.stop)
@@ -43,10 +35,19 @@ class ThymioController(object):
         #self.readCsv()
 
         
+    def enableMotors(self, val):
+        rospy.wait_for_service("/enable_motors") # wait until service isn't running
+        try:
+            fan = rospy.ServiceProxy("/enable_motors", EnableMotors)
+            fan(enable=val)
+        except rospy.ServiceException as e:
+            print("Service call failed: %s"%e)
+
+
     def normalizeData(self, resTraj):
-        self.pose = np.vstack((resTraj[1], resTraj[0] , resTraj[2])).T * 5
+        self.pose = np.vstack((resTraj[1], resTraj[0]*1.5 , resTraj[2])).T * 2 #5
         self.orientation = np.vstack((resTraj[3], resTraj[4], resTraj[5])).T
-        self.dtime = resTraj[6]
+        self.dtime = resTraj[6] * 0.5 # half time to have the correct time
         self.speed = resTraj[7]
 
 
@@ -118,6 +119,7 @@ class ThymioController(object):
 
         #Return clipped linear velocity
         distance = self.euclidean_distance(goal_pose, current_pose)
+        #print(f"distance: {distance}")
         velocity = distance / self.step.to_sec()
 
         return velocity

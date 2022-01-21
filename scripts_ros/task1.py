@@ -35,10 +35,16 @@ class Task1(ThymioController):
 
         self.time_take_off = 5
 
+        self.time_draw_point = -1
+
 
     def drawPoint(self, event): # callback
 
-        print('Timer called at ' + str(event.current_real))
+        if self.time_draw_point == -1:
+            self.time_draw_point = rospy.Time.now()
+
+        duration_drawPoint = str((event.current_real - self.time_draw_point).secs)
+        print('Timer called at ' + duration_drawPoint + "s")
 
         # https://www.youtube.com/watch?v=WqK2IY5_9OQ
         # the second value means took this obj, not child as reference
@@ -96,7 +102,6 @@ class Task1(ThymioController):
         while start_time.secs == 0:
             start_time = rospy.Time.now()
 
-        current_pose = self.get_model_state("quadrotor", "").pose
 
         # x_controll = PID(1, 0, 1)
         # y_controll = PID(1, 0, 1)
@@ -104,7 +109,21 @@ class Task1(ThymioController):
         # y_ang_controll = PID(1, 0, 1)
         # z_ang_controll = PID(1, 0, 1)
 
+        current_pose = self.get_model_state("quadrotor", "").pose
         while not rospy.is_shutdown():
+
+            # state_msg = ModelState()
+            # state_msg.model_name = 'quadrotor'
+            # try:
+            #     quadr = self.get_model_state("quadrotor", "")
+            #     state_msg.pose.orientation = quadr.pose.orientation
+            #     state_msg.pose.position.z = quadr.pose.position.z
+            #     set_state = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
+            #     resp = set_state( state_msg )
+            # except rospy.ServiceException as e:
+            #     print("Service call failed: %s" % e)
+
+
             elapsed_time = rospy.Time.now() - start_time
             next_time = (elapsed_time + self.step).to_sec()
             goal_pose = self.next_takeoff_pose(next_time)
@@ -116,8 +135,10 @@ class Task1(ThymioController):
             # self.vel_msg.angular.y = y_ang_controll.step(pos_drone.orientation.y, self.step.to_sec())
             # self.vel_msg.angular.z = z_ang_controll.step(pos_drone.orientation.x, self.step.to_sec())
             
+            self.vel_msg = Twist()
             if next_time < self.time_take_off + 2:
                 self.vel_msg.linear.z = self.linear_vel(goal_pose.position.z, current_pose.position.z)
+                #print(self.vel_msg)
                 self.velocity_publisher.publish(self.vel_msg) 
             else:
                 self.vel_msg.linear.z = 0
@@ -130,18 +151,21 @@ class Task1(ThymioController):
 
             
     def next_takeoff_pose(self, time_delta):
-            
+        
         pose = Pose()
+        goal_height = 1.5
+        
         if self.time_take_off > time_delta:
 
             # we have to start not from zero, otherwise there are problems
-            z = 0.1 + 3 * time_delta / self.time_take_off
+            z = 0.1 + goal_height * time_delta / self.time_take_off
 
             pose.position.z = z
+            #print(f"z interpolated: {z}")
 
         quadr = self.get_model_state("quadrotor", "")
-        print(time_delta)
-        print(quadr.pose)
+        #print(f"time_delta: {time_delta}")
+        #print(f"z true: {quadr.pose.position.z}\n")
             
         return pose
 
@@ -157,6 +181,10 @@ class Task1(ThymioController):
 
             if elapsed_time < for_x_time:
 
+                self.vel_msg = Twist()
+                #print(self.vel_msg)
+                self.velocity_publisher.publish(self.vel_msg)
+
                 rospy.wait_for_service('/gazebo/set_model_state')
                 try:
                     set_state = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
@@ -165,10 +193,7 @@ class Task1(ThymioController):
                 except rospy.ServiceException as e:
                     print("Service call failed: %s" % e)
 
-                self.vel_msg = Twist()
-                self.velocity_publisher.publish(self.vel_msg)
-
-                #pos_drone = self.get_model_state("quadrotor", "").pose
+                pos_drone = self.get_model_state("quadrotor", "")
                 #print(pos_drone)
             else:
                 break
@@ -202,7 +227,7 @@ class Task1(ThymioController):
 
         print("Initialization...")
         state_msg.pose.position.z = 0.03
-        self.set_position(2, state_msg)
+        self.set_position(2, state_msg) # 2 secs
 
         self.takeoff() #### fly fly little drone
 
@@ -227,28 +252,27 @@ class Task1(ThymioController):
                 self.vel_msg.linear.x = self.linear_vel(goal_pose.position.x, current_pose.position.x)
                 self.vel_msg.linear.y = self.linear_vel(goal_pose.position.y, current_pose.position.y)
                 self.vel_msg.linear.z = self.linear_vel(goal_pose.position.z, current_pose.position.z)
-                #self.vel_msg.angular.z = self.angular_vel(goal_pose, current_pose)
-
-                #print(self.vel_msg)
+                self.vel_msg.angular.x = 0
+                self.vel_msg.angular.y = 0
+                self.vel_msg.angular.z = 0
+                #print(self.vel_msg.linear)
 
                 self.velocity_publisher.publish(self.vel_msg) 
                 self.sleep()
             elif next_time<self.dtime[-1]:
-                self.vel_msg.linear.x = 0
-                self.vel_msg.linear.y = 0
-                self.vel_msg.linear.z = 0
-                #self.vel_msg.angular.z = 0
+                self.vel_msg = Twist()
                 self.velocity_publisher.publish(self.vel_msg)
+
                 self.sleep()
             else:
 
                 # black timer
                 callBack.shutdown()
 
-                # delete all sphere
+                # delete all spheres
                 if self.numberSpheres >= 0:
 
-                    for i in range(self.numberSpheres):
+                    for i in range(self.numberSpheres+1):
                         try:
                             flag = True
                             while(flag): # exit only if obj deleted
@@ -259,6 +283,9 @@ class Task1(ThymioController):
                                     flag = False
                         except rospy.ServiceException as e:
                             print("Service call failed: %s"%e)
+                    
+                    # reset value
+                    self.numberSpheres = -1
 
                 break
 
@@ -304,14 +331,29 @@ if __name__ == '__main__':
         controller = Task1()
 
         fullControll = fullControllModule.FullControll()
+        testMode = False
         
         while True:
-            #Get data from hand
-            resTraj = fullControll.main()
-            controller.normalizeData(resTraj)
+
+            if testMode:
+                # If True execute trajectory based on data.csv
+                controller.readCsv()
+            else:
+                # Reset values
+                fullControll.autoSet(resize=True, showPlot=False, isSimulation=True)
+
+                # Get data from hand
+                resTraj = fullControll.run()
+                controller.normalizeData(resTraj)
+
+            # we need enable the motors to move the drone in the simulation
+            controller.enableMotors(True)
 
             # execute trajectory
             controller.run()
+
+            # disable the motors
+            controller.enableMotors(False)
             
             # test
             #controller.test2()

@@ -121,30 +121,24 @@ Per oggi:
 
 11/01
 -[DONE] scrivere nella tesi parte relativa alle reti neurali
+-[DONE][magari è meglio aspettare prima riposta prof] scrivere nella tesi parte relativa al batch gradient descent per la ridge regression 
 
--aggiornare pipeline per comandi veloci di controllo con la mano
-
--creare una scena di acquisizione video nella simulazione
-
-
--nella simulazione aggiungere anche lo yaw (e volendo il pitch e il roll)
--[magari è meglio aspettare prima riposta prof] scrivere nella tesi parte relativa al batch gradient descent per la ridge regression 
-
--aggiungere gesto di "stop", "left", "right" (vedere se funziona)
--controllare il risultato con adam ottimizzatore
--Leaky Rectified linear activation 
-
-
-lunedì 17 ore 16.00
 
 17/01
--ritornare dizionario di valori invece di n liste...(magari robe in numpy)
--andrebbe calcolato la velocità ocme vettore, non ci dovrebbe essere il modulo, e andrebbe quindi eseguito lo smooth sulla velocità computata sucessivamente
 -[DONE]skip n step dovrebbe essere eseguito semplicemenete salvando il dato ogni n secondi, ora invece salva una montagna di dati e ogni secondo vengono recuperati solo i valori di n secondi
 
+21/01/2022
+-[Done] scale text log with resolution
+-[DONE]controllare il risultato con adam ottimizzatore
+-[DONE]Leaky Rectified linear activation 
 
+-aggiornare pipeline per comandi veloci di controllo con la mano
+-creare una scena di acquisizione video nella simulazione
+-nella simulazione aggiungere anche lo yaw (NON pitch e il roll)
+-ritornare dizionario di valori invece di n liste...(magari robe in numpy)
+-aggiungere gesto di "pugno", "left", "right" (vedere se funziona)
 4.	Non e’ chiaro se nell’acquisire la traiettoria consideri anche la componente temporale, o se e’ solo un path che poi segui a velocita’ costante.
 5.	Idem per lo yaw del drone.  Guarda sempre nella stessa direzione?
 
-21/01/2022
-[Done] scale text log with resolution
+
+nell'evaluation mettiamo i risultati della rete neurale, come mappa l'univariate spline. Che metrica invece per il mappaggio della traiettoria nel real?
