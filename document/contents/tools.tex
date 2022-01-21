@@ -4,13 +4,64 @@
 
 This chapter introduces the tools used in this work, starting from the description of the target platform in, then describing the simulator in and finally mentioning the frameworks used for the implementation in.
 
+\subsection{Tello}
+\label{subsec:tello}
+Tello is a small quadcopter that features a Vision Positioning System and an onboard camera. Using its advanced flight controller, it can hover in place and is suitable for flying indoors. Tello caputers 5MP photos and stream until 720p live video. Its maximum flight time is approximately 12 minutes (tested in windless conditions at a consistent $15km/h$) and its maximum flight distance id $100m$ \cite[]{djitelloguide}.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=.7\textwidth]{images/tello}
+	\caption[Tello - Aircraft diagram.]{1.Propellers; 2.Motors; 3.Aircraft Status Indicator; 4.Camera; 5.Power Button; 6.Antennas; 7.Vision Positioning System; 8.Flight Battery; 9.Micro USB Port; 10.Propeller Guards.}
+	\label{fig:telloairdiagr}
+\end{figure}
+
+\noindent The Tello can be controlled manually using the virtual joysticks in the Tello app or using a compatible remote controller. It also has various Intelligent Flight Modes that be used to make Tello perform maneuvers automatically. Propeller Guards can be used to reduce the risk of harm or damage people or objects resulting from accidental collisions with Tello aircraft.
+
+\subsection{Tello Command Types and Results}
+\label{subsec:tellosdk}
+The Tello SDK connects to the aircraft through a Wi-Fi UDP port, allowing users to control the aircraft with text commands. There are Control and Set commands where return "ok" if the command was successful or "error" or an informational result code if the ocmmand failed. There are also Read commands that return the current value of the sub-parameters.
+
+% Please add the following required packages to your document preamble:
+% \usepackage{booktabs}
+% \usepackage{multirow}
+\begin{table}[H]
+	\begin{tabular}{@{}|llc|@{}}
+		\toprule
+		\multicolumn{3}{|c|}{\textbf{Main Tello Commands}}                                                                                                                                                                                                                                                                                                                      \\ \midrule
+		\multicolumn{1}{|l|}{\textbf{Command}}  & \multicolumn{1}{l|}{\textbf{Description}}                                                                                                                                                                                                                                   & \multicolumn{1}{l|}{\textbf{Possible Response}} \\ \midrule
+		\multicolumn{1}{|l|}{connect}           & \multicolumn{1}{l|}{Enter SDK mode.}                                                                                                                                                                                                                                        & \multirow{6}{*}{ok / error}                     \\ \cmidrule(r){1-2}
+		\multicolumn{1}{|l|}{streamon}          & \multicolumn{1}{l|}{Turn on video streaming.}                                                                                                                                                                                                                               &                                                 \\ \cmidrule(r){1-2}
+		\multicolumn{1}{|l|}{streamoff}         & \multicolumn{1}{l|}{Turn off video streaming.}                                                                                                                                                                                                                              &                                                 \\ \cmidrule(r){1-2}
+		\multicolumn{1}{|l|}{takeoff}           & \multicolumn{1}{l|}{Auto takeoff.}                                                                                                                                                                                                                                          &                                                 \\ \cmidrule(r){1-2}
+		\multicolumn{1}{|l|}{land}              & \multicolumn{1}{l|}{Auto landing.}                                                                                                                                                                                                                                          &                                                 \\ \cmidrule(r){1-2}
+		\multicolumn{1}{|l|}{send\_rc\_control} & \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}Set remote control via four channels.\\ Arguments:\\ - left / right velocity: from -100 to +100\\ - forward / backward velocity: from -100 to +100\\ - up / down: from -100 to +100\\ - yaw: from -100 to +100\end{tabular}} &                                                 \\ \midrule
+		\multicolumn{1}{|l|}{get\_battery}      & \multicolumn{1}{l|}{Get current battery percentage}                                                                                                                                                                                                                         & \multicolumn{1}{l|}{from 0 to +100}             \\ \bottomrule
+	\end{tabular}
+	\captionof{table}[Tello Python Commands.]{List of the main Tello functions of the python wrapper to interact with the Ryze Tello drone using the official Tello api.}
+	\label{tab:modeln5dist}
+\end{table}
+
+\subsection{Gazebo}
+\label{subsec:gazebo}
+
+% parlare che si è lavorato su windows, ma gazebo era in una macchina virtuale con immagine ubuntu.
+Gazebo is a 3D simulator, offers the ability to accurately and efficiently simulate robots in complex indoor and outdoor environments. Thanks to Gazebo it was possible to launch the 3D trajectory acquired by hand through the webcam on a simulated drone. 
+
 \subsection{Frameworks}
-\label{subsec:Frameworks}
+\label{subsec:frameworks}
 
-NumPy is a package for scientific computing that provides support for a range of utilities for linear algebra and matrix manipulation
+\paragraph*{\texttt{DJITelloPy}} DJI Tello drone python interface using the official Tello SDK and Tello EDU SDK. This library has an implementation of all tello commands, easily retrieve a video stream, receive and parse state packets and other features.\footnote{\url{https://github.com/damiafuentes/DJITelloPy}}.
 
-Pandas is an open source library providing high-performance, easy-to-use data structures and data analysis tools3. We used it in particular for building and working on the datasets generated for training the models.
+\paragraph*{\texttt{TensorFlow}} is an end-to-end open source platform for \gls{ml}. It has a comprehensive, flexible ecosystem of tools, libraries and community resources that lets researchers push the state-of-the-art in \gls{ml}\footnote{\url{https://www.tensorflow.org/}}.
 
-Matplotlib is a comprehensive package for creating static, animated, and interactive visualisations in Python4.
+\paragraph*{\texttt{NumPy}} is a highly optimized library for scientific computing that provides support for a range of utilities for numerical operations with a MATLAB-style syntax. manipulation\footnote{\url{https://numpy.org}}.
 
-scikit-learn is a library that provides simple and efficient tools for predictive data analysis, built on NumPy, Scipy, and Matplotlib5
+\paragraph*{\texttt{OpenCV-Python}} OpenCV-Python is a library of Python bindings designed to solve computer vision problems. Python can be easily extended with C/C++, which allows us to write computationally intensive code in C/C++ and create Python wrappers that can be used as Python modules. OpenCV-Python is a Python wrapper for the original OpenCV C++ implementation. It makes use of Numpy.\footnote{\url{https://docs.opencv.org/4.x/index.html}}.
+
+\paragraph*{\texttt{Robot Operating System}} is an open-source robotics middleware suite. It provides high-level hardware abstraction layer for sensors and actuators, an extensive set of standardized message types and services, and package management.\footnote{\url{https://www.ros.org/}}.
+
+\paragraph*{\texttt{Pandas}} is an open source library providing high-performance, easy-to-use data structures and data analysis tools\footnote{\url{https://pandas.pydata.org}}.
+
+\paragraph*{\texttt{Matplotlib}} is a comprehensive package for creating static, animated, and interactive visualisations in \texttt{Python}\footnote{\url{https://matplotlib.org}}. 
+
+\paragraph*{\texttt{scikit-learn}} is an open source package that provides simple and efficient tools for predictive data analysis, built on \texttt{NumPy}, \texttt{Scipy}, and \texttt{Matplotlib}\footnote{\url{https://scikit-learn.org}}.

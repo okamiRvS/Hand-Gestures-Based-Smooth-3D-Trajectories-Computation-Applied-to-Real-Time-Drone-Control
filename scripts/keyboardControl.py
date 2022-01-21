@@ -1,5 +1,4 @@
 from djitellopy import tello
-from sqlalchemy import false
 import keyPressModule as kp
 import time
 import cv2
