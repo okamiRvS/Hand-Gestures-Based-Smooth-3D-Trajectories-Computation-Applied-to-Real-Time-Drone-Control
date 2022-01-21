@@ -7,6 +7,7 @@ import pdb
 class smoothing():
 
     def __init__(self, skipEveryNpoints):
+
         self.skipEveryNpoints = skipEveryNpoints
 
     def setPoints(self, xdata, ydata, zdata, rolldata, yawdata, pitchdata, dtime, speed):
@@ -28,7 +29,6 @@ class smoothing():
             "speed": self.smoothData(speed)[0]
         }
 
-       
         # fig = plt.figure()
         # ax = fig.add_subplot(111, projection='3d')
         # ax.set_xlabel('X Label')

@@ -18,7 +18,11 @@ class recordVideo():
         self.height, self.width, _ = self.frame_read.frame.shape
 
 
-    def getLastIdx(self):
+    def getLastIdx(self) -> int:
+        """
+        Return the index of the last video added +1.
+        Return 1 if there are not video in VIDEO_DIR_PATH
+        """
         
         if not os.path.exists(self.VIDEO_DIR_PATH):
             if os.name == 'posix': # if linux system
@@ -33,8 +37,11 @@ class recordVideo():
 
 
     def videoRecorder(self):
-        # create a VideoWrite object, recoring to ./video.avi
-        
+        """
+        create a VideoWrite object, 
+        recording to self.VIDEO_DIR_PATH}/video{self.getLastVideoIdx}.avi
+        """
+
         video = cv2.VideoWriter(f'{self.VIDEO_DIR_PATH}/video{self.getLastVideoIdx}.avi', cv2.VideoWriter_fourcc(*'XVID'), 30, (self.width, self.height))
 
         while self.keepRecording:
@@ -46,8 +53,11 @@ class recordVideo():
 
 
     def run(self):
-        # we need to run the recorder in a seperate thread, otherwise blocking options
-        #  would prevent frames from getting added to the video
+        """
+        we need to run the recorder in a seperate thread, otherwise blocking options
+        would prevent frames from getting added to the video
+        """
+        
         self.recorder = Thread(target=self.videoRecorder)
         self.recorder.start()
 

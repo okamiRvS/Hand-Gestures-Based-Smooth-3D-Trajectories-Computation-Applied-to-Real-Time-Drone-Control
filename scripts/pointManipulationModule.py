@@ -1,5 +1,6 @@
 import numpy as np
-   
+
+
 class pointManipulation():
     
     def __init__(self):
@@ -7,19 +8,31 @@ class pointManipulation():
         self.height = 0
         self.width = 0
 
-    def setSize(self, height, width):
+
+    def setSize(self, height: int, width: int):
+        """
+        Set dimension of picture.
+        """ 
 
         self.height = height
         self.width = width
 
-    def convertOriginBottomLeft(self, vector):
 
-        # move the origin from top left to bottom left
+    def convertOriginBottomLeft(self, vector: np.array) -> np.array:
+        """
+        This function permits to move the origin from top left to bottom left.
+        It is useful because opencv has a different way to express x/y coordinate.
+        """
+
         vector[1] = self.height - vector[1]
         
         return vector
 
-    def findAngle(self, vec1, vec2):
+
+    def findAngle(self, vec1: np.array, vec2: np.array) -> float:
+        """
+        For the stop gesture find the angle that identify the pitch.
+        """
  
         sin = vec1[0] - vec2[0]
         cos = vec1[1] - vec2[1]
@@ -29,7 +42,11 @@ class pointManipulation():
 
         return theta
 
-    def translate(self, tmp, ty, tx): 
+
+    def translate(self, tmp: np.array, ty: float, tx: float) -> np.array: 
+        """
+        Translate tmp points of ty and tx position.
+        """
         
         # build matrix 2d translation
         # https://ncase.me/matrix/
@@ -40,7 +57,11 @@ class pointManipulation():
 
         return tmp
 
-    def rotatate(self, tmp, theta):
+
+    def rotatate(self, tmp: np.array, theta: float) -> np.array:
+        """
+        Rotate tmp points of theta angle
+        """
 
         # build matrix 2d rotation
         # https://ncase.me/matrix/
@@ -51,7 +72,12 @@ class pointManipulation():
 
         return tmp
 
-    def scaleMaxDistance(self, tmp):
+
+    def scaleMaxDistance(self, tmp: np.array) -> np.array:
+        """
+        Scale all tmp points wrt the max distance between centre of hand (stop gesture)
+        and all the others hand landmarks.
+        """
 
         distances = np.sqrt([tmp[:,0]**2 + tmp[:,1]**2])
         maxDistance = np.max(distances)

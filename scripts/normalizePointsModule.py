@@ -239,6 +239,7 @@ class normalizePoints():
         cv2.putText(img, f"Pitch: {pitch}", (centerVectorEnd[0]+20,centerVectorEnd[1]+80), font, fontScale, (0, 225, 0), thickness)
         cv2.putText(img, f"MODULE: {self.zcoord}", (centerVectorEnd[0]+20,centerVectorEnd[1]+120), font, fontScale, (0, 225, 0), thickness)
 
+
     def removeHomogeneousCoordinate(self):
         """
         Remove homogeneous coordinate in the landmarks points.
@@ -246,6 +247,7 @@ class normalizePoints():
 
         if self.tmp.shape[1] == 3:
             self.tmp = self.tmp[:,:-1]
+
 
     def drawAllHandTransformed(self, img: np.array):
         """

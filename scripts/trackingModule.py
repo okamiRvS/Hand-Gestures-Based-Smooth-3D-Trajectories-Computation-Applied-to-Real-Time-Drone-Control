@@ -44,7 +44,11 @@ class tracking():
 
         self.startingPoint = None
 
-    def drawLog(self, img, color, checkTollerance, val):
+    def drawLog(self, img: np.array, color: tuple, checkTollerance: float, val: float):
+        """
+        Draw Log in img, with a specific color. Print the tollerance
+        of the curren state and the val.
+        """
 
         fontScale = 1 * (self.width /640)
         font = cv2.FONT_HERSHEY_DUPLEX
@@ -55,7 +59,10 @@ class tracking():
         cv2.putText(img, f"{self.currentState}", (10,160), font, fontScale, color, thickness)
 
 
-    def draw2dTraj(self, img, xdata, zdata, flag = False):
+    def draw2dTraj(self, img: np.array, xdata: list, zdata: list, flag: bool = False):
+        """
+        Draw the 2d trajectory in the window.
+        """
 
         if flag:
             pdb.set_trace()
@@ -73,13 +80,20 @@ class tracking():
             self.startingPoint = self.endingPoint
 
 
-    def setSize(self, height, width):
+    def setSize(self, height: int, width: int):
+        """
+        Set height and width of the picture.
+        """
         
         self.height = height
         self.width = width
 
 
-    def justDrawLast2dTraj(self, img):
+    def justDrawLast2dTraj(self, img: np.array):
+        """
+        Draw the 2d trajectory in the window. This function is called
+        when lmlList is empty.
+        """
 
         if self.startingPoint is not None:
             xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed = self.traj.getData()
