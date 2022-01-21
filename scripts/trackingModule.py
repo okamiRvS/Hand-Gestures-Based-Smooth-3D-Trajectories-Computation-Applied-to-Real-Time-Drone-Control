@@ -45,7 +45,7 @@ class tracking():
 
     def drawLog(self, img, color, checkTollerance, val):
 
-        fontScale = 1
+        fontScale = 1 * (self.width /640)
         font = cv2.FONT_HERSHEY_DUPLEX
         thickness = 1
         cv2.putText(img, f"checkTollerance: {checkTollerance:.2f}", (10,70), font, fontScale, color, thickness)

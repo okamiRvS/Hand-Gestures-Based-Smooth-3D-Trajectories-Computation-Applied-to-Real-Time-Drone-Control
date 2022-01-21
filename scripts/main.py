@@ -193,7 +193,7 @@ class FullControll():
         return self.tracking.height, self.tracking.width
 
 
-    def autoSet(self, isWebcam=True, resize = False, showPlot=True, isSimulation=False, allHandTransformed=False):
+    def autoSet(self, isWebcam=True, resize=False, showPlot=True, isSimulation=False, allHandTransformed=False):
 
         # Set if webcam or drone camera source
         # True is webcam, False is drone camera
@@ -250,7 +250,7 @@ def main():
         print(me.get_battery())
 
     fullControll = FullControll()
-    fullControll.autoSet(isWebcam=isWebcam, resize = False, showPlot=True)
+    fullControll.autoSet(isWebcam=isWebcam, resize=True, showPlot=True)
 
     fullControll.run(me)
 
