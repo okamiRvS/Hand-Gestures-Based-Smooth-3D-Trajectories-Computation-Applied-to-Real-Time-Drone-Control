@@ -1,5 +1,6 @@
 from djitellopy import tello
 import keyPressModule as kp
+import recordVideoModule as recVid
 import time
 import cv2
 import numpy as np
@@ -29,7 +30,7 @@ points = [(500, 500, 500)]
 
 flag = True
 
-def getKeyboardInput2(vels):
+def getKeyboardInput2(vels, rec):
     global x, y, z, yaw, a, height, totTime, flag, isWebcam
 
     const = 117/10 # forward speed in cm/2     (15cm/s)
@@ -57,8 +58,10 @@ def getKeyboardInput2(vels):
 
     print(interval)
 
+    # If end trajectory then land and stop rec
     if totTime > vels[-1][3] + 2 and flag and not isWebcam:
         me.land()
+        rec.stop()
         flag = False
 
     time.sleep(interval)
@@ -315,10 +318,14 @@ if not isWebcam:
 
 velocities = normalizeData(resTraj, height, width)
 
+# Start rec video
+rec = recVid.recordVideo(me)
+rec.run()
+
 while True:
 
     # Control with detected trajectory
-    vals = getKeyboardInput2(velocities)
+    vals = getKeyboardInput2(velocities, rec)
     imgXY = np.zeros((1000,1000,3), dtype=np.uint8) # 0 - 256
     imgXZ = np.zeros((1000,1000,3), dtype=np.uint8) # 0 - 256
     
