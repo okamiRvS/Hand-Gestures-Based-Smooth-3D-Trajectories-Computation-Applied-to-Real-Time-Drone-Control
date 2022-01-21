@@ -170,8 +170,7 @@ class FullControll():
                 if res is not None:
                     return res
             else:
-                #self.tracking.justDrawLast2dTraj(img)
-                print("h")
+                self.tracking.justDrawLast2dTraj(img)
 
             # Update framerate
             cTime = time.time()

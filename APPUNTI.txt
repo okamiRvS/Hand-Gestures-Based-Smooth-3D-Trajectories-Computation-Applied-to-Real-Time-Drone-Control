@@ -141,3 +141,10 @@ lunedì 17 ore 16.00
 -ritornare dizionario di valori invece di n liste...(magari robe in numpy)
 -andrebbe calcolato la velocità ocme vettore, non ci dovrebbe essere il modulo, e andrebbe quindi eseguito lo smooth sulla velocità computata sucessivamente
 -[DONE]skip n step dovrebbe essere eseguito semplicemenete salvando il dato ogni n secondi, ora invece salva una montagna di dati e ogni secondo vengono recuperati solo i valori di n secondi
+
+
+4.	Non e’ chiaro se nell’acquisire la traiettoria consideri anche la componente temporale, o se e’ solo un path che poi segui a velocita’ costante.
+5.	Idem per lo yaw del drone.  Guarda sempre nella stessa direzione?
+
+21/01/2022
+[Done] scale text log with resolution

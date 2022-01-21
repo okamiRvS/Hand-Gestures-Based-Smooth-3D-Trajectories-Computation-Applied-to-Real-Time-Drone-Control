@@ -42,6 +42,7 @@ class tracking():
         self.previousTmpTime = 0
         self.trajFlag = True
 
+        self.startingPoint = None
 
     def drawLog(self, img, color, checkTollerance, val):
 
@@ -80,8 +81,9 @@ class tracking():
 
     def justDrawLast2dTraj(self, img):
 
-        xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed = self.traj.getData()
-        self.draw2dTraj(img, xdata, zdata)
+        if self.startingPoint is not None:
+            xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed = self.traj.getData()
+            self.draw2dTraj(img, xdata, zdata)
 
 
     def distanceFromMeanPoint(self, lmList, val):
