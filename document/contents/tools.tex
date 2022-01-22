@@ -4,7 +4,7 @@
 
 This chapter introduces the tools used in this work, starting from the description of the target platform in, then describing the simulator in and finally mentioning the frameworks used for the implementation in.
 
-\subsection{Tello}
+\section{Tello}
 \label{subsec:tello}
 Tello is a small quadcopter that features a Vision Positioning System and an onboard camera. Using its advanced flight controller, it can hover in place and is suitable for flying indoors. Tello caputers 5MP photos and stream until 720p live video. Its maximum flight time is approximately 12 minutes (tested in windless conditions at a consistent $15km/h$) and its maximum flight distance id $100m$ \cite[]{djitelloguide}.
 
@@ -41,13 +41,13 @@ The Tello SDK connects to the aircraft through a Wi-Fi UDP port, allowing users 
 	\label{tab:modeln5dist}
 \end{table}
 
-\subsection{Gazebo}
+\section{Gazebo}
 \label{subsec:gazebo}
 
 % parlare che si è lavorato su windows, ma gazebo era in una macchina virtuale con immagine ubuntu.
 Gazebo is a 3D simulator, offers the ability to accurately and efficiently simulate robots in complex indoor and outdoor environments. Thanks to Gazebo it was possible to launch the 3D trajectory acquired by hand through the webcam on a simulated drone. 
 
-\subsection{Frameworks}
+\section{Frameworks}
 \label{subsec:frameworks}
 
 \paragraph*{\texttt{DJITelloPy}} DJI Tello drone python interface using the official Tello SDK and Tello EDU SDK. This library has an implementation of all tello commands, easily retrieve a video stream, receive and parse state packets and other features.\footnote{\url{https://github.com/damiafuentes/DJITelloPy}}.
