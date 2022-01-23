@@ -7,33 +7,12 @@ import pdb
 
 class recordVideo():
 
-    def __init__(self, me):
-
-        self.VIDEO_DIR_PATH = os.path.join('src', 'video_src')
+    def __init__(self, me, path):
 
         self.keepRecording = True
-        self.recorder = None
-        self.getLastVideoIdx = self.getLastIdx()
         self.frame_read = me.get_frame_read()
         self.height, self.width, _ = self.frame_read.frame.shape
-
-
-    def getLastIdx(self) -> int:
-        """
-        Return the index of the last video added +1.
-        Return 1 if there are not video in VIDEO_DIR_PATH
-        """
-        
-        if not os.path.exists(self.VIDEO_DIR_PATH):
-            if os.name == 'posix': # if linux system
-                os.system(f"mkdir -p {CSV_DIR_PATH}")
-            if os.name == 'nt': # if windows system
-                os.system(f"mkdir {self.VIDEO_DIR_PATH}")
-
-            return 1
-
-        for root, dirs, files in os.walk(self.VIDEO_DIR_PATH, topdown=True):
-            return len(files)+1
+        self.path = path 
 
 
     def videoRecorder(self):
@@ -41,8 +20,8 @@ class recordVideo():
         create a VideoWrite object, 
         recording to self.VIDEO_DIR_PATH}/video{self.getLastVideoIdx}.avi
         """
-
-        video = cv2.VideoWriter(f'{self.VIDEO_DIR_PATH}/video{self.getLastVideoIdx}.avi', cv2.VideoWriter_fourcc(*'XVID'), 30, (self.width, self.height))
+        
+        video = cv2.VideoWriter(f'{self.path}.avi', cv2.VideoWriter_fourcc(*'XVID'), 30, (self.width, self.height))
 
         while self.keepRecording:
 
@@ -50,11 +29,11 @@ class recordVideo():
                 video.write(self.frame_read.frame)
             except Exception as e:
                 print(e)
-                
+
             time.sleep(1 / 30)
 
         video.release()
-        print(f"Video{self.getLastVideoIdx} saved.")
+        print(f"Video {self.path} saved.")
 
 
     def run(self):
@@ -63,8 +42,8 @@ class recordVideo():
         would prevent frames from getting added to the video
         """
         
-        self.recorder = Thread(target=self.videoRecorder)
-        self.recorder.start()
+        recorder = Thread(target=self.videoRecorder)
+        recorder.start()
 
 
     def stop(self):

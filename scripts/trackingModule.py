@@ -7,7 +7,6 @@ import dynamic3dDrawTrajectory as d3dT
 import trajectory as traj
 import smoothingModule as sm
 import copy
-import pandas as pd
 import os
 
 class tracking():
@@ -43,6 +42,7 @@ class tracking():
         self.trajFlag = True
 
         self.startingPoint = None
+
 
     def drawLog(self, img: np.array, color: tuple, checkTollerance: float, val: float):
         """
@@ -306,9 +306,6 @@ class tracking():
             #xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed = self.trajCOMPLETE[-1].getData()
             xdata, ydata, zdata, rolldata, yawdata, pitchdata, dtime, speed = self.smoothing.smoothCalculation()
             
-            # export data as csv
-            #pd.DataFrame(np.array([xdata, ydata, zdata, rolldata, yawdata, pitchdata, dtime, speed])).to_csv("data.csv", index=False, header=None)
-
             # if passed a few time from TRAKING state
             if self.waitForNewTraj < time.time():
 

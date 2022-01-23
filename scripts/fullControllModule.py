@@ -53,6 +53,7 @@ class FullControll():
 
         return [lr, fb, ud, yv]
 
+
     def isWebcamOrDrone(self, me):
         """
         This function set parameters to work with webcam or drone camera
@@ -90,7 +91,7 @@ class FullControll():
                     self.normalizedPoints.setSize(height, width)
             else:
                 success = False
-
+            
             return img, cap
 
         else:
@@ -105,6 +106,9 @@ class FullControll():
             return img, None
             
 
+    def closekp(self):
+        kp.close()
+
     def run(self, me=None):
         """
         Execute the algorithm to detect the 3D trajectories from 2D hand landmarks
@@ -118,6 +122,10 @@ class FullControll():
         cTime = 0
 
         img, cap = self.isWebcamOrDrone(me)
+
+        # Save video from camera
+        height, width = self.getResolution()
+        video = cv2.VideoWriter(f'{self.path}_webcam.avi', cv2.VideoWriter_fourcc(*'XVID'), 30, (width, height))
 
         while True:
 
@@ -152,7 +160,7 @@ class FullControll():
                 me.send_rc_control(vals[0], vals[1], vals[2], vals[3])
                 #print(f"vals are :{vals[0]}, {vals[1]}, {vals[2]}, {vals[3]}")
             
-            img = self.detector.findHands(img)
+            img = self.detector.findHands(img, drawHand="LEFT")
             lmList = self.detector.findPosition(img, draw=False)
 
             if len(lmList) != 0:
@@ -168,7 +176,8 @@ class FullControll():
                 res = self.tracking.run(img, self.normalizedPoints, outputClass, probability)
                 
                 if res is not None:
-                    kp.close()
+                    # Close video and return data
+                    video.release()
                     return res
             else:
                 self.tracking.justDrawLast2dTraj(img)
@@ -183,6 +192,10 @@ class FullControll():
             thickness = 1
             cv2.putText(img, f"FPS: {int(fps)}", (10,40), font, fontScale, (255,0,255), thickness) # print fps
 
+            # Write the flipped frame
+            video.write(img)
+
+            # Show frame
             cv2.imshow(self.nameWindowWebcam, img)
             key = cv2.waitKey(1)
             if key == 27: # exit on ESC
@@ -193,11 +206,11 @@ class FullControll():
         return self.tracking.height, self.tracking.width
 
 
-    def autoSet(self, isWebcam=True, resize=False, showPlot=True, isSimulation=False, allHandTransformed=False):
+    def autoSet(self, path, isWebcam=True, resize=False, showPlot=True, isSimulation=False, allHandTransformed=False):
 
         # Set if webcam or drone camera source
         # True is webcam, False is drone camera
-        getFromWebcam = isWebcam
+        self.getFromWebcam = isWebcam
 
         # Set name window of imshow
         nameWindowWebcam = "Image"
@@ -227,7 +240,6 @@ class FullControll():
                                 log3D=showPlot) 
 
         # set variable
-        self.getFromWebcam = getFromWebcam
         self.nameWindowWebcam = nameWindowWebcam
         self.resize = resize
         self.xResize = xResize
@@ -238,6 +250,7 @@ class FullControll():
         self.tracking = tracking
         self.isSimulation = isSimulation
         self.allHandTransformed = allHandTransformed
+        self.path = path
 
 
 def main():
