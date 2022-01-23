@@ -107,7 +107,9 @@ class FullControll():
             
 
     def closekp(self):
+
         kp.close()
+
 
     def run(self, me=None):
         """
@@ -117,7 +119,7 @@ class FullControll():
         if not self.isSimulation:
             kp.init()
 
-        # define variable to compute framerate
+        # Define variable to compute framerate
         pTime = 0
         cTime = 0
 
@@ -134,7 +136,6 @@ class FullControll():
                 img = cv2.flip(img, 1)
 
             else:
-
                 img = me.get_frame_read().frame
                 img = cv2.flip(img, 1)
 
@@ -177,7 +178,9 @@ class FullControll():
                 
                 if res is not None:
                     # Close video and return data
-                    video.release()
+                    if self.getFromWebcam:
+                        video.release()
+                        
                     return res
             else:
                 self.tracking.justDrawLast2dTraj(img)
@@ -203,6 +206,7 @@ class FullControll():
 
 
     def getResolution(self):
+
         return self.tracking.height, self.tracking.width
 
 

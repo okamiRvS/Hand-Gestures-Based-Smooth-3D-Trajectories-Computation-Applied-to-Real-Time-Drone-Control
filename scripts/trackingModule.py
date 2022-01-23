@@ -53,10 +53,10 @@ class tracking():
         fontScale = 1 * (self.width /640)
         font = cv2.FONT_HERSHEY_DUPLEX
         thickness = 1
-        cv2.putText(img, f"checkTollerance: {checkTollerance:.2f}", (10,70), font, fontScale, color, thickness)
-        cv2.putText(img, f"val: {val}", (10,100), font, fontScale, color, thickness)
-        cv2.putText(img, f"scale: {round(self.scale, 3)}", (10,130), font, fontScale, color, thickness)
-        cv2.putText(img, f"{self.currentState}", (10,160), font, fontScale, color, thickness)
+        cv2.putText(img, f"TOLLERANCE: {checkTollerance:.2f}", (10,70), font, fontScale, color, thickness)
+        cv2.putText(img, f"POSITION: {val}", (10,100), font, fontScale, color, thickness)
+        cv2.putText(img, f"DEPTH: {round(self.scale, 3)}", (10,130), font, fontScale, color, thickness)
+        cv2.putText(img, f"STATUS: {self.currentState}", (10,160), font, fontScale, color, thickness)
 
 
     def draw2dTraj(self, img: np.array, xdata: list, zdata: list, flag: bool = False):
@@ -75,7 +75,7 @@ class tracking():
             cv2.circle(img, self.endingPoint, radius=0, color=(0,255,0), thickness=-1)
             
             if i != 1:
-                cv2.line(img, self.startingPoint, self.endingPoint, (255,255,0), thickness=1)
+                cv2.line(img, self.startingPoint, self.endingPoint, (0,165,255), thickness=2)
             
             self.startingPoint = self.endingPoint
 

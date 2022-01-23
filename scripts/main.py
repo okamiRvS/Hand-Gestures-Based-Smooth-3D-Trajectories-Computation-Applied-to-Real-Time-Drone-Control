@@ -116,7 +116,7 @@ class keyboardControl:
             self.y += fb_interval
             self.z -= ud_interval
         
-        print(lr, fb, ud, yv, self.x, self.y, self.z)
+        #print(lr, fb, ud, yv, self.x, self.y, self.z)
 
         return [lr, fb, ud, yv, self.x, self.y, self.z]
         
@@ -332,32 +332,46 @@ class keyboardControl:
 
 
     def runJustDrone(self):
-
-        # IS ALWAYS isWebcam=False, DRONE FLY, VIDEO RECORDED FROM DRONE,
-        # DETECTION TRAJECTORY FROM DRONE
+        """
+        IS ALWAYS isWebcam=False, DRONE FLY, VIDEO RECORDED FROM DRONE,
+        DETECTION TRAJECTORY FROM DRONE
+        """
 
         self.isWebcam = False
 
-        fullControll = fullControllModule.FullControll()
-
         me = tello.Tello()
+        me.connect()
+        print(me.get_battery())
 
-        if not self.isWebcam:
-            me.connect()
-            print(me.get_battery())
-            me.streamon() # to get the stream image
-            me.takeoff(); 
-            time.sleep(3)
-            rec = recVid.recordVideo(me)
-            rec.run()
-            me.send_rc_control(0, 0, 20, 0)
-            print("Let's start")
+        # Path for save things
+        idx = self.setLastIdx()
+        path = f"{self.VIDEO_DIR_PATH}/{idx}"
+
+        fullControll = fullControllModule.FullControll()
 
         # Reset values
         fullControll.autoSet(isWebcam=self.isWebcam, resize=False, showPlot=False)
 
+        # Get the stream image
+        me.streamon() # to get the stream image
+        time.sleep(3)
+       
+        # Start rec video
+        rec = recVid.recordVideo(me, f"{path}_droneCamera")
+        rec.run()
+
+        # Takeoff
+        me.takeoff()
+        time.sleep(3) 
+
+        # Fly up a bit
+        me.send_rc_control(0, 0, 20, 0)
+ 
         # Get data from hand
         resTraj = fullControll.run(me)
+
+        # Export original data as CSV
+        pd.DataFrame(np.array(resTraj)).to_csv(f"{path}_original.csv", index=False, header=None)
 
         # Get resolution
         height, width = fullControll.getResolution()
@@ -391,9 +405,10 @@ class keyboardControl:
 
 
     def runDroneWebcam(self):
-
-        # IS ALWAYS isWebcam=True, DRONE FLY, VIDEO RECORDED FROM DRONE AND FROM WEBCAM,
-        # DETECTION TRAJECTORY FROM WEBCAM
+        """
+        IS ALWAYS isWebcam=True, DRONE FLY, VIDEO RECORDED FROM DRONE AND FROM WEBCAM,
+        DETECTION TRAJECTORY FROM WEBCAM
+        """
 
         self.isWebcam = True
 
@@ -410,24 +425,20 @@ class keyboardControl:
         # Reset values
         fullControll.autoSet(path, isWebcam=self.isWebcam, resize=False, showPlot=False)
 
-        print(me.get_battery())
-
-        # Takeoff
-        me.takeoff()
-        time.sleep(3)
-
         # Get the stream image
-        me.streamon()
-        time.sleep(3) # TRY TO DON'T USE IT ##### IMPO
-
-        # Fly up a bit
-        me.send_rc_control(0, 0, 20, 0)
+        me.streamon() # to get the stream image
+        time.sleep(3)
        
         # Start rec video
         rec = recVid.recordVideo(me, f"{path}_droneCamera")
         rec.run()
 
-        time.sleep(3) # TRY TO DON'T USE IT ##### IMPO
+        # Takeoff
+        me.takeoff()
+        time.sleep(3) 
+
+        # Fly up a bit
+        me.send_rc_control(0, 0, 20, 0)
 
         # Get data from hand
         resTraj = fullControll.run(me)
@@ -474,10 +485,10 @@ class keyboardControl:
 
 
     def test(self):
-
-        # THIS IS TEST, IS ALWAYS isWebcam=True, DRONE DON'T FLY, VIDEO RECORDED FROME DRONE AND FROM WEBCAM
-        # DETECTION TRAJECTORY FROM WEBCAM
-
+        """
+        THIS IS TEST, IS ALWAYS isWebcam=True, DRONE DON'T FLY, VIDEO RECORDED FROME DRONE AND FROM WEBCAM
+        DETECTION TRAJECTORY FROM WEBCAM
+        """
         self.isWebcam = True
 
         me = tello.Tello()
@@ -493,23 +504,21 @@ class keyboardControl:
         # Reset values
         fullControll.autoSet(path, isWebcam=self.isWebcam, resize=False, showPlot=False)
 
-        print("Takeoff...")
-        time.sleep(3)
-
         # Get the stream image
         print("Get the stream image...")
         me.streamon()
         time.sleep(3)
-
-        # Fly up a bit
-        print("Fly up a bit...")
         
         # Start rec video
         rec = recVid.recordVideo(me, f"{path}_droneCamera")
         rec.run()
 
+        print("Takeoff...")
         time.sleep(3)
 
+        # Fly up a bit
+        print("Fly up a bit...")
+   
         # Get data from hand
         resTraj = fullControll.run(me)
 
