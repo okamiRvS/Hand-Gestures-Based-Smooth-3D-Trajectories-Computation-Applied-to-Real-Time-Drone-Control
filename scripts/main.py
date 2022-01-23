@@ -66,12 +66,12 @@ class keyboardControl:
         time.sleep(self.interval)
         self.totTime += self.interval
 
-        lr = int(lr)
+        lr = int(-lr)
         fb = int(fb)
         ud = int(ud)
 
         if lr !=0 and fb!=0 and ud !=0:
-            self.x += lr_interval
+            self.x += -lr_interval
             self.y += fb_interval
             self.z -= ud_interval
         
@@ -394,13 +394,74 @@ class keyboardControl:
         me.streamoff()
 
 
+    def test2(self):
+
+        # THIS TEST DRON WILL FLY AFTER TRAJECTORY DETECTED FROM HAND
+
+        self.isWebcam = True
+
+        fullControll = fullControllModule.FullControll()
+
+        # Reset values
+        fullControll.autoSet(isWebcam=self.isWebcam, resize=False, showPlot=False)
+
+        me = tello.Tello()
+        me.connect()
+        print(me.get_battery())
+
+        # Takeoff
+        me.takeoff()
+        time.sleep(4)
+
+        # Start rec video
+        me.streamon() # to get the stream image
+        rec = recVid.recordVideo(me)
+        rec.run()
+
+        # Get data from hand
+        resTraj = fullControll.run(me)
+
+        # Get resolution
+        height, width = fullControll.getResolution()
+
+        velocities = self.normalizeData(resTraj, height, width, log=True)
+
+        while self.flag:
+
+            # Control with detected trajectory
+            vals = self.getKeyboardInput2(velocities)
+
+            imgXY = np.zeros((1000,1000,3), dtype=np.uint8) # 0 - 256
+            imgXZ = np.zeros((1000,1000,3), dtype=np.uint8) # 0 - 256
+            
+            if self.points[-1][0] != vals[4] or self.points[-1][1] != vals[5] or self.points[-1][2] != vals[6]:
+                self.points.append((vals[4], vals[5], vals[6]))
+
+            me.send_rc_control(vals[0], vals[1], vals[2], vals[3])
+            self.drawXYPoints(imgXY)
+            self.drawXZPoints(imgXZ)
+            cv2.imshow("imgXY",imgXY)
+            cv2.imshow("imgXZ",imgXZ)
+            cv2.waitKey(1)
+
+        # Destroying all the windows
+        cv2.destroyAllWindows()
+
+        # Stop recording
+        rec.stop()
+        me.streamoff()
+
+
 def main():
 
     # isWebcam=True IF YOU WANT TO USE WEBCAM
     kc = keyboardControl(isWebcam=True)
 
-    # THIS IS TEST, IS ALWAY isWebcam=FALSE
-    kc.test()
+    # THIS IS TEST, IS ALWAY isWebcam=FALSE, DRONE WON'T FLY BUT RECORD FROM THERE
+    #kc.test()
+
+    # THIS IS TEST, IS ALWAY isWebcam=TRUE, DRONE FLY BUT RECORD FROM WEBCAM
+    kc.test2()
 
     #kc.run()
 

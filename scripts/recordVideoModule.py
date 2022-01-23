@@ -45,7 +45,12 @@ class recordVideo():
         video = cv2.VideoWriter(f'{self.VIDEO_DIR_PATH}/video{self.getLastVideoIdx}.avi', cv2.VideoWriter_fourcc(*'XVID'), 30, (self.width, self.height))
 
         while self.keepRecording:
-            video.write(self.frame_read.frame)
+
+            try:
+                video.write(self.frame_read.frame)
+            except Exception as e:
+                print(e)
+                
             time.sleep(1 / 30)
 
         video.release()
