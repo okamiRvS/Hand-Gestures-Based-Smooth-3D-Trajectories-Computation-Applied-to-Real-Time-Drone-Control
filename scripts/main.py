@@ -418,7 +418,7 @@ class keyboardControl:
 
         # Path for save things
         idx = self.setLastIdx()
-        path = f"{self.VIDEO_DIR_PATH}/{idx}"
+        path = f"{self.VIDEO_DIR_PATH}\\{idx}"
 
         fullControll = fullControllModule.FullControll()
 
