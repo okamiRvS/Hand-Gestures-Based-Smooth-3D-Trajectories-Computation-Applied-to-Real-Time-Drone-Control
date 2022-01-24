@@ -83,7 +83,7 @@ class normalizePoints():
         tmp = self.transf.translate(tmp, -mean[0], -mean[1])
 
         # compute rotation
-        tmp = self.transf.rotatate(tmp, theta)
+        #tmp = self.transf.rotatate(tmp, theta)
 
         # save this info to compute the z-coordinate
         self.wrist = tmp[0]

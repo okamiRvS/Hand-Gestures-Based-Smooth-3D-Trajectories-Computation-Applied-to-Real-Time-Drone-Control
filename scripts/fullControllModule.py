@@ -126,8 +126,9 @@ class FullControll():
         img, cap = self.isWebcamOrDrone(me)
 
         # Save video from camera
-        height, width = self.getResolution()
-        video = cv2.VideoWriter(f'{self.path}_webcam.avi', cv2.VideoWriter_fourcc(*'XVID'), 30, (width, height))
+        if self.getFromWebcam:
+            height, width = self.getResolution()
+            video = cv2.VideoWriter(f'{self.path}_webcam.avi', cv2.VideoWriter_fourcc(*'XVID'), 30, (width, height))
 
         while True:
 
@@ -157,9 +158,13 @@ class FullControll():
             
             # Control with joystick
             if not self.isSimulation:
+                # If we get some action from joystick then send rc, else no set anything
+                # because the command me.send_rc_control(0, 0, 0, 0) will be send
+                # in self.tracking.run() function always
                 vals = self.getKeyboardInput(me, img)
-                me.send_rc_control(vals[0], vals[1], vals[2], vals[3])
-                #print(f"vals are :{vals[0]}, {vals[1]}, {vals[2]}, {vals[3]}")
+                if not (vals[0] == vals[1] == vals[2] == vals[3] == 0):
+                    me.send_rc_control(vals[0], vals[1], vals[2], vals[3])
+                    #print(f"vals are :{vals[0]}, {vals[1]}, {vals[2]}, {vals[3]}")
             
             img = self.detector.findHands(img, drawHand="LEFT")
             lmList = self.detector.findPosition(img, draw=False)
@@ -174,7 +179,7 @@ class FullControll():
 
                 # hand gesture recognition
                 img, outputClass, probability = self.gestureDetector.processHands(img, self.normalizedPoints)
-                res = self.tracking.run(img, self.normalizedPoints, outputClass, probability)
+                res = self.tracking.run(img, self.normalizedPoints, outputClass, probability, me)
                 
                 if res is not None:
                     # Close video and return data
@@ -196,7 +201,8 @@ class FullControll():
             cv2.putText(img, f"FPS: {int(fps)}", (10,40), font, fontScale, (255,0,255), thickness) # print fps
 
             # Write the flipped frame
-            video.write(img)
+            if self.getFromWebcam:
+                video.write(img)
 
             # Show frame
             cv2.imshow(self.nameWindowWebcam, img)
@@ -259,6 +265,7 @@ class FullControll():
 
 def main():
 
+    VIDEO_DIR_PATH = os.path.join('src', 'video_src')
     isWebcam = True
     me = tello.Tello()
     
@@ -267,7 +274,7 @@ def main():
         print(me.get_battery())
 
     fullControll = FullControll()
-    fullControll.autoSet(isWebcam=isWebcam, resize=True, showPlot=True)
+    fullControll.autoSet(path=VIDEO_DIR_PATH, isWebcam=isWebcam, resize=False, showPlot=True, allHandTransformed=False)
 
     fullControll.run(me)
 

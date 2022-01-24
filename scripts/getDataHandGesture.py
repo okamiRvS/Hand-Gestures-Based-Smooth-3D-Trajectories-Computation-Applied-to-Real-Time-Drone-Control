@@ -12,33 +12,18 @@ import pdb
 global img
 getFromWebcam = True
 
-# if true you can save all picture of the data and decide the currentPicture, if false you'll use that data that can
-# be uncorrect (could be useful for real application?)
+# If true you can save all picture of the data and decide the currentPicture
+# If false you'll use that data that can be uncorrect, could be useful for real application...
+# Press esc to retake data, space if you want to save that frame
 takeControl = True
 
 # wait from a frame and another
 timeDelay = 0
 
-# define images to collect
-labels = ['stop', 'onefingerup', 'twofingerup', 'thumbsup'] # da migliorare con movimenti avanti e indietro
-number_imgs = 20
-
-# (207*3)
-# IT'S REALLY IMPORTANT DIVERSIFY THE ORIENTATION THROUGH ROLL, PITCH AND YAW
-# 0-206 z1 (background)
-    # (23*3)
-    # back
-        # right 0-22
-        # center 23-45
-        # left 46-68
-    # center
-        # right 68-91
-        # center 92-114
-        # left 115-137
-    # front
-        # right 138-160
-        # center 161-183
-        # left 184-206
+# IT'S REALLY IMPORTANT DIVERSIFY THE ORIENTATION AND TYPE OF THE SAME GESTURE
+# Define images to collect
+labels = ['backward', 'detect', 'down', 'forward', 'land', 'left', 'ok', 'right', 'stop', 'up']
+number_imgs = 100
 
 np_array = np.zeros((len(labels)*number_imgs, 21*2 + 1), dtype=np.float32)
 
@@ -182,30 +167,11 @@ try:
                         normalizedPoints.removeHomogeneousCoordinate()
                         data = normalizedPoints.getPointsForNet()
 
-                        # x_sum = y_sum = 0
-                        # # insert values, except for the last element for each row because it is the label that we set after this iteration
-                        # for j, val in enumerate(lmList):
-                        #     np_array[index, j*2] = val[1]
-                        #     x_sum += val[1]
-                        #     np_array[index, j*2+1] = val[2]
-                        #     y_sum += val[2]
-
-                        # x_mean = x_sum / 21
-                        # y_mean = y_sum / 21
-
-                        # # translate all values to the origin
-                        # for j in range(42):
-                        #     if j%2 == 0:
-                        #         np_array[index, j] = np_array[index, j] - x_mean
-                        #     else:
-                        #         np_array[index, j] = np_array[index, j] - y_mean
-
                         np_array[index, :-1] = data
                         np_array[index, -1] = nLabel # put label on last column
 
                         isLmListEmpty = False
 
-                        #print(lmList)
                         print(np_array[index])
 
                         if not getFromWebcam:

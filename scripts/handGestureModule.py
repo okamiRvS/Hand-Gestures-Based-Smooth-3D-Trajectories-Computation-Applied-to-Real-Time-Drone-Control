@@ -11,15 +11,15 @@ class handGestureRecognition():
 
     # To train a new model look at "3. Hand gesture recognition.ipynb" use as kernel tfod
 
-    lastModel = "1642800231" # COPY THE FOLDER NAME OF Tensorflow/workspace/models/my_hand_gesture_model
+    lastModel = "1642981324" # COPY THE FOLDER NAME OF Tensorflow/workspace/models/my_hand_gesture_model
     
     if os.name == 'posix': # if linux system
         export_path = str.encode(os.path.join("/home/usiusi/catkin_ws/src/DJI-Tello-3D-Hand-Gesture-control/Tensorflow/workspace/models/my_hand_gesture_model", lastModel)) # must be in bytes
     elif os.name == 'nt': # if windows system
         export_path = str.encode(os.path.join("Tensorflow","workspace", "models", "my_hand_gesture_model", lastModel)) # must be in bytes
 
-    SPECIES = ['stop', 'onefingerup', 'twofingerup', 'thumbsup']
-    #SPECIES = ['back_left', 'back_center', 'back_right', 'center_left', 'center_center', 'center_right', 'front_left', 'front_center', 'front_right']
+    #SPECIES = ['stop', 'onefingerup', 'twofingerup', 'thumbsup']
+    SPECIES = ['backward', 'detect', 'down', 'forward', 'land', 'left', 'ok', 'right', 'stop', 'up']
     FRAME_THICKNESS = 3
     FONT_THICKNESS = 2
 

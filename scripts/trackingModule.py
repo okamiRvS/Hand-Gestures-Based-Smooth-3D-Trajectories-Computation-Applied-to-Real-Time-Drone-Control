@@ -43,6 +43,11 @@ class tracking():
 
         self.startingPoint = None
 
+        # This var permits to execute always rc 0 0 0 0, but if
+        # it is False for that fram will not be executed.
+        # This is always reset True in run function
+        self.flag = True
+
 
     def drawLog(self, img: np.array, color: tuple, checkTollerance: float, val: float):
         """
@@ -173,7 +178,7 @@ class tracking():
         cv2.circle(img, positionDrone, radius=10, color=(0,0,255), thickness=10)
 
 
-    def run(self, img, normalizedPoints, outputClass, probability):
+    def run(self, img, normalizedPoints, outputClass, probability, me):
 
         val = normalizedPoints.mean.astype(int)
         cv2.circle(img, (val[0], val[1]), radius=3, color=(0,255,0), thickness=3)
@@ -184,6 +189,8 @@ class tracking():
         normalizedPoints.computeDistanceWristMiddleFingerTip(pitch)
         # IF YOU WANT PRINT PITCH, ROLL, YAW
         #normalizedPoints.drawOrientationVector(img, roll, yaw, pitch)
+
+        self.flag = True
 
         if "INIZIALIZATION" == self.currentState:
             # fill all the queue before START state
@@ -203,7 +210,7 @@ class tracking():
                 self.previous_mean_distance = self.distanceFromMeanPoint(lmList, val)
                 self.tolleranceSTART = int(self.previous_mean_distance) + 20
 
-            if checkStart < self.tolleranceSTART and self.queueObj.checkGesture("stop"):
+            if checkStart < self.tolleranceSTART and self.queueObj.checkGesture("detect"):
                 self.idxPoint = 0
                 cv2.circle(img, (val[0], val[1]), radius=self.tolleranceSTART, color=(0,0,255), thickness=1) # draw the tollerance inside 
                 cv2.circle(img, (val[0], val[1]), radius=self.tolleranceSTART*2, color=(0,255,0), thickness=1) # draw the tollerance outside 
@@ -211,7 +218,7 @@ class tracking():
                 if self.traj.checkIsPossibleAddPoint():
                     self.addTrajectoryPointAndSpeed(lmList, val, roll, yaw, pitch)
  
-            elif checkStart < self.tolleranceSTART and self.queueObj.checkGesture("thumbsup"): # execute last trajectory
+            elif checkStart < self.tolleranceSTART and self.queueObj.checkGesture("ok"): # execute last trajectory
                 
                 if len(self.trajCOMPLETE) > 0: # if trajectory exists
 
@@ -240,7 +247,7 @@ class tracking():
                     self.cleanTraj()
                     self.currentState = "INIZIALIZATION"
 
-            elif self.tolleranceSTART < checkStart < self.tolleranceSTART*2 and self.queueObj.checkGesture("stop"):
+            elif self.tolleranceSTART < checkStart < self.tolleranceSTART*2 and self.queueObj.checkGesture("detect"):
                 self.traj.saveLastNValues(nPoints = 5) # take only the last 20 points
                 xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed = self.traj.getData()
 
@@ -252,6 +259,47 @@ class tracking():
                 self.addTrajectoryPointAndSpeed(lmList, val, roll, yaw, pitch)
 
                 self.drawLog(img, (0,255,0), checkStart, val)
+
+            elif self.queueObj.checkGesture("up"):
+                me.send_rc_control(0, 0, 15, 0)
+                self.flag = False
+                time.sleep(0.05)
+
+            elif self.queueObj.checkGesture("down"):
+                me.send_rc_control(0, 0, -15, 0)
+                self.flag = False
+                time.sleep(0.05)
+            
+            elif self.queueObj.checkGesture("forward"):
+                me.send_rc_control(0, 15, 0, 0)
+                self.flag = False
+                time.sleep(0.05)
+
+            elif self.queueObj.checkGesture("backward"):
+                me.send_rc_control(0, -15, 0, 0)
+                self.flag = False
+                time.sleep(0.05)
+
+            elif self.queueObj.checkGesture("left"):
+                me.send_rc_control(15, 0, 0, 0)
+                self.flag = False
+                time.sleep(0.05)
+
+            elif self.queueObj.checkGesture("right"):
+                me.send_rc_control(-15, 0, 0, 0)
+                self.flag = False
+                time.sleep(0.05)
+
+            elif self.queueObj.checkGesture("stop"):
+                me.send_rc_control(0, 0, 0, 0)
+                self.flag = False
+                time.sleep(0.05)
+
+            elif self.queueObj.checkGesture("land"):
+                me.land()
+                self.flag = False
+                time.sleep(0.05)
+
             else:
                 self.drawLog(img, (0,0,255), checkStart, val)
 
@@ -264,7 +312,7 @@ class tracking():
             cv2.circle(img, (x_mean,y_mean), radius=3, color=(255,0,0), thickness=3)
             checkStartTracking = math.sqrt( (x_mean - val[0] )**2 + (y_mean - val[1])**2 )
 
-            if self.queueObj.checkGesture("thumbsup"):
+            if self.queueObj.checkGesture("ok"):
                 self.currentState = "EXIT"
 
                 # remove last n keypoint because the movement is thumbup, so the end of traj
@@ -285,12 +333,17 @@ class tracking():
                 if self.log3D:
                     self.drawTraj.clean()
 
-            elif checkStartTracking < self.tolleranceTRACKING and self.queueObj.checkGesture("stop"):
+            elif checkStartTracking < self.tolleranceTRACKING and self.queueObj.checkGesture("detect"):
 
                 # if totaltime is under the time of trajectory execution
                 # and if passed n secs to add a new point
                 if self.traj.checkIsPossibleAddPoint() and self.traj.checkTrajTimeDuration():
                     self.addTrajectoryPointAndSpeed(lmList, val, roll, yaw, pitch)
+            
+            elif self.queueObj.checkGesture("stop"):
+                # If stop gesture then reset
+                self.cleanTraj()
+                self.currentState = "INIZIALIZATION"
                 
             xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed = self.traj.getData()
             self.draw2dTraj(img, xdata, zdata)
@@ -309,13 +362,13 @@ class tracking():
             # if passed a few time from TRAKING state
             if self.waitForNewTraj < time.time():
 
-                # if stop gesture then reset
-                if self.queueObj.checkGesture("stop"):
+                # If stop gesture then reset
+                if self.queueObj.checkGesture("detect") or self.queueObj.checkGesture("stop"):
                     self.cleanTraj()
                     self.currentState = "INIZIALIZATION"
 
-                # if thumbsup then execute action
-                elif self.queueObj.checkGesture("thumbsup"):
+                # If thumbsup then execute action
+                elif self.queueObj.checkGesture("ok"):
                     return xdata, ydata, zdata, rolldata, yawdata, pitchdata, dtime, speed
                         
             self.draw2dTraj(img, xdata, zdata)
@@ -326,6 +379,11 @@ class tracking():
             self.drawLog(img, (0,0,255), 0, val)
 
         self.queueObj.addMeanAndMatch(val, outputClass, probability)
+
+        # Send this to the drone otherwise it will land automatically
+        if self.flag:
+            me.send_rc_control(0, 0, 0, 0)
+
 
 
 def main():
