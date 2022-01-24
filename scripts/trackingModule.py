@@ -33,7 +33,7 @@ class tracking():
         self.height = 0
         self.width = 0
 
-        self.timeToCatchAnotherTraj = 2
+        self.timeToCatchAnotherTraj = 1
 
         self.idxPoint = 0
         self.delayToExecuteTrajectory = 50

@@ -282,7 +282,7 @@ class keyboardControl:
         plt.plot(xz[0], xz[1])
 
         # move coordinates of traj in range from -range cm to range cm
-        range = 150
+        range = 100
         xz = xz * range
         y = y * (range/2) # reduce range of z space... ########################################
 
@@ -313,8 +313,8 @@ class keyboardControl:
 
         # scale time from 0 to 10
         istTime = resTraj[6] - resTraj[6][0]
-        istTime = istTime / np.max(istTime) * 10
-        #istTime = resTraj[6]
+        #istTime = istTime / np.max(istTime) * 10
+        istTime = resTraj[6]
 
         # delta time in secs
         dtime = np.diff(istTime)
@@ -438,7 +438,7 @@ class keyboardControl:
         time.sleep(3) 
 
         # Fly up a bit
-        me.send_rc_control(0, 0, 20, 0)
+        #me.send_rc_control(0, 0, 20, 0)
 
         # Get data from hand
         resTraj = fullControll.run(me)
@@ -578,7 +578,7 @@ def main():
 
     # THIS IS TEST, IS ALWAYS isWebcam=True, DRONE DON'T FLY, VIDEO RECORDED FROME DRONE AND FROM WEBCAM
     # DETECTION TRAJECTORY FROM WEBCAM
-    kc.runJustDrone()
+    kc.runDroneWebcam()
 
 
 if __name__ == "__main__":
