@@ -53,10 +53,10 @@ class keyboardControl:
         if not os.path.exists(self.VIDEO_DIR_PATH):
             if os.name == 'posix': # if linux system
                 os.system(f"mkdir -p {self.VIDEO_DIR_PATH}")
-                os.system(f"mkdir -p {self.VIDEO_DIR_PATH}\1")
+                os.system(f"mkdir -p {self.VIDEO_DIR_PATH}\\1")
             if os.name == 'nt': # if windows system
                 os.system(f"mkdir {self.VIDEO_DIR_PATH}")
-                os.system(f"mkdir {self.VIDEO_DIR_PATH}\1")
+                os.system(f"mkdir {self.VIDEO_DIR_PATH}\\1")
 
             self.VIDEO_DIR_PATH = os.path.join(self.VIDEO_DIR_PATH, str(1))
             return 1
@@ -282,7 +282,7 @@ class keyboardControl:
         plt.plot(xz[0], xz[1])
 
         # move coordinates of traj in range from -range cm to range cm
-        range = 130
+        range = 150
         xz = xz * range
         y = y * (range/2) # reduce range of z space... ########################################
 
@@ -345,12 +345,12 @@ class keyboardControl:
 
         # Path for save things
         idx = self.setLastIdx()
-        path = f"{self.VIDEO_DIR_PATH}/{idx}"
+        path = f"{self.VIDEO_DIR_PATH}\\{idx}"
 
         fullControll = fullControllModule.FullControll()
 
         # Reset values
-        fullControll.autoSet(isWebcam=self.isWebcam, resize=False, showPlot=False)
+        fullControll.autoSet(path, isWebcam=self.isWebcam, resize=False, showPlot=False)
 
         # Get the stream image
         me.streamon() # to get the stream image
@@ -497,7 +497,7 @@ class keyboardControl:
 
         # Path for save things
         idx = self.setLastIdx()
-        path = f"{self.VIDEO_DIR_PATH}/{idx}"
+        path = f"{self.VIDEO_DIR_PATH}\\{idx}"
 
         fullControll = fullControllModule.FullControll()
 
@@ -578,7 +578,7 @@ def main():
 
     # THIS IS TEST, IS ALWAYS isWebcam=True, DRONE DON'T FLY, VIDEO RECORDED FROME DRONE AND FROM WEBCAM
     # DETECTION TRAJECTORY FROM WEBCAM
-    kc.test()
+    kc.runJustDrone()
 
 
 if __name__ == "__main__":
