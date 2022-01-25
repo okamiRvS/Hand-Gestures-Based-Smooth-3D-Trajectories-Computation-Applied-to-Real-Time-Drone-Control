@@ -2,7 +2,9 @@ import tensorflow as tf
 import pandas as pd
 import numpy as np
 import os
-
+import handTrackingModule as htm
+import normalizePointsModule as normalize
+import time
 import cv2
 import pdb
 
@@ -140,7 +142,56 @@ class handGestureRecognition():
 
 def main():
 
-    print("hello")
+    pTime = 0
+    cTime = 0
+
+    detector = htm.handDetector()
+    normalizedPoints = normalize.normalizePoints()
+    gestureDetector = handGestureRecognition()
+
+    cv2.namedWindow("Image")
+    cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
+
+    if cap.isOpened(): # try to get the first frame
+        success, img = cap.read()
+        detector.findHands(img)
+    else:
+        success = False
+
+    while success:
+        success, img = cap.read()
+        img = cv2.flip(img, 1)
+        img = detector.findHands(img, drawHand="LEFT")
+        lmList = detector.findPosition(img, draw=False)
+
+        if len(lmList) != 0:
+            # setArray, computeMean, normalize points, and draw
+            normalizedPoints.setArray(lmList)
+            normalizedPoints.normalize()
+            normalizedPoints.drawAllHandTransformed(img)
+            normalizedPoints.removeHomogeneousCoordinate()
+
+            # hand gesture recognition
+            img, outputClass, probability = gestureDetector.processHands(img, normalizedPoints)
+        
+        # Update framerate
+        cTime = time.time()
+        fps = 1/(cTime-pTime)
+        pTime = cTime
+
+        fontScale = 1
+        font = cv2.FONT_HERSHEY_DUPLEX
+        thickness = 1
+        cv2.putText(img, f"FPS: {int(fps)}", (10,40), font, fontScale, (255,0,255), thickness) # print fps
+
+        # Show frame
+        cv2.imshow("Image", img)
+
+        key = cv2.waitKey(20)
+        if key == 27: # exit on ESC
+            break
+
+    cv2.destroyWindow("Image")
 
 
 if __name__ == "__main__":

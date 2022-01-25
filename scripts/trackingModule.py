@@ -188,7 +188,7 @@ class tracking():
         roll, yaw, pitch = normalizedPoints.computeOrientation()
         normalizedPoints.computeDistanceWristMiddleFingerTip(pitch)
         # IF YOU WANT PRINT PITCH, ROLL, YAW
-        #normalizedPoints.drawOrientationVector(img, roll, yaw, pitch)
+        normalizedPoints.drawOrientationVector(img, roll, yaw, pitch)
 
         self.flag = True
 

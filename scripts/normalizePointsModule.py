@@ -196,17 +196,17 @@ class normalizePoints():
         index_finger_mcp = self.tmp[5]
         index_finger_pip = self.tmp[6]
 
-        # copmute the difference from the mean between index_finger_mcp and index_finger_pip with the thumb_tip y value
+        # Compute the difference from the mean between index_finger_mcp and index_finger_pip with the thumb_tip y value
         pointZero = (index_finger_mcp[1] + index_finger_pip[1]) / 2
         res = pointZero - thumb_tip[1]
 
-        # this is a quadratic form, more stable to zero
+        # This is a quadratic form, more stable to zero
         if res < 0:
             res = (res**2) / 31 # 180 is empirically computed
         else:
             res = -(res**2) / 31
 
-        # the part above 90 degrees scale a lot
+        # The part above 90 degrees scale a lot
         if res < - 90:
             res = -90 - (res + 90) * 0.1
         elif res > 90:
@@ -223,7 +223,7 @@ class normalizePoints():
         wrist = np.array(self.lmList[0], dtype=np.int32) # palmo
         middle_finger_tip = np.array(self.lmList[12], dtype=np.int32) # punta medio
 
-        # compute the vector that pass at the center
+        # Compute the vector that pass at the center
         centerVector = 1.2 * ( middle_finger_tip - wrist )
 
         centerVectorEnd = wrist + centerVector
