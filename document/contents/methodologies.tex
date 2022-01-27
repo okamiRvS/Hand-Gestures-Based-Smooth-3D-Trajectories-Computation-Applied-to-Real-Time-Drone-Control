@@ -26,7 +26,7 @@ MediaPipe has a python implementation for their Hand Keypoints Detector. It retu
 	\label{fig:handland}
 \end{figure}
 
-\noindent The coordinates of pixels in OpenCV follow a reference system $(x,y)$ in which the origin is in top-left of each image frame, $x$ is column-wise and $y$ is row-wise on the computer screen. In order to normalize each point, the origin has been converted from top-left to bottom-left. This gives us the classic cartesian coordinate system. After, for each landmark has been computed the mean for $x$ and $y$, converted in homogeneous coordinates and translated them in order to match mean and origin. Finally, each point has been scaled respect the max distance from mean point to all other hand points. This normalization permits to compare same gesture at different distance from camera, if same orientation. 
+\noindent The coordinates of pixels in OpenCV follow a reference system $(x,y)$ in which the origin is in top-left of each image frame, $x$ is column-wise and $y$ is row-wise on the computer screen. In order to normalize each point, the origin has been converted from top-left to bottom-left. This gives us the classic cartesian coordinate system. After, for each landmark has been computed the mean for $x$ and $y$, converted in homogeneous coordinates and shifted them in order to match mean with origin. Note that shifting the data did not change how the data points are positioned relative to each other. Finally, each point has been scaled respect the max distance from mean point to all other hand points. This normalization permits to compare same gesture at different distance from camera, if same orientation. 
 
 \subsection{Data Acquisition and Description}
 \label{sec:getdata}
