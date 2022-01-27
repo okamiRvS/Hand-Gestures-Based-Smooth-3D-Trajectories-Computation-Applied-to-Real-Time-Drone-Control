@@ -55,6 +55,27 @@ Following the normalization of the data, it was thought of gestures that would a
 
 \noindent From the module that has been built is there the possibility to get data either from a webcam or from the drone camera. The dataset consists of $42000$ elements because $100$ images are acquired for each gesture and each gesture has $21$ points $(x,y)$. The python script to get data has also a restore in case of particular error (for example if images are acquired from the drone could be problems due to overheating or low battery). Given the structure of the generation script it is particularly easy to build a model with new gestures.
 
+\subsection{Pearson Correlation}
+Correlation is a measure of the linear relationship of 2 or more variables. Through correlation, we can predict one variable from the other. The logic behind using correlation for feature selection is that the good variables are highly correlated with the target. Furthermore, variables should be correlated with the target but should be uncorrelated among themselves.
+
+\noindent If two variables are correlated, we can predict one from the other. Therefore, if two features are correlated, the model only really needs one of them, as the second one does not add additional information. We will use the Pearson Correlation here through the heatmap plot.
+
+\noindent A heatmap is a two-dimensional graphical representation of data where the individual values that are contained in a matrix are represented as colors. The seaborn python package allows the creation of annotated heatmaps which can be tweaked using Matplotlib tools as per the creator’s requirement.
+
+\begin{figure}[H]
+	\makebox[\textwidth]{
+		\includegraphics[width=1.3 \textwidth]{images/corr}
+	}
+	\caption[Heatmap.]{Heatmap is really useful to display a general view of numerical data, not to extract specific data point. It rapresents the correlation matrix and it is done using Pearson correlation.}\label{fig:correlation}
+\end{figure}
+
+% https://stats.stackexchange.com/questions/392517/how-can-one-interpret-a-heat-map-plot
+\noindent Each square shows the correlation between the variables on each axis. Correlation ranges from $-1$ to $+1$. Values closer to zero implies weaker correlation (exact $0$ implying no correlation). A value closer to $1$ implies stronger positive correlation, that is as one increases so does the other and the closer to $1$ the stronger this relationship is. A correlation closer to $-1$ is similar, but instead of both increasing, one variable will decrease as the other increases. This is called negative correlation.
+
+\noindent The diagonals are all $1$ because those squares are correlating each variable to itself (so it's a perfect correlation). Larger the number associated (in absolute) the higher the correlation between the two variables. The plot is also symmetrical about the diagonal since the same two variables are being paired together in those squares. This is the reason why we we plot just the lower matrix.
+
+\noindent Looking at the picture it is possible to see that there is a high correlation between variables. Therefore, we compared the correlation between features and remove one of two features that have an absolute correlation higher than 0.9
+
 \subsection{Model}
 \label{sec:model}
 Now we are ready to choose a model. For classification tasks there are variety of different estimators/models that we can pick from. In the end, DNNClassifier was chosen. We built a \gls{dnn} with two hidden layers with $30$ and $10$ nodes each. Input layer is composed of 42 elements and the output layer of 10 classes (see Fig. \ref{fig:handarch}). The model must choose among ten classes. The activation function is the Leaky ReLU and Adam the optimizer with learning rate $0.1$, decay steps $10000$ and decay rate $0.96$. About steps for the training phase has been chosen $3000$ as value. Loss is calculated by using softmax cross entropy.
