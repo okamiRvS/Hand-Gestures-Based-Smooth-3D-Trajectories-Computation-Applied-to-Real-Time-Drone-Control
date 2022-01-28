@@ -179,6 +179,12 @@ class FullControll():
 
                 # hand gesture recognition
                 img, outputClass, probability = self.gestureDetector.processHands(img, self.normalizedPoints)
+                
+                # Rotate Points TO FIX THIS PROBLEM
+                self.normalizedPoints.addHomogeneousCoordinate()
+                self.normalizedPoints.rotatePoints()
+                self.normalizedPoints.removeHomogeneousCoordinate()
+
                 res = self.tracking.run(img, self.normalizedPoints, outputClass, probability, me)
                 
                 if res is not None:

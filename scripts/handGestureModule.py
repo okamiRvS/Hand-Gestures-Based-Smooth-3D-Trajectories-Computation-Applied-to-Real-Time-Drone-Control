@@ -33,25 +33,6 @@ class handGestureRecognition():
 
     def processHands(self, img, handPoints):
 
-        # np_array = np.zeros((1, 21*2), dtype=np.int32)
-
-        # x_sum = y_sum = 0
-        # for j, val in enumerate(handPoints):
-        #     np_array[0, j*2] = val[1]
-        #     x_sum += val[1]
-        #     np_array[0, j*2+1] = val[2]
-        #     y_sum += val[2]
-
-        # x_mean = x_sum / 21
-        # y_mean = y_sum / 21
-
-        # # translate all values to the origin
-        # for j in range(42):
-        #     if j%2 == 0:
-        #         np_array[0, j] = np_array[0, j] - x_mean
-        #     else:
-        #         np_array[0, j] = np_array[0, j] - y_mean
-
         np_array = handPoints.getPointsForNet()
 
         CSV_COLUMN_NAMES = np.arange(42)
@@ -170,9 +151,23 @@ def main():
             normalizedPoints.normalize()
             normalizedPoints.drawAllHandTransformed(img)
             normalizedPoints.removeHomogeneousCoordinate()
-
-            # hand gesture recognition
+            
+            # Hand gesture recognition
             img, outputClass, probability = gestureDetector.processHands(img, normalizedPoints)
+
+            # Rotate Points
+            normalizedPoints.addHomogeneousCoordinate()
+            normalizedPoints.rotatePoints()
+            normalizedPoints.removeHomogeneousCoordinate()
+
+            # Draw orientation
+            val = normalizedPoints.mean.astype(int)
+            cv2.circle(img, (val[0], val[1]), radius=3, color=(0,255,0), thickness=3)
+
+            roll, yaw, pitch = normalizedPoints.computeOrientation()
+            normalizedPoints.computeDistanceWristMiddleFingerTip(pitch)
+            normalizedPoints.drawOrientationVector(img, roll, yaw, pitch)
+
         
         # Update framerate
         cTime = time.time()

@@ -72,28 +72,30 @@ class normalizePoints():
         mean = copy.deepcopy(self.mean) # LASCIA COSì! DOBBIAMO COPIARE SELF.MEAN
         mean = self.transf.convertOriginBottomLeft(mean)
 
-        # find angle
+        # Find angle
         theta = self.transf.findAngle(self.tmp[12], self.tmp[0])
         self.theta = theta
 
-        # convert in homogeneous coordinates
-        tmp = np.hstack( (self.tmp, np.ones((21,1)) ))
+        # Convert in homogeneous coordinates
+        self.addHomogeneousCoordinate()
 
-        # since mean point as anchor translate everything to the origin
-        tmp = self.transf.translate(tmp, -mean[0], -mean[1])
+        # Since mean point as anchor translate everything to the origin
+        tmp = self.transf.translate(self.tmp, -mean[0], -mean[1])
 
-        # compute rotation
-        #tmp = self.transf.rotatate(tmp, theta)
-
-        # save this info to compute the z-coordinate
-        self.wrist = tmp[0]
-        self.middle_finger_tip = tmp[12]
-
-        # scale everything respect max distance
+        # Scale everything respect max distance
         tmp = self.transf.scaleMaxDistance(tmp)     
 
-        # save this information
+        # Cave this information
         self.tmp = tmp
+
+
+    def rotatePoints(self):
+        # Compute rotation just for wrist and middle_finger_tip
+        self.tmp = self.transf.rotatate(self.tmp, self.theta)
+        
+        # save this info to compute the z-coordinate
+        self.wrist = self.tmp[0]
+        self.middle_finger_tip = self.tmp[12]
 
 
     def getPointsForNet(self):
@@ -238,6 +240,13 @@ class normalizePoints():
         cv2.putText(img, f"Yaw: {yaw}", (centerVectorEnd[0]+20,centerVectorEnd[1]+40), font, fontScale, (0, 225, 0), thickness)
         cv2.putText(img, f"Pitch: {pitch}", (centerVectorEnd[0]+20,centerVectorEnd[1]+80), font, fontScale, (0, 225, 0), thickness)
         cv2.putText(img, f"MODULE: {self.zcoord}", (centerVectorEnd[0]+20,centerVectorEnd[1]+120), font, fontScale, (0, 225, 0), thickness)
+
+
+    def addHomogeneousCoordinate(self):
+        """
+        Add homogeneous coordinate in the landmarks points.
+        """
+        self.tmp = np.hstack( (self.tmp, np.ones((21,1)) ))
 
 
     def removeHomogeneousCoordinate(self):

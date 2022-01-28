@@ -53,9 +53,10 @@ Following the normalization of the data, it was thought of gestures that would a
 	\item \texttt{up}: this command allows the drone to go up.
 \end{itemize}
 
-\noindent From the module that has been built is there the possibility to get data either from a webcam or from the drone camera. The dataset consists of $42000$ elements because $100$ images are acquired for each gesture and each gesture has $21$ points $(x,y)$. The python script to get data has also a restore in case of particular error (for example if images are acquired from the drone could be problems due to overheating or low battery). Given the structure of the generation script it is particularly easy to build a model with new gestures.
+\noindent From the module that has been built is there the possibility to get data either from a webcam or from the drone camera. The dataset consists of $43$ columns: $42$ are the $21$ $2D$ points’ components, and the last is the target. $1000$ examples were acquired, $100$ images for each gesture. In total, the dataset is composed of $43000$ elements. The python script to get data has also a restore in case of particular error (for example if images are acquired from the drone could be problems due to overheating or low battery). Given the structure of the generation script it is particularly easy to build a model with new gestures.
 
 \subsection{Pearson Correlation}
+\label{sec:pearsoncorr}
 Correlation is a measure of the linear relationship of 2 or more variables. Through correlation, we can predict one variable from the other. The logic behind using correlation for feature selection is that the good variables are highly correlated with the target. Furthermore, variables should be correlated with the target but should be uncorrelated among themselves.
 
 \noindent If two variables are correlated, we can predict one from the other. Therefore, if two features are correlated, the model only really needs one of them, as the second one does not add additional information. We will use the Pearson Correlation here through the heatmap plot.
@@ -70,28 +71,70 @@ Correlation is a measure of the linear relationship of 2 or more variables. Thro
 \end{figure}
 
 % https://stats.stackexchange.com/questions/392517/how-can-one-interpret-a-heat-map-plot
+% https://www.analyticsvidhya.com/blog/2020/10/feature-selection-techniques-in-machine-learning/
+% https://towardsdatascience.com/feature-selection-with-pandas-e3690ad8504b
 \noindent Each square shows the correlation between the variables on each axis. Correlation ranges from $-1$ to $+1$. Values closer to zero implies weaker correlation (exact $0$ implying no correlation). A value closer to $1$ implies stronger positive correlation, that is as one increases so does the other and the closer to $1$ the stronger this relationship is. A correlation closer to $-1$ is similar, but instead of both increasing, one variable will decrease as the other increases. This is called negative correlation.
 
 \noindent The diagonals are all $1$ because those squares are correlating each variable to itself (so it's a perfect correlation). Larger the number associated (in absolute) the higher the correlation between the two variables. The plot is also symmetrical about the diagonal since the same two variables are being paired together in those squares. This is the reason why we we plot just the lower matrix.
 
-\noindent Looking at the picture it is possible to see that there is a high correlation between variables. Therefore, we compared the correlation between features and remove one of two features that have an absolute correlation higher than 0.9
+\noindent Looking at the picture it is possible to see that there is a high correlation between variables. Therefore, we compared the correlation between features and remove one of two features that have an absolute correlation higher than $0.8$
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{images/featuresel}
+	\caption[Feature Selection: Feature Vs Feature.]{Feature Selection: Feature Vs Feature.}
+	\label{fig:featuresel}
+\end{figure}
+
+\noindent Note: a better verion could be used, setting an absolute value, saying $0.5$ as the threshold for selecting the variables. If we find that the predictor variables are correlated among themselves, we can drop the variable which has a lower correlation coefficient value with the target variable. High results are gained just finding that if the predictor variables are correlated among themselves we drop one of them. So we dropped all features except for $9$ features: WRIST\_X, WRIST\_Y, THUMB\_CMC\_X, INDEX\_FINGER\_MCP\_Y, INDEX\_FINGER\_PIP\_Y, MIDDLE\_FINGER\_MCP\_X, MIDDLE\_FINGER\_PIP\_X, MIDDLE\_FINGER\_DIP\_X, RING\_FINGER\_DIP\_Y. These are the final features given by Pearson correlation.
+
+\subsection{PCA}
+\label{sec:pca}
+% https://www.reneshbedre.com/blog/principal-component-analysis.html#pca-interpretation
+PCA is a classical multivariate (unsupervised machine learning) non-parametric dimensionality reduction method that used to interpret the variation in high-dimensional interrelated dataset (dataset with a large number of variables). PCA reduces the high-dimensional interrelated data to low-dimension by linearly transforming the old variable into a new set of uncorrelated variables called principal component (\gls{pc}) while retaining the most possible variation. The first component has the largest variance followed by the second component and so on. The first few components retain most of the variation, which is easy to visualize and summarise the feature of original high-dimensional datasets in low-dimensional space. PCA helps to assess which original samples are similar and different from each other.
+
+\begin{figure}[htbp]
+	\makebox[\textwidth]{
+		\includegraphics[width=1.3 \textwidth]{images/bipca}
+	}
+	\caption[PCA - Biplot.]{After dimensionality reduction, there usually is not a particular meaning assigned to each principal component. The new components are just the two main dimensions of variation.}\label{fig:bipca}
+\end{figure}
+
+\noindent As PCA is based on the correlation of the variables, it usually requires a large sample size for the reliable output. The sample size can be given as the absolute numbers or as subjects to variable ratios. The minimum absolute sample size of $100$ or at least $10$ or $5$ times to the number of variables is recommended for PCA. On other hand, Comrey and Lee’s (1992) have a provided sample size scale and suggested the sample size of $300$ is good and over $1000$ is excellent.
+
+\noindent As the number of \glspl{pc} is equal to the number of original variables, We should keep only the PCs which explain the most variance ($70-95\%$) to make the interpretation easier. More the PCs you include that explains most variation in the original data, better will be the PCA model. This is highly subjective and based on the user interpretation (Cangelosi et al., 2007).
+
+\noindent For a lot of machine learning applications it helps to be able to visualize the dataset. Visualizing $2$ or $3$ dimensional data is not that challenging. However things are different when the dimension is above four. We can use PCA to reduce that n dimensional data into $2$ or $3$ dimensions so that we can plot and hopefully understand the data better. For this reason we can say that PCA can also be used for Data Visualization. 
+
+\noindent PCA is effected by scale so we need to scale the features in our data before applying PCA. In sklearn framework using StandardScaler helps standardize the dataset’s features onto unit scale ($mean = 0$ and $variance = 1$) which is a requirement for the optimal performance of many machine learning algorithms. An alternative standardization is scaling features to lie between a given minimum and maximum value, often between zero and one, or so that the maximum absolute value of each feature is scaled to unit size. This can be achieved using MinMaxScaler or MaxAbsScaler, respectively. Problem about StandardScaler is when we have new data, and this cannot be scaled as the dataset used to build the \gls{ml} model. We have choosen MinMaxScaler. \\
+
+\noindent Biplots (see Fig. \ref{fig:bipca}) are useful to visualize the relationships between variables and observations. The original data has $n$ columns and we projects the original data which is $m$ dimensional (where $m$ is the number of rows, in other words, the sample number of the dataset) into $2$ dimensions. From the biplot and loadings plot, we can see that a lot of variables are highly associated and forms cluster. If the variables are highly associated, the angle between the variable vectors should be as small as possible in the biplot. The length of PCs in biplot refers to the amount of variance contributed by the \glspl{pc}. The longer the length of \gls{pc}, the higher the variance contributed and well represented in space. The first two \glspl{pc} contribute $~70,43\%$ of the total variation in the dataset.
+
+\noindent Scree plot (see Fig. \ref{fig:screeplot}) is another graphical technique useful in \glspl{pc} retention. We should keep the \glspl{pc} where there is a sharp change in the slope of the line connecting adjacent \glspl{pc}. We took just only the $6$ \gls{pc} because they descrive around the $93\%$ of the total variation in the dataset .
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=.8\textwidth]{images/screeplot}
+	\caption[Scree plot.]{Scree plot.}
+	\label{fig:screeplot}
+\end{figure}
 
 \subsection{Model}
 \label{sec:model}
-Now we are ready to choose a model. For classification tasks there are variety of different estimators/models that we can pick from. In the end, DNNClassifier was chosen. We built a \gls{dnn} with two hidden layers with $30$ and $10$ nodes each. Input layer is composed of 42 elements and the output layer of 10 classes (see Fig. \ref{fig:handarch}). The model must choose among ten classes. The activation function is the Leaky ReLU and Adam the optimizer with learning rate $0.1$, decay steps $10000$ and decay rate $0.96$. About steps for the training phase has been chosen $3000$ as value. Loss is calculated by using softmax cross entropy.
+Now we are ready to choose a model. For classification tasks there are variety of different estimators/models that we can choose from. In the end, DNNClassifier from Tensorflow framework, with two hidden layers composed of $30$ and $10$ neurons each. Input layer is composed of $42$ elements and the output layer of 10 classes (see Fig. \ref{fig:handarch}). The model must choose among ten classes. The activation function is the Leaky ReLU and Adam the optimizer with learning rate $0.1$, decay steps $10000$ and decay rate $0.96$. About steps for the training phase has been chosen $3000$ as value. Loss is calculated by using softmax cross entropy.
 
 % https://github.com/ashishpatel26/Tools-to-Design-or-Visualize-Architecture-of-Neural-Network
 % http://alexlenail.me/NN-SVG/index.html
+
 \begin{figure}[H]
-	\begin{minipage}{\textwidth}
-		\centering
-		\includegraphics[width=1 \textwidth]{images/net}
-		\caption[Hand gesture reconognition \gls{nn}.] {\gls{nn} image of the hand gesture recognition, generated by NNSVG\footnote{\url{http://alexlenail.me/NN-SVG/index.html}}.}
-		\label{fig:handarch}
-	\end{minipage}
+	\makebox[\textwidth]{
+		\includegraphics[width=1.1 \textwidth]{images/net}
+	}
+	\caption[Hand gesture reconognition \gls{nn}.] {\gls{dnn} image of the hand gesture recognition, generated by NNSVG\footnote{\url{http://alexlenail.me/NN-SVG/index.html}}. This is the specific case when all the $42$ variables were given as input.}
+	\label{fig:handarch}
 \end{figure}
 
-\noindent Because of such a simple structure,  high accuracy with a small number of examples was reached. It is not required to retrain the model for each gesture in different illumination, because MediaPipe takes over all the detection work.
+\noindent Three models were genearated: one using the entire dataset, one using just only the selected features and finally one using PCA. Because of such a simple structure, high accuracy was reached for all of them. It is not required to retrain the model for each gesture in different illumination (or building a convolutional neural network), because MediaPipe takes over all the detection work.
 
 \section{3D trajectory detection}
 \label{sec:3dtraj}
@@ -149,6 +192,17 @@ To compute pitch estimation, we compute the middle point $m$ between index\_fing
 
 \subsection{Camera-hand distance estimation}
 \label{subsec:cam-hand}
+%Nella fase iniziale di identificazione di una traiettoria 3d, il palmo della mano è perpendicolare rispetto al raggio d'azione dalla lente della fotocamera. La mano all'inizio è ferma e nell'immagine acquisita la stessa mano possiede una certa area h. Se consideriamo il punto centrale p della mano come la distanza media tra tutti i punti di riferimento della mano allora tale punto p possiamo considerarlo l'origine di un sistema di riferimento cartesiano ortogonale a tre assi. 
+%
+%Se volessimo trattare la mano come un punto materiale, cioè che non cambia il suo orientamento nello spazio, allora catturare tutti i punti medi della mano e confrontare le aree della mano per stimare le profondità nel corso del tempo t significa ottenere quei punti che identificano una traiettoria 3d. 
+%
+%Se però volessimo trattare la mano come un corpo, e quindi stimare anche il suo orientamento nello spazio allora le cose si complicano. Infatti, seppur comunque riusciremmo a identificare lo spostamento bidimensionale della mano, in termini di altezza e larghezza, come se trattassimo la mano come un punto materiale, invece non potremmo più confrontare le aree della mano perché queste possono essere alterate a causa dell'orientamento della mano assunta in un certo istante di tempo. Ecco perchè abbiamo di stimare l'orientamento della mano nello spazio, perché così possiamo proiettare i punti che descrivono la mano in modo che la mano sia perpendicolare rispetto al raggio d'azione della lente della fotocamera, quindi a ricondurci al caso precedente, ovvero confrontare le aree della mano per stimare la profondità.
+
+In the initial phase of identifying a 3D trajectory, the palm of the hand is perpendicular to the range of action from the camera lens. At the beginning the hand is still and in the acquired image the same hand has a certain area h. If we consider the central point p of the hand as the average distance between all the reference points of the hand then this point p can be considered the origin of an orthogonal three-axis Cartesian reference system.
+
+\noindent If we wanted to treat the hand as a material point, i.e. that does not change its orientation in space, then capturing all the midpoints of the hand and comparing the areas of the hand to estimate the depths over time t means obtaining those points that identify a trajectory 3d.
+
+\noindent However, if we wanted to treat the hand as a body, and therefore also estimate its orientation in space, then things get complicated. In fact, although we would still be able to identify the two-dimensional displacement of the hand, in terms of height and width, as if we were treating the hand as a material point, instead we could no longer compare the areas of the hand because these can be altered due to the orientation of the hand. hand taken in a certain instant of time. This is why we have to estimate the orientation of the hand in space, because in this way we can project the points that describe the hand so that the hand is perpendicular to the range of action of the camera lens, thus bringing us back to the previous case, or comparing areas of the hand to estimate depth.
 
 \subsection{Univariate spline}
 \label{sec:univspline}
