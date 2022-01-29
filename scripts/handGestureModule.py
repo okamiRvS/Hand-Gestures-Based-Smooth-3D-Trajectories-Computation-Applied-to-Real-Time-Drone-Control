@@ -148,24 +148,33 @@ def main():
         if len(lmList) != 0:
             # setArray, computeMean, normalize points, and draw
             normalizedPoints.setArray(lmList)
-            normalizedPoints.normalize()
-            normalizedPoints.drawAllHandTransformed(img)
+            normalizedPoints.normalize() # here already computed roll
             normalizedPoints.removeHomogeneousCoordinate()
-            
+
             # Hand gesture recognition
+            # we detect after normalization: translate origin, scale wrt max distance
             img, outputClass, probability = gestureDetector.processHands(img, normalizedPoints)
-
-            # Rotate Points
+            
+            # Scale a little bit 
             normalizedPoints.addHomogeneousCoordinate()
-            normalizedPoints.rotatePoints()
+            normalizedPoints.scaleLittle() # ATTUALMENTE INDISPENSABILE PER COMPUTARE BENE ORIENTAMENTO
+            normalizedPoints.drawAllHandTransformed(img) 
+
+            # Rotate Points, needed to compute yaw and pitch
+            normalizedPoints.rotatePoints() 
             normalizedPoints.removeHomogeneousCoordinate()
 
-            # Draw orientation
+            # Compute Mean
             val = normalizedPoints.mean.astype(int)
             cv2.circle(img, (val[0], val[1]), radius=3, color=(0,255,0), thickness=3)
 
+            # Compute Orientation
             roll, yaw, pitch = normalizedPoints.computeOrientation()
-            normalizedPoints.computeDistanceWristMiddleFingerTip(pitch)
+
+            # Draw DrawFixedHand
+            normalizedPoints.drawFixedHand(img, roll, yaw, pitch)
+            
+            normalizedPoints.computeDepth(roll, yaw, pitch)
             normalizedPoints.drawOrientationVector(img, roll, yaw, pitch)
 
         

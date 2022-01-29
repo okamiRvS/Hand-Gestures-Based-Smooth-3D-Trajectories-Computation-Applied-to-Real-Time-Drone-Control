@@ -173,19 +173,37 @@ class FullControll():
                 # setArray, computeMean, normalize points, and draw
                 self.normalizedPoints.setArray(lmList)
                 self.normalizedPoints.normalize()
-                if self.allHandTransformed:
-                    self.normalizedPoints.drawAllHandTransformed(img)
                 self.normalizedPoints.removeHomogeneousCoordinate()
 
-                # hand gesture recognition
+                # Hand gesture recognition
+                # we detect after normalization: translate origin, scale wrt max distance
                 img, outputClass, probability = self.gestureDetector.processHands(img, self.normalizedPoints)
                 
-                # Rotate Points TO FIX THIS PROBLEM
+                # Scale a little bit
                 self.normalizedPoints.addHomogeneousCoordinate()
+                self.normalizedPoints.scaleLittle() # ATTUALMENTE INDISPENSABILE PER COMPUTARE BENE ORIENTAMENTO
+                if self.allHandTransformed:
+                    self.normalizedPoints.drawAllHandTransformed(img)
+
+                # Rotate Points, needed to compute yaw and pitch
                 self.normalizedPoints.rotatePoints()
                 self.normalizedPoints.removeHomogeneousCoordinate()
 
-                res = self.tracking.run(img, self.normalizedPoints, outputClass, probability, me)
+                # Compute Mean point and draw it
+                val = self.normalizedPoints.mean.astype(int)
+                cv2.circle(img, (val[0], val[1]), radius=3, color=(0,255,0), thickness=3)
+
+                # Compute Orientation
+                roll, yaw, pitch = self.normalizedPoints.computeOrientation()
+
+                # Draw DrawFixedHand
+                self.normalizedPoints.drawFixedHand(img, roll, yaw, pitch)
+                
+                self.normalizedPoints.computeDepth(roll, yaw, pitch)
+                self.normalizedPoints.drawOrientationVector(img, roll, yaw, pitch)
+
+                # Execute commands
+                res = self.tracking.run(img, self.normalizedPoints, outputClass, probability, me, val, roll, yaw, pitch)
                 
                 if res is not None:
                     # Close video and return data
@@ -222,7 +240,7 @@ class FullControll():
         return self.tracking.height, self.tracking.width
 
 
-    def autoSet(self, path, isWebcam=True, resize=False, showPlot=True, isSimulation=False, allHandTransformed=False):
+    def autoSet(self, path, isWebcam=True, resize=False, showPlot=True, isSimulation=False, allHandTransformed=True):
 
         # Set if webcam or drone camera source
         # True is webcam, False is drone camera
@@ -280,7 +298,7 @@ def main():
         print(me.get_battery())
 
     fullControll = FullControll()
-    fullControll.autoSet(path=VIDEO_DIR_PATH, isWebcam=isWebcam, resize=False, showPlot=True, allHandTransformed=False)
+    fullControll.autoSet(path=VIDEO_DIR_PATH, isWebcam=isWebcam, resize=False, showPlot=True, allHandTransformed=True)
 
     fullControll.run(me)
 

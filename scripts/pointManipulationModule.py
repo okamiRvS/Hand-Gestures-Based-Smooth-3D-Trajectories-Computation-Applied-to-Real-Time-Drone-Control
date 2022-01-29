@@ -1,4 +1,5 @@
 import numpy as np
+import pdb
 
 
 class pointManipulation():
@@ -72,10 +73,40 @@ class pointManipulation():
 
         return tmp
 
+    def rotatate3D(self, tmp: np.array, roll, yaw, pitch) -> np.array:
+        """
+        Rotate tmp points of theta angle
+        """
+
+        # Matrix3dRotationX = np.array([[1, 0, 0, 0], [0, np.cos(roll), np.sin(roll), 0], [0, -np.sin(roll), np.cos(roll), 0], [0, 0, 0, 1]])
+        # Matrix3dRotationY = np.array([[np.cos(yaw), 0, -np.sin(yaw), 0], [0, 1, 0, 0], [np.sin(yaw), 0, np.cos(yaw), 0], [0, 0, 0, 1]])
+        # Matrix3dRotationZ = np.array([[np.cos(pitch), -np.sin(pitch), 0, 0], [np.sin(pitch), np.cos(pitch), 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]])
+
+        tmp[:,2] = 0
+        tmp = np.c_[tmp, np.ones(tmp.shape[0])]
+
+        # Convert from radians in degree
+        roll = roll * np.pi / 180 
+        yaw = yaw * np.pi / 180 
+        pitch = pitch * np.pi / 180 
+
+        # Build matrix
+        Matrix3dRotationX = np.array([[1, 0, 0, 0], [0, np.cos(pitch), np.sin(pitch), 0], [0, -np.sin(pitch), np.cos(pitch), 0], [0, 0, 0, 1]])
+        Matrix3dRotationY = np.array([[np.cos(yaw), 0, -np.sin(yaw), 0], [0, 1, 0, 0], [np.sin(yaw), 0, np.cos(yaw), 0], [0, 0, 0, 1]])
+        Matrix3dRotationZ = np.array([[np.cos(roll), -np.sin(roll), 0, 0], [np.sin(roll), np.cos(roll), 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]])
+
+        # apply the transformation to the vector
+        tmp = (Matrix3dRotationX @ Matrix3dRotationY @ Matrix3dRotationZ @ tmp.T).T
+
+        tmp = tmp[:,:-1]
+        tmp[:,-1] = 1
+
+        return tmp
+
 
     def scaleMaxDistance(self, tmp: np.array) -> np.array:
         """
-        Scale all tmp points wrt the max distance between centre of hand (stop gesture)
+        Scale all tmp points wrt the max distance between centre of hand (detect gesture)
         and all the others hand landmarks.
         """
 

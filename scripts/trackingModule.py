@@ -117,7 +117,7 @@ class tracking():
         return sum_distances / 21
 
 
-    def addTrajectoryPointAndSpeed(self, lmList, val, roll, yaw, pitch):
+    def addTrajectoryPointAndSpeed(self, lmList, val, roll, yaw, pitch, depth):
 
         # mean of all distances from mean point val and hand landmark in lmList
         current_mean_dist = self.distanceFromMeanPoint(lmList, val)
@@ -133,7 +133,8 @@ class tracking():
         # collect data to draw the 3d trajectory
         # scale X,Z data from 0 to 1; about scale factor I consider 50 values, but maybe it requires some major details...
         self.traj.addPoint(x = val[0] / self.width,
-                           y = self.scale / 50,
+                           #y = self.scale / 50, # THIS JUST COMPUTE SUM OF DISTANCES BETWEEN MEAN POINT AND ALL OTHER LANDMARK
+                           y = depth / 50, # THIS USE ORIENTATION, IT SHOULD WORK BETTER, REMEMBER TO ALWAYS START WITH DETECT GESTURE OTHERWISE AT THE MOMENT PROBLEMS
                            z = 1 - (val[1] / self.height),
                            roll = roll,
                            yaw = yaw,
@@ -178,17 +179,10 @@ class tracking():
         cv2.circle(img, positionDrone, radius=10, color=(0,0,255), thickness=10)
 
 
-    def run(self, img, normalizedPoints, outputClass, probability, me):
-
-        val = normalizedPoints.mean.astype(int)
-        cv2.circle(img, (val[0], val[1]), radius=3, color=(0,255,0), thickness=3)
+    def run(self, img, normalizedPoints, outputClass, probability, me, val, roll, yaw, pitch):
 
         lmList = normalizedPoints.lmList
-
-        roll, yaw, pitch = normalizedPoints.computeOrientation()
-        normalizedPoints.computeDistanceWristMiddleFingerTip(pitch)
-        # IF YOU WANT PRINT PITCH, ROLL, YAW
-        normalizedPoints.drawOrientationVector(img, roll, yaw, pitch)
+        depth = normalizedPoints.zcoord
 
         self.flag = True
 
@@ -216,7 +210,7 @@ class tracking():
                 cv2.circle(img, (val[0], val[1]), radius=self.tolleranceSTART*2, color=(0,255,0), thickness=1) # draw the tollerance outside 
                 
                 if self.traj.checkIsPossibleAddPoint():
-                    self.addTrajectoryPointAndSpeed(lmList, val, roll, yaw, pitch)
+                    self.addTrajectoryPointAndSpeed(lmList, val, roll, yaw, pitch, depth)
  
             elif checkStart < self.tolleranceSTART and self.queueObj.checkGesture("ok"): # execute last trajectory
                 
@@ -256,7 +250,7 @@ class tracking():
                     self.startingPoint = ( int( xdata[1] * self.height),
                                            int( (1- zdata[1]) * self.width) )
 
-                self.addTrajectoryPointAndSpeed(lmList, val, roll, yaw, pitch)
+                self.addTrajectoryPointAndSpeed(lmList, val, roll, yaw, pitch, depth)
 
                 self.drawLog(img, (0,255,0), checkStart, val)
 
@@ -338,7 +332,7 @@ class tracking():
                 # if totaltime is under the time of trajectory execution
                 # and if passed n secs to add a new point
                 if self.traj.checkIsPossibleAddPoint() and self.traj.checkTrajTimeDuration():
-                    self.addTrajectoryPointAndSpeed(lmList, val, roll, yaw, pitch)
+                    self.addTrajectoryPointAndSpeed(lmList, val, roll, yaw, pitch, depth)
             
             elif self.queueObj.checkGesture("stop"):
                 # If stop gesture then reset

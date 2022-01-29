@@ -23,6 +23,17 @@ class normalizePoints():
 
         self.zcoord = 0
 
+        # This variable is to save the first hand (should be evaluated if detect gesture)
+        self.firstHandNotScaled = None
+        self.currentHandNotScaled = None
+
+
+    def addHandNotScaled(self):
+        if self.firstHandNotScaled is None:
+            self.firstHandNotScaled = copy.deepcopy(self.tmp)
+        
+        self.currentHandNotScaled = copy.deepcopy(self.tmp)
+
 
     def setSize(self, height: int, width: int):
         """
@@ -80,13 +91,13 @@ class normalizePoints():
         self.addHomogeneousCoordinate()
 
         # Since mean point as anchor translate everything to the origin
-        tmp = self.transf.translate(self.tmp, -mean[0], -mean[1])
+        self.tmp = self.transf.translate(self.tmp, -mean[0], -mean[1])
+
+        # Add the current hand that is not scaled
+        self.addHandNotScaled()
 
         # Scale everything respect max distance
-        tmp = self.transf.scaleMaxDistance(tmp)     
-
-        # Cave this information
-        self.tmp = tmp
+        self.tmp = self.transf.scaleMaxDistance(self.tmp)     
 
 
     def rotatePoints(self):
@@ -258,15 +269,24 @@ class normalizePoints():
             self.tmp = self.tmp[:,:-1]
 
 
+    def scaleLittle(self):
+        self.tmp[:,:-1] = self.tmp[:,:-1] * 100
+
+
     def drawAllHandTransformed(self, img: np.array):
         """
         Draw all the point that defines the hand after the normalization in the window.
         """
 
-        # scale a bit to draw points on canvas
+        ##########################################
+        # DRAW VARIABLE HAND
+        ##########################################
+
+        # Scale a bit to draw points on canvas
         tmp = self.tmp
-        tmp[:,:-1] = tmp[:,:-1] * 100
-        tmp = self.transf.translate(tmp, 100, 130) #tmp + mean + np.array([-300, 0])
+
+        tmp = self.transf.translate(tmp, 130, -350) #stmp + mean + np.array([-300, 0])
+
         tmp = tmp[:,:-1]
         tmp[:,1] = self.height - tmp[:,1]
         tmp = tmp.astype(int)
@@ -318,18 +338,87 @@ class normalizePoints():
         cv2.line(img, tuple(tmp[19]), tuple(tmp[20]), color, thickness=1)
 
 
-    def computeDistanceWristMiddleFingerTip(self, pitch: float):
+    def drawFixedHand(self, img: np.array, roll, yaw, pitch):
+        ##########################################
+        # FIXED FIRST HAND
+        ##########################################
+
+        # Scale a bit to draw points on canvas
+        tmp = copy.deepcopy(self.firstHandNotScaled)
+        tmp = self.transf.scaleMaxDistance(tmp)    
+
+        tmp = self.transf.rotatate3D(tmp, roll, yaw, pitch)
+
+        tmp[:,:-1] = tmp[:,:-1] * 100
+        tmp = self.transf.translate(tmp, 130, -100) #stmp + mean + np.array([-300, 0])
+
+        tmp = tmp[:,:-1]
+        tmp[:,1] = self.height - tmp[:,1]
+        tmp = tmp.astype(int)
+
+        # DrawPoint
+        fontScale = 0.3
+        font = cv2.FONT_HERSHEY_DUPLEX
+        thickness = 1
+        color = (255,255,0)
+        for i in range(tmp.shape[0]):
+            position = tuple(tmp[i])
+            cv2.circle(img, position, radius=0, color=color, thickness=5)
+            cv2.putText(img, str(i), (position[0]+10, position[1]), font, fontScale, color, thickness)
+
+        # Put text on thumb_tip, index_finger_mcp and index_finger_pip
+        color = (0,255,0)
+        position = tuple(tmp[4])
+        cv2.circle(img, position, radius=0, color=color, thickness=5)
+        cv2.putText(img, "thumb_tip", ( position[0] + 10, position[1] ), font, fontScale, color, thickness)
+        position = tuple(tmp[5])
+        cv2.circle(img, position, radius=0, color=color, thickness=5)
+        cv2.putText(img, "index_finger_mcp", ( position[0] + 10, position[1] ), font, fontScale, color, thickness)
+        position = tuple(tmp[6])
+        cv2.circle(img, position, radius=0, color=color, thickness=5)
+        cv2.putText(img, "index_finger_pip", ( position[0] + 10, position[1] ), font, fontScale, color, thickness)
+
+        # Connect points to get the hand shape
+        color = (0,0,255)
+        cv2.line(img, tuple(tmp[0]), tuple(tmp[1]), color, thickness=1)
+        cv2.line(img, tuple(tmp[0]), tuple(tmp[5]), color, thickness=1)
+        cv2.line(img, tuple(tmp[0]), tuple(tmp[17]), color, thickness=1)
+        cv2.line(img, tuple(tmp[1]), tuple(tmp[2]), color, thickness=1)
+        cv2.line(img, tuple(tmp[2]), tuple(tmp[3]), color, thickness=1)
+        cv2.line(img, tuple(tmp[3]), tuple(tmp[4]), color, thickness=1)
+        cv2.line(img, tuple(tmp[5]), tuple(tmp[6]), color, thickness=1)
+        cv2.line(img, tuple(tmp[5]), tuple(tmp[9]), color, thickness=1)
+        cv2.line(img, tuple(tmp[6]), tuple(tmp[7]), color, thickness=1)
+        cv2.line(img, tuple(tmp[7]), tuple(tmp[8]), color, thickness=1)
+        cv2.line(img, tuple(tmp[9]), tuple(tmp[10]), color, thickness=1)
+        cv2.line(img, tuple(tmp[9]), tuple(tmp[13]), color, thickness=1)
+        cv2.line(img, tuple(tmp[10]), tuple(tmp[11]), color, thickness=1)
+        cv2.line(img, tuple(tmp[11]), tuple(tmp[12]), color, thickness=1)
+        cv2.line(img, tuple(tmp[13]), tuple(tmp[14]), color, thickness=1)
+        cv2.line(img, tuple(tmp[14]), tuple(tmp[15]), color, thickness=1)
+        cv2.line(img, tuple(tmp[15]), tuple(tmp[16]), color, thickness=1)
+        cv2.line(img, tuple(tmp[13]), tuple(tmp[17]), color, thickness=1)
+        cv2.line(img, tuple(tmp[17]), tuple(tmp[18]), color, thickness=1)
+        cv2.line(img, tuple(tmp[18]), tuple(tmp[19]), color, thickness=1)
+        cv2.line(img, tuple(tmp[19]), tuple(tmp[20]), color, thickness=1)
+
+
+    def computeDepth(self, roll, yaw, pitch):
         """
         Compute distance from wrist to middle finger tip.
         """
 
-        # they have the same x cause rotation, so just diff y
-        diff = self.middle_finger_tip[1] - self.wrist[1]
+        tmp = copy.deepcopy(self.firstHandNotScaled)
+        
+        # Transform the first hand in order to have the same orientation in the space
+        tmp = self.transf.rotatate3D(tmp, roll, yaw, pitch)
 
-        middlePoint = diff/2
-
-        theta = pitch * np.pi / 180
-
-        vecModule = 2 * middlePoint / np.cos(theta)
-        self.zcoord = vecModule
-        #print(f"theta: {pitch}, first: {2*middlePoint}, after: {vecModule}")
+        # Copmute distance of each point from the center
+        sum_dist_orig = np.mean(np.sqrt(tmp[:,0]**2 + tmp[:,1]**2))
+        sum_dist_new = np.mean(np.sqrt(self.currentHandNotScaled[:,0]**2 + self.currentHandNotScaled[:,1]**2))
+        
+        # Compute the differences between this two values to 
+        # estimate the depth
+        diff = sum_dist_new - sum_dist_orig
+        
+        self.zcoord = np.mean(diff)
