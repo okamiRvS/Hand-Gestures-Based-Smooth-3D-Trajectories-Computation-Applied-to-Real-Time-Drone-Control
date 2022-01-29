@@ -26,7 +26,7 @@ MediaPipe has a python implementation for their Hand Keypoints Detector. It retu
 	\label{fig:handland}
 \end{figure}
 
-\noindent The coordinates of pixels in OpenCV follow a reference system $(x,y)$ in which the origin is in top-left of each image frame, $x$ is column-wise and $y$ is row-wise on the computer screen. In order to normalize each point, the origin has been converted from top-left to bottom-left. This gives us the classic cartesian coordinate system. After, for each landmark has been computed the mean for $x$ and $y$, converted in homogeneous coordinates and shifted them in order to match mean with origin. Note that shifting the data did not change how the data points are positioned relative to each other. Finally, each point has been scaled respect the max distance from mean point to all other hand points. This normalization permits to compare same gesture at different distance from camera, if same orientation. 
+\noindent The coordinates of pixels in OpenCV follow a reference system $(x,y)$ in which the origin is in top-left of each image frame, $x$ is column-wise and $y$ is row-wise on the computer screen. In order to normalize each point, the origin was converted from top-left to bottom-left. This gave us the classic cartesian coordinate system. After, for each landmark was computed the mean for $x$ and $y$, converted in homogeneous coordinates and shifted them in order to match mean with origin. Note that shifting the data did not change how the data points are positioned relative to each other. Finally, each point has been scaled respect the max distance from mean point to all other hand points. This normalization permits to compare same gesture at different positions from the camera, if same orientation. 
 
 \subsection{Data Acquisition and Description}
 \label{sec:getdata}
@@ -142,7 +142,8 @@ Trajectories will be detected using the detect gesture (see Fig. \ref{fig:gestur
 
 \subsection{Orientation estimation}
 \label{sec:orientationestimation}
-In the following section, we will discuss the methods used to perform yaw, roll and pitch measurements starting from the pixels of the image captured with a camera.
+% Note that yaw and pitch orientation estimates are made after the hand points are normalized, while roll is computed at the time of normalization, as described in. The normalization in this phase occurs by first of all making the translation so that the origin of the axes matches the midpoint of the hand, then all the points of the hand are scaled so that the maximum distance between them and the origin has a value of 1. Finally we rotate the hand with respect to the roll value computed during the normalization phase.
+In the following section, we will discuss the methods used to perform yaw, roll and pitch measurements starting from the pixels of the image captured with a camera. Note that yaw and pitch orientation estimates are made after the hand points are normalized, while roll is computed at the time of normalization, as described in. The normalization in this phase occurs by first of all making the translation so that the origin of the axes matches the midpoint of the hand, then all the points of the hand are scaled so that the maximum distance between them and the origin has a value of 1. Finally we rotate the hand \gls{wrt} the roll value computed during the normalization phase.
 
 \subsubsection{Turning and orientations}
 \label{subsec:orientationtest}
@@ -164,9 +165,9 @@ In order to find a value for the yaw we need to understand how to determine whet
 	\begin{equation} \label{eq:orientationtest}
 		Orient(p,q,r) = det
 		\begin{pmatrix}
-		1 & p_x & p_y \\
-		1 & q_x & q_y \\
-		1 & r_x & r_y 
+			1 & p_x & p_y \\
+			1 & q_x & q_y \\
+			1 & r_x & r_y 
 		\end{pmatrix}
 		\end{equation}
 	\caption[Orientation test.]{Thus orientation generalizes the familiar 1-dimensional binary relations $<, =, >$.}
@@ -202,7 +203,72 @@ In the initial phase of identifying a 3D trajectory, the palm of the hand is per
 
 \noindent If we wanted to treat the hand as a material point, i.e. that does not change its orientation in space, then capturing all the midpoints of the hand and comparing the areas of the hand to estimate the depths over time t means obtaining those points that identify a trajectory 3d.
 
-\noindent However, if we wanted to treat the hand as a body, and therefore also estimate its orientation in space, then things get complicated. In fact, although we would still be able to identify the two-dimensional displacement of the hand, in terms of height and width, as if we were treating the hand as a material point, instead we could no longer compare the areas of the hand because these can be altered due to the orientation of the hand. hand taken in a certain instant of time. This is why we have to estimate the orientation of the hand in space, because in this way we can project the points that describe the hand so that the hand is perpendicular to the range of action of the camera lens, thus bringing us back to the previous case, or comparing areas of the hand to estimate depth.
+\noindent However, if we wanted to treat the hand as a body, and therefore also estimate its orientation in space, then things get complicated. In fact, although we would still be able to identify the two-dimensional displacement of the hand, in terms of height and width, as if we were treating the hand as a material point, instead we could no longer compare the areas of the hand because these can be altered due to the orientation of the hand, taken in a certain instant of time. This is why we have to estimate the orientation of the hand in space, because in this way we can project the points that describe the first hand detected, thus bringing us back to the previous case, comparing areas of the hand to estimate depth. \\
+
+
+%Quindi dopo aver rilevato il primo gesto, è stato calcolato il punto medio p e tutti punti della mano sono stati traslati in modo tale che il punto medio p diventi l'origine della mano. Notare che, a differenza di come è stato fatto per normalizzare i dati come ingresso per la rete neurale, qui non scaliamo i punti rispetto la massima distanza tra punto medio e tutti gli altri punti della mano. Non lo facciamo perché non vogliamo perdere l'informazione dello scaling. Anche tutti i gesti sucessivi (sempre riferiti al gesto del "detect") con possibile orientamento diverso vengono catturati ed eseguito lo stesso processo di normalizzazione. A ogni frame computiamo il valore della profondità confrontando la prima mano acqusita con quella in corso. Nello specifico, ai punti che definiscono la prima mano acquisita attuiamo una trasformazione matricale: una rotazione 3D lungo i 3 assi sfruttando le stime dello yaw, roll e pitch calcolare precedentmente
+
+\noindent So after detecting the first gesture, the midpoint $p$ was calculated and all points of the hand were translated in such a way that the midpoint $p$ becomes the origin of the hand. Note that, unlike how it was done to normalize the data as an input to the neural network, here we do not scale the points \gls{wrt} the maximum distance between the midpoint and all other points of the hand. We do not do this because we do not want to lose the scaling information. Also all subsequent gestures (always referring to the "detect" gesture) with possible different orientation are captured and performed the same normalization process. At each frame we calculate the depth value by comparing the first hand acquired with the one in progress. Specifically, at the points that define the first hand acquired we implementd a matrix transformation: a 3D rotation along the 3 axes using the estimates of the yaw, roll and pitch calculated previously (see \ref{sec:orientationestimation}).
+
+\noindent A rotation matrix rotates an object about one of the three coordinate axes or any arbitrary vector. The rotation matrix is more complex than the scaling and translation matrix since the whole $3x3$ upper-left matrix is needed to express complex rotations. It is common to specify arbitrary rotations with a sequence of simpler ones each along with one of the three cardinal axes. In each case, the rotation is through an angle, about the given axis. As in \ref{eq:rotx}, \ref{eq:roty} and \ref{eq:rotz}, the three matrices $R_X$, $R_Y$ and $R_Z$ represent transformations that rotate points through the angle $\theta$ in radians about the coordinate origin.
+
+% FORSE MEGLIO INSERIRE LE ROATAZIONI CLASSICHE, MA PRIMA GUARDARE IL CODICE SE FUNZIONANO
+\begin{Equation}[!htb]
+	\centering
+	\begin{equation} \label{eq:rotx}
+	R_X(\theta) =
+		\begin{pmatrix}
+			1 & 0 & 0 & 0 \\
+			0 & cos(\theta) & sin(\theta) & 0 \\
+			0 & -sin(\theta) & cos(\theta) & 0 \\
+			0 & 0 & 0 & 1 \\
+		\end{pmatrix}
+	\end{equation}
+	\caption[X-Rotation Matrix in homogeneous coordinates.]{X-Rotation Matrix in homogeneous coordinates.}
+\end{Equation}
+
+\begin{Equation}[!htb]
+	\centering
+	\begin{equation} \label{eq:roty}
+	R_Y(\theta) =
+		\begin{pmatrix}
+			cos(\theta) & 0 & -sin(\theta) & 0 \\
+			0 & 1 & 0 & 0 \\
+			sin(\theta) & 0 & cos(\theta) & 0 \\
+			0 & 0 & 0 & 1 \\
+		\end{pmatrix}
+	\end{equation}
+	\caption[Y-Rotation Matrix in homogeneous coordinates.]{Y-Rotation Matrix in homogeneous coordinates.}
+\end{Equation}
+
+\begin{Equation}[!htb]
+	\centering
+	\begin{equation} \label{eq:rotz}
+	R_Z(\theta) =
+		\begin{pmatrix}
+			cos(\theta) & -sin(\theta) & 0 & 0 \\
+			sin(\theta) & cos(\theta) & 0 & 0 \\
+			0 & 0 & 1 & 0 \\
+			0 & 0 & 0 & 1 \\
+		\end{pmatrix}
+	\end{equation}
+	\caption[Z-Rotation Matrix in homogeneous coordinates.]{Z-Rotation Matrix in homogeneous coordinates.}
+\end{Equation} 
+
+\noindent It must be further deﬁned whether positive angles perform a clockwise (CW) or counterclockwise (CCW) rotation around an axis \gls{wrt} a speciﬁcation of the orientation of the axis. Here, positive rotation angles cause a counterclockwise rotation about an axis as one looks inward from a point on the positive axis toward the origin. This is commonly the case for right-handed coordinate systems. Note that transformation matrices containing only rotations and translations are examples of rigid-body (solid-body) transformations, which do not alter the size or shape of an object. It is also possible to combine the three transformations to obtain a single matrix (see Eq. \ref{eq:rot})
+
+% SE CAMBI LE TRASFORMAZIONI PRECEDENTI ALLORA AGGIUNGI ANCHE IL FORUMULONE CHE è COMBINAZIONE DELLE 3
+\begin{Equation}[H]
+	\centering
+	\begin{equation} \label{eq:rot}
+		R(pitch, yaw, roll) = R_X(pitch) \cdot R_Y(yaw) \cdot R_Z(roll)
+	\end{equation}
+	\caption[General Rotation.]{General rotation matrix, used to perform a rotation in Euclidean space.}
+\end{Equation}
+
+\noindent Actually, instead of calculating the area of the hand, the mean of the sums of the distances between the hand midpoint p and all other reference hand landmark was calculated, to have a more robust metric. After having performed this last operation both on all the points of the current hand and on the first hand transformed with the general matrix, we finally made the difference between the first and the second value obtained previously. In this way we are able to obtain an estimate of the depth of the hand (which is performing the detecting gesture) even if it is oriented in space.
+
+
 
 \subsection{Univariate spline}
 \label{sec:univspline}
