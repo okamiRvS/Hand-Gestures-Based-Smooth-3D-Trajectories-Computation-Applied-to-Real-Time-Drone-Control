@@ -149,3 +149,6 @@ https://playground.tensorflow.org/#activation=tanh&batchSize=10&dataset=circle&r
 23/01/2022
 -[DONE] cattura solo mano sinistra
 -[DONE] creare cartella dove viene inserito video del drone, video della camera, dati originali, dati normalizzati, foto delle traiettorie dai dati normalizzati e foto delle traiettorie effettive
+
+29/01/2022
+[DONE] aggiunto stima depth sfruttando stima orientamento. ATTENZIONE bisogna assolutamente iniziare con la mano perfettamente perpendicolare rispetto alla camera, altrimenti al momento problemi.
