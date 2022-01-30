@@ -39,9 +39,6 @@ class dynamic3dDrawTrajectory():
         
         if currentTime > self.nextTime:
             self.nextTime = currentTime + 1 #currentTime + 2
-
-            #print(xdata, ydata, zdata)
-            #print(speed)
             
             #self.ax.plot3D(xdata, ydata, zdata, c='gray')
             surf = self.ax.scatter(xdata, ydata, zdata, s=speed,c=speed, vmin = 2, vmax = 10)
@@ -72,11 +69,6 @@ class dynamic3dDrawTrajectory():
 
             plt.draw()
             #plt.pause(0.5)
-  
-            # print(directionx[-1], directiony[-1], directionz[-1])
-            # print(xdata[-1], ydata[-1], zdata[-1])
-
-            #print(xdata, ydata, zdata)
 
 
     def destroy(self):
@@ -92,6 +84,8 @@ class dynamic3dDrawTrajectory():
         Reset the plot. It continues to exist.
         """
         
+        #self.fig.savefig("test.png")
+
         # delete everything
         self.ax.clear()
 

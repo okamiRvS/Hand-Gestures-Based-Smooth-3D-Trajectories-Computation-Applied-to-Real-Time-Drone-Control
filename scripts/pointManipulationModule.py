@@ -91,6 +91,7 @@ class pointManipulation():
         pitch = pitch * np.pi / 180 
 
         # Build matrix
+        # https://www.brainvoyager.com/bv/doc/UsersGuide/CoordsAndTransforms/SpatialTransformationMatrices.html
         Matrix3dRotationX = np.array([[1, 0, 0, 0], [0, np.cos(pitch), np.sin(pitch), 0], [0, -np.sin(pitch), np.cos(pitch), 0], [0, 0, 0, 1]])
         Matrix3dRotationY = np.array([[np.cos(yaw), 0, -np.sin(yaw), 0], [0, 1, 0, 0], [np.sin(yaw), 0, np.cos(yaw), 0], [0, 0, 0, 1]])
         Matrix3dRotationZ = np.array([[np.cos(roll), -np.sin(roll), 0, 0], [np.sin(roll), np.cos(roll), 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]])

@@ -152,3 +152,17 @@ https://playground.tensorflow.org/#activation=tanh&batchSize=10&dataset=circle&r
 
 29/01/2022
 [DONE] aggiunto stima depth sfruttando stima orientamento. ATTENZIONE bisogna assolutamente iniziare con la mano perfettamente perpendicolare rispetto alla camera, altrimenti al momento problemi.
+the rotation matrix: testare con le generiche matrici di rotazione.
+
+
+quando specifici:
+was 
+had
+
+in passsato sei stato
+I have been at the university
+
+to estimate = sia nome che verbo
+
+30/01
+[done] implementato ridge regression. Spline interpolation also avoids the problem of Runge's phenomenon, in which oscillation can occur between points when interpolating using high-degree polynomials. Stesso discorso riguarda la ridge regression
