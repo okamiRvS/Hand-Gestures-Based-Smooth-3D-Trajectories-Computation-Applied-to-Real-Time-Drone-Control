@@ -9,6 +9,7 @@ from geometry_msgs.msg import Pose2D, Pose, Twist
 from thymio import ThymioController, PID
 from gazebo_msgs.msg import ModelState 
 from gazebo_msgs.srv import SpawnModel, DeleteModel, GetModelState, SetModelState
+import os
 import pdb
 
 
@@ -328,6 +329,8 @@ class Task1(ThymioController):
 if __name__ == '__main__':
 
     try:
+        VIDEO_DIR_PATH = os.path.join('src', 'video_src')
+
         controller = Task1()
 
         fullControll = fullControllModule.FullControll()
@@ -340,11 +343,15 @@ if __name__ == '__main__':
                 controller.readCsv()
             else:
                 # Reset values
-                fullControll.autoSet(resize=True, showPlot=False, isSimulation=True)
+                fullControll.autoSet(path=VIDEO_DIR_PATH, resize=True, showPlot=False, isSimulation=True)
 
                 # Get data from hand
                 resTraj = fullControll.run()
-                controller.normalizeData(resTraj)
+
+                # Get resolution
+                height, width = fullControll.getResolution()
+
+                controller.normalizeData(resTraj, height, width)
 
             # we need enable the motors to move the drone in the simulation
             controller.enableMotors(True)

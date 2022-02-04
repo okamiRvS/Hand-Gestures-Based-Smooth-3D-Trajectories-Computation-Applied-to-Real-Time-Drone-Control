@@ -32,7 +32,7 @@ class ThymioController(object):
         self.resetPose = rospy.ServiceProxy("/gazebo/reset_world", Empty)
 
         # test reading csv file
-        #self.readCsv()
+        self.readCsv()
 
         
     def enableMotors(self, val):
@@ -44,8 +44,12 @@ class ThymioController(object):
             print("Service call failed: %s"%e)
 
 
-    def normalizeData(self, resTraj):
-        self.pose = np.vstack((resTraj[1], resTraj[0]*1.5 , resTraj[2])).T * 2 #5
+    def normalizeData(self, resTraj, height, width):
+        # Remember that width could be different from height, therefore 
+        # we need to scale width axis wrt aspect ratio
+        aspectRatio = width/height
+
+        self.pose = np.vstack((resTraj[1], resTraj[0] / aspectRatio, resTraj[2])).T * 2 #5
         self.orientation = np.vstack((resTraj[3], resTraj[4], resTraj[5])).T
         self.dtime = resTraj[6] * 0.5 # half time to have the correct time
         self.speed = resTraj[7]
@@ -76,11 +80,10 @@ class ThymioController(object):
                 
                 line_count+=1
 
-        self.pose = np.vstack((self.pose[1], self.pose[0] , self.pose[2])).T * 5
-        #print(self.pose)
+        self.pose = np.vstack((self.pose[1], np.array(self.pose[0])*1.5, self.pose[2])).T * 2
         self.orientation = np.vstack((self.orientation[0], self.orientation[1], self.orientation[2])).T
-        self.dtime = self.dtime[0]
-        self.speed = self.speed[0]
+        self.dtime = np.array(self.dtime[0]) * 0.5 # half time to have the correct time
+        self.speed = np.array(self.speed[0])
 
 
     def human_readable_pose2d(self, pose):
