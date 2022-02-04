@@ -101,12 +101,12 @@ class smoothing():
 
         out = []
         for ri in rid:
-            out.append(ri.predict(alpha[predictors]))
+            out.append(ri.predict(alpha[predictors]).T[0])
 
         # fig = plt.figure()
         # ax = plt.axes(projection='3d')
         # ax.scatter3D(data.x, data.y, data.z, cmap='black')
-        # ax.plot3D(out[0].T[0], out[1].T[0], out[2].T[0], 'orange')
+        # ax.plot3D(out[0], out[1], out[2], 'orange')
         # plt.show()
         # pdb.set_trace()
 
