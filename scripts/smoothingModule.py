@@ -28,7 +28,7 @@ class smoothing():
         tmpTime = self.smoothData(dtime)[0]
         
         self.data = {
-            "position": self.Ridge3D(coord), #self.smoothData(coord), 
+            "position": self.Ridge3D(coord), #self.smoothData(coord)
             "orientation": self.Ridge3D(orientation), #self.smoothData(orientation),
             "time": [np.where(tmpTime < 0, 0, tmpTime)][0], # to have only positive values
             "speed": self.smoothData(speed)[0]
@@ -149,7 +149,7 @@ class smoothing():
             distance = np.insert(distance, 0, 0)/distance[-1]
             
             # Build a list of the spline function, one for each dimension:
-            splines = [UnivariateSpline(distance, coords, k=3, s=.2) for coords in data.T]
+            splines = [UnivariateSpline(distance, coords, k=5, s=.2) for coords in data.T]
 
         out = []
         for spline in splines:
