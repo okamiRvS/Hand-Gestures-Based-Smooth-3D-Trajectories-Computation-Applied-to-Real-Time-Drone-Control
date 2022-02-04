@@ -203,7 +203,7 @@ class FullControll():
                 self.normalizedPoints.drawOrientationVector(img, roll, yaw, pitch)
 
                 # Execute commands
-                res = self.tracking.run(img, self.normalizedPoints, outputClass, probability, me, val, roll, yaw, pitch)
+                res = self.tracking.run(img, self.normalizedPoints, outputClass, probability, me, val, roll, yaw, pitch, self.isSimulation)
                 
                 if res is not None:
                     # Close video and return data
