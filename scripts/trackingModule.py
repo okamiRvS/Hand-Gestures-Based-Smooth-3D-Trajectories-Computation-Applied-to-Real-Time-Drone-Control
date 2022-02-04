@@ -179,7 +179,7 @@ class tracking():
         cv2.circle(img, positionDrone, radius=10, color=(0,0,255), thickness=10)
 
 
-    def run(self, img, normalizedPoints, outputClass, probability, me, val, roll, yaw, pitch):
+    def run(self, img, normalizedPoints, outputClass, probability, me, val, roll, yaw, pitch, isSimulation):
 
         lmList = normalizedPoints.lmList
         depth = normalizedPoints.zcoord
@@ -254,45 +254,46 @@ class tracking():
 
                 self.drawLog(img, (0,255,0), checkStart, val)
 
-            elif self.queueObj.checkGesture("up"):
-                me.send_rc_control(0, 0, 25, 0)
-                self.flag = False
-                time.sleep(0.05)
+            elif not isSimulation:
+                if self.queueObj.checkGesture("up"):
+                    me.send_rc_control(0, 0, 25, 0)
+                    self.flag = False
+                    time.sleep(0.05)
 
-            elif self.queueObj.checkGesture("down"):
-                me.send_rc_control(0, 0, -25, 0)
-                self.flag = False
-                time.sleep(0.05)
-            
-            elif self.queueObj.checkGesture("forward"):
-                me.send_rc_control(0, 25, 0, 0)
-                self.flag = False
-                time.sleep(0.05)
+                elif self.queueObj.checkGesture("down"):
+                    me.send_rc_control(0, 0, -25, 0)
+                    self.flag = False
+                    time.sleep(0.05)
+                
+                elif self.queueObj.checkGesture("forward"):
+                    me.send_rc_control(0, 25, 0, 0)
+                    self.flag = False
+                    time.sleep(0.05)
 
-            elif self.queueObj.checkGesture("backward"):
-                me.send_rc_control(0, -25, 0, 0)
-                self.flag = False
-                time.sleep(0.05)
+                elif self.queueObj.checkGesture("backward"):
+                    me.send_rc_control(0, -25, 0, 0)
+                    self.flag = False
+                    time.sleep(0.05)
 
-            elif self.queueObj.checkGesture("left"):
-                me.send_rc_control(25, 0, 0, 0)
-                self.flag = False
-                time.sleep(0.05)
+                elif self.queueObj.checkGesture("left"):
+                    me.send_rc_control(25, 0, 0, 0)
+                    self.flag = False
+                    time.sleep(0.05)
 
-            elif self.queueObj.checkGesture("right"):
-                me.send_rc_control(-25, 0, 0, 0)
-                self.flag = False
-                time.sleep(0.05)
+                elif self.queueObj.checkGesture("right"):
+                    me.send_rc_control(-25, 0, 0, 0)
+                    self.flag = False
+                    time.sleep(0.05)
 
-            elif self.queueObj.checkGesture("stop"):
-                me.send_rc_control(0, 0, 0, 0)
-                self.flag = False
-                time.sleep(0.05)
+                elif self.queueObj.checkGesture("stop"):
+                    me.send_rc_control(0, 0, 0, 0)
+                    self.flag = False
+                    time.sleep(0.05)
 
-            elif self.queueObj.checkGesture("land"):
-                me.land()
-                self.flag = False
-                time.sleep(0.05)
+                elif self.queueObj.checkGesture("land"):
+                    me.land()
+                    self.flag = False
+                    time.sleep(0.05)
 
             else:
                 self.drawLog(img, (0,0,255), checkStart, val)
@@ -375,7 +376,7 @@ class tracking():
         self.queueObj.addMeanAndMatch(val, outputClass, probability)
 
         # Send this to the drone otherwise it will land automatically
-        if self.flag:
+        if self.flag and not isSimulation:
             me.send_rc_control(0, 0, 0, 0)
 
 
