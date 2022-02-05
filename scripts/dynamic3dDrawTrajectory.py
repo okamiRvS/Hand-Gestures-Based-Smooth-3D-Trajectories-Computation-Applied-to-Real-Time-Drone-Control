@@ -10,7 +10,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 class dynamic3dDrawTrajectory():
 
-    def __init__(self, path):
+    def __init__(self, path, save3dPlot):
 
         plt.ion()
         self.fig = plt.figure()
@@ -29,7 +29,8 @@ class dynamic3dDrawTrajectory():
         self.start = self.ax.text3D(0, 0, 0, "", zdir='x', size=10, zorder=1, color='black') 
         self.end = self.ax.text3D(0, 0, 0, "", zdir='x', size=10, zorder=1, color='black')
 
-        self.path = path        
+        self.path = path
+        self.save3dPlot = save3dPlot    
         self.imgNum = 0
 
 
@@ -73,8 +74,9 @@ class dynamic3dDrawTrajectory():
             plt.draw()
             #plt.pause(0.5)
 
-            plt.savefig(f"{self.path}\\{self.imgNum}")
-            self.imgNum += 1
+            if self.save3dPlot:
+                plt.savefig(f"{self.path}_{self.imgNum}")
+                self.imgNum += 1
 
 
     def destroy(self):

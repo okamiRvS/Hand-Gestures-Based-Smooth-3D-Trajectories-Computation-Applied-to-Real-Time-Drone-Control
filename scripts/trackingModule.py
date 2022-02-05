@@ -11,7 +11,7 @@ import os
 
 class tracking():
 
-    def __init__(self, queueObj, skipEveryNsec, skipEveryNpoints, trajTimeDuration, log3D, path):
+    def __init__(self, queueObj, skipEveryNsec, skipEveryNpoints, trajTimeDuration, log3D, save3dPlot, path):
 
         self.queueObj = queueObj 
         self.currentState = "INIZIALIZATION"
@@ -22,7 +22,7 @@ class tracking():
         self.previous_mean_distance = -1
 
         if log3D:
-            self.drawTraj = d3dT.dynamic3dDrawTrajectory(path)
+            self.drawTraj = d3dT.dynamic3dDrawTrajectory(path, save3dPlot)
         self.log3D = log3D
 
         self.smoothing = sm.smoothing(skipEveryNpoints)

@@ -240,7 +240,7 @@ class FullControll():
         return self.tracking.height, self.tracking.width
 
 
-    def autoSet(self, path, isWebcam=True, resize=False, showPlot=True, isSimulation=False, allHandTransformed=True):
+    def autoSet(self, path, isWebcam=True, resize=False, showPlot=True, isSimulation=False, allHandTransformed=True, save3dPlot=False):
 
         # Set if webcam or drone camera source
         # True is webcam, False is drone camera
@@ -272,6 +272,7 @@ class FullControll():
                                 skipEveryNpoints=2, #4
                                 trajTimeDuration=20, # trajTimeDuration is in seconds
                                 log3D=showPlot,
+                                save3dPlot=save3dPlot,
                                 path=path) 
 
         # set variable
@@ -288,17 +289,49 @@ class FullControll():
         self.path = path
 
 
+def setLastIdx(PATH) -> int:
+    """
+    Create folder "self.VIDEO_DIR_PATH" if doesn't exist and return 1.
+    In general, return as index the number of video added +1.
+
+    If folder with n as name already exists, try to create folder
+    with n+1 as name, otherwise iterate.
+
+    Update self.VIDEO_DIR_PATH with folder where to put all files
+    """
+    
+    if not os.path.exists(PATH):
+        folder = os.path.join(PATH, str(1))
+        if os.name == 'posix': # if linux system
+            os.system(f"mkdir -p {folder}\\1")
+        if os.name == 'nt': # if windows system
+            os.system(f"mkdir {folder}\\1")
+
+        PATH = f"{folder}\\{str(1)}"
+        return PATH
+
+    nu = len(next(os.walk(PATH))[1]) + 1
+    while True:
+        # Count number of folders
+        folder = os.path.join(PATH, str(nu))
+        if not os.path.exists(folder):
+            if os.name == 'posix': # if linux system
+                os.system(f"mkdir -p {folder}")
+            if os.name == 'nt': # if windows system
+                os.system(f"mkdir {folder}")
+            
+            PATH = f"{folder}\\{nu}"
+            return PATH
+        else:
+            nu+=1
+
+
 def main():
 
-    PATH = os.path.join('src', 'tmp', 'tmp')
+    PATH = os.path.join('src', 'tmp')
 
-    if not os.path.exists(PATH):
-        if os.name == 'posix': # if linux system
-            os.system(f"mkdir -p {PATH}")
-            os.system(f"mkdir -p {PATH}")
-        if os.name == 'nt': # if windows system
-            os.system(f"mkdir {PATH}")
-            os.system(f"mkdir {PATH}")
+    # Path for save things
+    PATH = setLastIdx(PATH)
 
     isWebcam = True
     me = tello.Tello()
@@ -308,7 +341,7 @@ def main():
         print(me.get_battery())
 
     fullControll = FullControll()
-    fullControll.autoSet(path=PATH, isWebcam=isWebcam, resize=False, showPlot=True, allHandTransformed=True)
+    fullControll.autoSet(path=PATH, isWebcam=isWebcam, resize=False, showPlot=True, allHandTransformed=True, save3dPlot=True)
 
     fullControll.run(me)
 
