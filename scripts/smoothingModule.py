@@ -16,7 +16,7 @@ class smoothing():
     def setPoints(self, xdata, ydata, zdata, rolldata, yawdata, pitchdata, dtime, speed):
 
         # Computed the spline for the asked distances:
-        subdivision = len(xdata) * 3
+        subdivision = len(xdata) * 5
         self.alpha = np.linspace(0, 1, subdivision)
 
         coord = np.array([xdata, ydata, zdata]).T

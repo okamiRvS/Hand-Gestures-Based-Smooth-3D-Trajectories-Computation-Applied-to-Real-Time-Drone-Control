@@ -16,7 +16,7 @@ class keyboardControl:
 
     def __init__(self):
 
-        self.VIDEO_DIR_PATH = os.path.join('src', 'video_src')
+        self.PATH = os.path.join('src', 'video_src')
 
         ######################################################
         # PARAMETERS
@@ -41,37 +41,37 @@ class keyboardControl:
 
     def setLastIdx(self) -> int:
         """
-        Create folder "self.VIDEO_DIR_PATH" if doesn't exist and return 1.
+        Create folder "self.PATH" if doesn't exist and return 1.
         In general, return as index the number of video added +1.
 
         If folder with n as name already exists, try to create folder
         with n+1 as name, otherwise iterate.
 
-        Update self.VIDEO_DIR_PATH with folder where to put all files
+        Update self.PATH with folder where to put all files
         """
         
-        if not os.path.exists(self.VIDEO_DIR_PATH):
+        if not os.path.exists(self.PATH):
             if os.name == 'posix': # if linux system
-                os.system(f"mkdir -p {self.VIDEO_DIR_PATH}")
-                os.system(f"mkdir -p {self.VIDEO_DIR_PATH}\\1")
+                os.system(f"mkdir -p {self.PATH}")
+                os.system(f"mkdir -p {self.PATH}\\1")
             if os.name == 'nt': # if windows system
-                os.system(f"mkdir {self.VIDEO_DIR_PATH}")
-                os.system(f"mkdir {self.VIDEO_DIR_PATH}\\1")
+                os.system(f"mkdir {self.PATH}")
+                os.system(f"mkdir {self.PATH}\\1")
 
-            self.VIDEO_DIR_PATH = os.path.join(self.VIDEO_DIR_PATH, str(1))
+            self.PATH = os.path.join(self.PATH, str(1))
             return 1
 
-        nu = len(next(os.walk(self.VIDEO_DIR_PATH))[1]) + 1
+        nu = len(next(os.walk(self.PATH))[1]) + 1
         while True:
             # Count number of folders
-            folder = os.path.join(self.VIDEO_DIR_PATH, str(nu))
+            folder = os.path.join(self.PATH, str(nu))
             if not os.path.exists(folder):
                 if os.name == 'posix': # if linux system
                     os.system(f"mkdir -p {folder}")
                 if os.name == 'nt': # if windows system
                     os.system(f"mkdir {folder}")
                 
-                self.VIDEO_DIR_PATH = folder
+                self.PATH = folder
                 return nu
             else:
                 nu+=1
@@ -345,7 +345,7 @@ class keyboardControl:
 
         # Path for save things
         idx = self.setLastIdx()
-        path = f"{self.VIDEO_DIR_PATH}\\{idx}"
+        path = f"{self.PATH}\\{idx}"
 
         fullControll = fullControllModule.FullControll()
 
@@ -418,7 +418,7 @@ class keyboardControl:
 
         # Path for save things
         idx = self.setLastIdx()
-        path = f"{self.VIDEO_DIR_PATH}\\{idx}"
+        path = f"{self.PATH}\\{idx}"
 
         fullControll = fullControllModule.FullControll()
 
@@ -497,12 +497,13 @@ class keyboardControl:
 
         # Path for save things
         idx = self.setLastIdx()
-        path = f"{self.VIDEO_DIR_PATH}\\{idx}"
+        path = f"{self.PATH}\\{idx}"
 
         fullControll = fullControllModule.FullControll()
 
         # Reset values
-        fullControll.autoSet(path, isWebcam=self.isWebcam, resize=False, showPlot=False)
+        # save3dPlot works only if showPlot is True
+        fullControll.autoSet(path, isWebcam=self.isWebcam, resize=False, showPlot=True, save3dPlot=True)
 
         # Get the stream image
         print("Get the stream image...")
@@ -578,7 +579,7 @@ def main():
 
     # THIS IS TEST, IS ALWAYS isWebcam=True, DRONE DON'T FLY, VIDEO RECORDED FROME DRONE AND FROM WEBCAM
     # DETECTION TRAJECTORY FROM WEBCAM
-    kc.runDroneWebcam()
+    kc.test()
 
 
 if __name__ == "__main__":

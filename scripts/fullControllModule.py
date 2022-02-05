@@ -230,8 +230,7 @@ class FullControll():
 
             # Show frame
             cv2.imshow(self.nameWindowWebcam, img)
-            key = cv2.waitKey(1)
-            if key == 27: # exit on ESC
+            if cv2.waitKey(1) & 0xFF == ord('q'): # exit on ESC
                 break
 
 
@@ -341,7 +340,9 @@ def main():
         print(me.get_battery())
 
     fullControll = FullControll()
-    fullControll.autoSet(path=PATH, isWebcam=isWebcam, resize=False, showPlot=True, allHandTransformed=True, save3dPlot=True)
+
+    # save3dPlot works only if showPlot is True
+    fullControll.autoSet(path=PATH, isWebcam=isWebcam, resize=False, allHandTransformed=True, showPlot=True, save3dPlot=True)
 
     fullControll.run(me)
 

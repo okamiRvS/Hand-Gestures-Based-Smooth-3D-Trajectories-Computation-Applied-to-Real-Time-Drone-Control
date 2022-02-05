@@ -88,7 +88,12 @@ def Ridge3DEasy():
 
 def Ridge3D():
     #https://www.pluralsight.com/guides/linear-lasso-ridge-regression-scikit-learn
-    # for 30 gesti salvare r^2, RMSE sia del test che del train (75% e 25%)
+    #https://www.statology.org/adjusted-r-squared-in-python/
+    #https://towardsdatascience.com/what-are-the-best-metrics-to-evaluate-your-regression-model-418ca481755b
+    #https://towardsdatascience.com/20-popular-machine-learning-metrics-part-1-classification-regression-evaluation-metrics-1ca3e282a2ce
+    #https://www.kaggle.com/residentmario/model-fit-metrics/notebook
+    #https://scikit-learn.org/stable/modules/model_evaluation.html#r2-score
+    # for 1 gesto con k=10 gradi diversi e salvare r^2, MSE e RMSE
 
     #Setting seed for reproducibility
     np.random.seed(10)  

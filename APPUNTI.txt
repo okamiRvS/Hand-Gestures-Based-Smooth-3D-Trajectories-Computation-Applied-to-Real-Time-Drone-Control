@@ -169,6 +169,18 @@ to estimate = sia nome che verbo
 
 
 
+05/02/2021
+[done] salvare immagine prima e dopo traiettoria smussata
+[done] rimuovere da git immagine della traiettoria e rimuovere video src
+
 catturare solo il primo frame della mano quando questa è simbolo detect (serve per il roll, pitch and yaw)
-salvare immagine prima e dopo traiettoria smussata
-rimuovere da git immagine della traiettoria e rimuovere video src
+
+
+#https://www.pluralsight.com/guides/linear-lasso-ridge-regression-scikit-learn
+#https://www.statology.org/adjusted-r-squared-in-python/
+#https://towardsdatascience.com/what-are-the-best-metrics-to-evaluate-your-regression-model-418ca481755b
+#https://towardsdatascience.com/20-popular-machine-learning-metrics-part-1-classification-regression-evaluation-metrics-1ca3e282a2ce
+#https://www.kaggle.com/residentmario/model-fit-metrics/notebook
+# for 1 gesto con k gradi diversi e salvare r^2, MSE e RMSE
+
+fixare immagine output
