@@ -271,7 +271,8 @@ class FullControll():
                                 skipEveryNsec=0.25, #0
                                 skipEveryNpoints=2, #4
                                 trajTimeDuration=20, # trajTimeDuration is in seconds
-                                log3D=showPlot) 
+                                log3D=showPlot,
+                                path=path) 
 
         # set variable
         self.nameWindowWebcam = nameWindowWebcam
@@ -289,7 +290,16 @@ class FullControll():
 
 def main():
 
-    VIDEO_DIR_PATH = os.path.join('src', 'video_src')
+    PATH = os.path.join('src', 'tmp', 'tmp')
+
+    if not os.path.exists(PATH):
+        if os.name == 'posix': # if linux system
+            os.system(f"mkdir -p {PATH}")
+            os.system(f"mkdir -p {PATH}")
+        if os.name == 'nt': # if windows system
+            os.system(f"mkdir {PATH}")
+            os.system(f"mkdir {PATH}")
+
     isWebcam = True
     me = tello.Tello()
     
@@ -298,7 +308,7 @@ def main():
         print(me.get_battery())
 
     fullControll = FullControll()
-    fullControll.autoSet(path=VIDEO_DIR_PATH, isWebcam=isWebcam, resize=False, showPlot=True, allHandTransformed=True)
+    fullControll.autoSet(path=PATH, isWebcam=isWebcam, resize=False, showPlot=True, allHandTransformed=True)
 
     fullControll.run(me)
 

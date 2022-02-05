@@ -59,19 +59,19 @@ class smoothing():
         # ax.set_ylabel('y')
         # ax.set_zlabel('z')
         # ax.plot3D(po[:,0], po[:,1], po[:,2], 'black') 
-        # plt.show()   
+        # plt.show() 
 
         # Fit!
         distance = np.cumsum( np.sqrt(np.sum( np.diff(data, axis=0)**2, axis=1 )) )
         distance = np.insert(distance, 0, 0)/distance[-1]
-        distance = pd.DataFrame( np.column_stack( [distance, po[:,0], po[:,1], po[:,2]] ),columns=["dist", "x", "y", "z"])
+        data["dist"] = distance
 
         n_features = 7
         for i in range(2,n_features):  #power of 1 is already there
             colname = f"dist_{i}"
-            distance[colname] = distance["dist"]**i
+            data[colname] = data["dist"]**i
 
-        print(distance.head())
+        print(data.head())
         plt.show()
 
         # Define the predictors
@@ -82,11 +82,11 @@ class smoothing():
         # Build a list of the spline function, one for each dimension:
         rid = []
         clf = Ridge(alpha=1e-10)
-        rid.append(clf.fit(distance[predictors], distance[ ["x"] ]))
+        rid.append(clf.fit(data[predictors], data[ ["x"] ]))
         clf = Ridge(alpha=1e-10)
-        rid.append(clf.fit(distance[predictors], distance[ ["y"] ]))
+        rid.append(clf.fit(data[predictors], data[ ["y"] ]))
         clf = Ridge(alpha=1e-10)
-        rid.append(clf.fit(distance[predictors], distance[ ["z"] ]))
+        rid.append(clf.fit(data[predictors], data[ ["z"] ]))
 
         alpha = copy.deepcopy(self.alpha.reshape(-1,1))
         alpha = pd.DataFrame( np.column_stack( [alpha] ),columns=["alpha"])

@@ -11,7 +11,7 @@ import os
 
 class tracking():
 
-    def __init__(self, queueObj, skipEveryNsec, skipEveryNpoints, trajTimeDuration, log3D):
+    def __init__(self, queueObj, skipEveryNsec, skipEveryNpoints, trajTimeDuration, log3D, path):
 
         self.queueObj = queueObj 
         self.currentState = "INIZIALIZATION"
@@ -22,7 +22,7 @@ class tracking():
         self.previous_mean_distance = -1
 
         if log3D:
-            self.drawTraj = d3dT.dynamic3dDrawTrajectory()
+            self.drawTraj = d3dT.dynamic3dDrawTrajectory(path)
         self.log3D = log3D
 
         self.smoothing = sm.smoothing(skipEveryNpoints)
@@ -362,7 +362,7 @@ class tracking():
                     self.cleanTraj()
                     self.currentState = "INIZIALIZATION"
 
-                # If thumbsup then execute action
+                # If thumbsup return the cleaned traj
                 elif self.queueObj.checkGesture("ok"):
                     return xdata, ydata, zdata, rolldata, yawdata, pitchdata, dtime, speed
                         
@@ -378,7 +378,6 @@ class tracking():
         # Send this to the drone otherwise it will land automatically
         if self.flag and not isSimulation:
             me.send_rc_control(0, 0, 0, 0)
-
 
 
 def main():

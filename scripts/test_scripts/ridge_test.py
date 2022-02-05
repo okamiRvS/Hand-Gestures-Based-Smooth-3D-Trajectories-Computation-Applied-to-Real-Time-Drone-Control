@@ -1,4 +1,6 @@
 from sklearn.linear_model import Ridge
+from sklearn.metrics import mean_squared_error
+from sklearn.metrics import r2_score
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -85,14 +87,16 @@ def Ridge3DEasy():
 
 
 def Ridge3D():
+    #https://www.pluralsight.com/guides/linear-lasso-ridge-regression-scikit-learn
+    # for 30 gesti salvare r^2, RMSE sia del test che del train (75% e 25%)
 
     #Setting seed for reproducibility
     np.random.seed(10)  
 
     # Data for three-dimensional scattered points
     zdata = np.linspace(0, 15, 100)
-    xdata = np.sin(zdata) + np.random.normal(0, 0.1, len(zdata))
-    ydata = np.cos(zdata) + np.random.normal(0, 0.1, len(zdata))
+    xdata = np.sin(zdata) + np.random.normal(0, .3, len(zdata))
+    ydata = np.cos(zdata) + np.random.normal(0, .3, len(zdata))
     data = pd.DataFrame( np.column_stack( [xdata, ydata, zdata] ),columns=['x', 'y', 'z'])
 
     fig = plt.figure()
@@ -105,14 +109,14 @@ def Ridge3D():
     # Fit!
     distance = np.cumsum( np.sqrt(np.sum( np.diff(data, axis=0)**2, axis=1 )) )
     distance = np.insert(distance, 0, 0)/distance[-1]
-    distance = pd.DataFrame( np.column_stack( [distance, xdata, ydata, zdata] ),columns=["dist", "x", "y", "z"])
+    data["dist"] = distance
 
     n_features = 10
     for i in range(2,n_features):  #power of 1 is already there
         colname = f"dist_{i}"
-        distance[colname] = distance["dist"]**i
+        data[colname] = data["dist"]**i
 
-    print(distance.head())
+    print(data.head())
     plt.show()
 
     # Define the predictors
@@ -123,17 +127,25 @@ def Ridge3D():
     # Build a list of the spline function, one for each dimension:
     splines = []
     clf = Ridge(alpha=1e-10)
-    splines.append(clf.fit(distance[predictors], distance[ ["x"] ]))
+    splines.append(clf.fit(data[predictors], data[ ["x"] ]))
+    print(f'adj_r2_score x: { 1 - (1-clf.score(data[predictors], data[ ["x"] ]))*(len(data[ ["x"] ])-1)/(len(data[ ["x"] ])-data[predictors].shape[1]-1) }')
     clf = Ridge(alpha=1e-10)
-    splines.append(clf.fit(distance[predictors], distance[ ["y"] ]))
+    splines.append(clf.fit(data[predictors], data[ ["y"] ]))
+    print(f'adj_r2_score y: { 1 - (1-clf.score(data[predictors], data[ ["y"] ]))*(len(data[ ["y"] ])-1)/(len(data[ ["y"] ])-data[predictors].shape[1]-1) }')
     clf = Ridge(alpha=1e-10)
-    splines.append(clf.fit(distance[predictors], distance[ ["z"] ]))
-
-    alpha = np.linspace(0, 1, 100).reshape(-1,1)
-
+    splines.append(clf.fit(data[predictors], data[ ["z"] ]))
+    print(f'adj_r2_score z: { 1 - (1-clf.score(data[predictors], data[ ["z"] ]))*(len(data[ ["z"] ])-1)/(len(data[ ["z"] ])-data[predictors].shape[1]-1) }')
+    
     out = []
     for spline in splines:
-        out.append(spline.predict(distance[predictors]))
+        out.append(spline.predict(data[predictors]))
+
+    print(f'r2_score x: {r2_score(data[ ["x"] ], out[0])}')
+    print(f'r2_score y: {r2_score(data[ ["y"] ], out[1])}')
+    print(f'r2_score z: {r2_score(data[ ["z"] ], out[2])}')
+    print(f'RMSE x: {np.sqrt(mean_squared_error(data[ ["x"] ], out[0]))}')
+    print(f'RMSE y: {np.sqrt(mean_squared_error(data[ ["y"] ], out[1]))}')
+    print(f'RMSE z: {np.sqrt(mean_squared_error(data[ ["z"] ], out[2]))}')
 
     fig = plt.figure()
     ax = plt.axes(projection='3d')
@@ -145,26 +157,12 @@ def Ridge3D():
     ax.plot3D(out[0].T[0], out[1].T[0], out[2].T[0], 'orange')
     plt.show()
 
-
-def test():
-    n_samples, n_features = 100, 1
-
-    rng = np.random.RandomState(0)
-
-    y = rng.randn(n_samples)
-    X = rng.randn(n_samples, n_features)
-    clf = Ridge(alpha=1.0)
-    clf.fit(X, y)
-
-    plt.plot(X, y)
-    plt.show()
-
 def main():
 
     #Ridge2D()
     #Ridge3DEasy()
     Ridge3D()
-
+    
 
 if __name__ == "__main__":
     

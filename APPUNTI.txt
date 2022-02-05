@@ -166,3 +166,9 @@ to estimate = sia nome che verbo
 
 30/01
 [done] implementato ridge regression. Spline interpolation also avoids the problem of Runge's phenomenon, in which oscillation can occur between points when interpolating using high-degree polynomials. Stesso discorso riguarda la ridge regression
+
+
+
+catturare solo il primo frame della mano quando questa è simbolo detect (serve per il roll, pitch and yaw)
+salvare immagine prima e dopo traiettoria smussata
+rimuovere da git immagine della traiettoria e rimuovere video src
