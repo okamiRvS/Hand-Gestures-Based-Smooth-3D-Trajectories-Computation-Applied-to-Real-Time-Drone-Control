@@ -20,7 +20,7 @@ The goal of regression is to predict the value of one or more continuous target 
 together with corresponding target values ${t_n}$, the goal is to predict the value of $t$
 for a new value of $x$.
 
-\noindent From a probabilistic perspective, we aim to model the predictive distribution $p(t|x)$ because this expresses our uncertainty about the value of $t$ for each value of $x$.
+\noindent From a probabilistic perspective, the aim is to model the predictive distribution $p(t|x)$ because this expresses the uncertainty about the value of $t$ for each value of $x$.
 
 \subsection{Linear Models for Regression}
 \label{subsec:reglinuniv}
@@ -33,7 +33,7 @@ The simplest linear model for regression is one that involved a linear combinati
 	\end{equation}
 \end{Equation}
 
-\noindent where $x=(x_1,...,x_D)^T$. This is often simply known as linear regression. The key property of this model is that it is a linear function of the parameters $w_i$, but also of $x_i$ and establishes significant limitations on the model. It is possibile extend the class of models by considering linear combinations of fixed nonlinear functions of the input variables:
+\noindent where $x=(x_1,...,x_D)^T$. This is often simply known as linear regression. The key property of this model is that it is a linear function of the parameters $w_i$, but also of $x_i$ and establishes significant limitations on the model. It is possible extend the class of models by considering linear combinations of fixed nonlinear functions of the input variables:
 \begin{Equation}[H]
 	\centering
 	\begin{equation} \label{eq:lincombbasis}
@@ -50,31 +50,31 @@ The simplest linear model for regression is one that involved a linear combinati
 	\begin{equation} \label{eq:vectlincomb}
 		y(x,w)=\sum_{j=0}^{M-1}w_j \phi_j(x) = w^T\phi(x)
 	\end{equation}
-	\caption[Linear combinations of fixed nonlinear basis functions.]{By using non linear basis functions, we allow the function $y(x,w)$ to be a non linear function of the input vector $x$.}
+	\caption[Linear combinations of fixed nonlinear basis functions.]{By using non linear basis functions, the function $y(x,w)$ can be a non linear function of the input vector $x$.}
 \end{Equation}
 
 \noindent where $w=(w_0,...,w_{M-1})$ and $\phi=(\phi_0,...,\phi_{M-1})^T$. \\
 
 \noindent A particle example of this model where there is a single input variable $x$ is the polynomial regression. The basis functions take the form of powers of $x$ so that $\phi_j(x)=x^j$.
 
-\noindent There are other possibile choices for the basis functions as:
+\noindent There are other possible choices for the basis functions as:
 
 \begin{Equation}[H]
 	\centering
 	\begin{equation} \label{eq:gausbasfun}
-		\resizebox{.3\hsize}{!}{$ \phi_j(x)=e^{\frac{-(x-u_j)^2}{2s^2}} $}
+		\resizebox{.25\hsize}{!}{$ \phi_j(x)=e^{\frac{-(x-u_j)^2}{2s^2}} $}
 	\end{equation}
 	\caption[Gaussian basis function.]{These are usually referred to as "Gaussian" basis functions.}
 \end{Equation}
 
 \noindent where $u_j$ regulates the locations of the basis functions in input space, while the parameter $s$ is their spatial scale.
-\noindent We can use simply the identity basis functions in which the vector $\phi(x)=x$.
+\noindent The identity basis functions in which the vector $\phi(x)=x$ can be simply used.
 
 \subsection{Normal equations}
 \label{subsec:reglinmulnormeq}
 % Bishop -pattern recognition and machine learning (pg. 25 intro chap 1.1)
 %https://en.wikipedia.org/wiki/Mean_squared_error
-The values of the coefficients will be determined by fitting the polynomial to the training data. This can be done by minimizing an error function that measures the misfit between the function $y(x, w)$, for any given value of $w$, and the training set data points. One simple choice of error function, which is widely used, is given by the \gls{sse} between the predictions $y(x_n, w)$ for each data point $x_n$ and the corresponding target values $t_n$ (called also sum of squares regression \cite[]{sum-squares}), so that we minimize:
+The values of the coefficients will be determined by fitting the polynomial to the training data. This can be done by minimizing an error function that measures the misfit between the function $y(x, w)$, for any given value of $w$, and the training set data points. One simple choice of error function, which is widely used, is given by the \gls{sse} between the predictions $y(x_n, w)$ for each data point $x_n$ and the corresponding target values $t_n$ (called also sum of squares regression \cite[]{sum-squares}), so that the following is minimised:
 
 \begin{Equation}[H]
 	\centering
@@ -86,7 +86,7 @@ The values of the coefficients will be determined by fitting the polynomial to t
 
 \noindent where the factor of 1/2 is included for mathematical convenience. It is a nonnegative quantity that would be zero if, and only if, the function $y(x, w)$ were to pass exactly through each training data point.
 
-\noindent We can solve the curve fitting problem by choosing the value of $w$ for which $E(w)$ is as small as possible. Because the error function is a quadratic function of the coefficients $w$, its derivatives with respect to the coefficients will be linear in the elements of $w$, and so the minimization of the error function has a unique solution $w^*$. The resulting polynomial is given by the function $y(x, w^*)$.
+\noindent The curve fitting problem can be solved by choosing the value of $w$ for which $E(w)$ is as small as possible. Because the error function is a quadratic function of the coefficients $w$, its derivatives with respect to the coefficients will be linear in the elements of $w$, and so the minimization of the error function has a unique solution $w^*$. The resulting polynomial is given by the function $y(x, w^*)$.
 
 % Leggere gli articoli che chiariscono differenza tra MSE e RSS...
 %https://stats.stackexchange.com/questions/73540/what-is-the-relationship-between-the-mean-squared-error-and-the-residual-sum-of
@@ -101,7 +101,7 @@ The values of the coefficients will be determined by fitting the polynomial to t
 
 % Derivate of matrix form
 % https://math.stackexchange.com/questions/756679/least-squares-residual-sum-of-squares-in-closed-form/757130#757130
-\noindent We can write (\ref{eq:sumsquarereg}) in matrix notation as:
+\noindent The formula (\ref{eq:sumsquarereg}) can be written in matrix notation as:
 
 \begin{Equation}[H]
 	\centering
@@ -147,7 +147,7 @@ The values of the coefficients will be determined by fitting the polynomial to t
 	\caption[Weights of $M-1$ features and target of $N$ examples.]{Weights of $M-1$ features and target of $N$ examples.}
 \end{Equation}
 
-\noindent Therefore, we have to solve the optimization problem finding the minimum of the cost function $E(w)$:
+\noindent Therefore, the optimization problem has to be solved finding the minimum of the cost function $E(w)$:
 \begin{Equation}[H]
 	\centering
 	\begin{equation} \label{eq:mincostregr}
@@ -156,7 +156,7 @@ The values of the coefficients will be determined by fitting the polynomial to t
 	\caption[Optimization problem for ridge regression.]{The goal is to find the weight $w$ that minimize the cost function $E(w)$.}
 \end{Equation}
 
-\noindent So we compute the gradient and solving for $w$ we obtain:
+\noindent The gradient is computed and solving for $w$ the result obtained is:
 \begin{Equation}[H]
 	\centering
 	\begin{equation} \label{eq:normeq}
@@ -170,9 +170,9 @@ The values of the coefficients will be determined by fitting the polynomial to t
 	\caption[Normal equations.]{They are known as the normal equations for the least squares problem}
 \end{Equation}
 
-\noindent This is the real minimum because if we take the second derivative $ \nabla^2 E(w) = \phi^T \phi $ and this is a symmetric matrix, so it's also positive definitive matrix, which means that this objective function that we try to minimize is convex. So if we find a stationary point, such that derivative is zero, we also find a global minium. Furthermore, to find a solution we need to invert this matrix $ \phi^T \phi $, so we need some condition that assure this is invertible and this is the case when the columns of the matrix are linearly independent. \\
+\noindent This is the real minimum because if the second derivative $\nabla^2 E(w) = \phi^T \phi$ is taken, this is a symmetric matrix, so it's also positive definitive matrix, which means that this objective function that is being minimized is convex. So if a stationary point is found, such that derivative is zero, a global minimum is also found. Furthermore, to find a solution the matrix $\phi^T \phi$ needs to be inverted, so some condition that assures this is invertible is needed, and this is the case when the columns of the matrix are linearly independent. \\
 
-\noindent Once we find the solution $w^*$ and we receive a new data point that we never seen during training, we just predict the new target $t^*$ as:
+\noindent Once the solution $w^*$ is found and a new data point that has never been seen during training is received, the new target $t^*$ is predicted as:
 
 \begin{Equation}[H]
 	\centering
@@ -186,23 +186,23 @@ The values of the coefficients will be determined by fitting the polynomial to t
 
 \section{The Problem Of Overfitting}
 \label{subsec:poverfitting}
-If we use a set of features that is too expressive, for example a ten polynomial grade ($x^{10}$), then this interpolates very close our training data, because we have a model with 10 parameters where we can perfectly represents the data points. The risk is that the model overfit data points (see Fig. \ref{fig:overunderfit} (center)).
+If an expensive set of features is used (for example a ten polynomial grade $x^{10}$), then the model interpolates very close the training data, because there is a model with $10$ parameters where the data points can be perfectly represented. The risk is that the model overfit data points (see Fig. \ref{fig:overunderfit} (center)).
 
 \begin{figure}[H]
 	\begin{minipage}{\textwidth}
 		\centering
-		\includegraphics[width=.8\textwidth]{images/overunderfit}
-		\caption[Overfitting and Underfitting.]{Image by "Applied Supervised Learning with R" book \footnote{\url{https://subscription.packtpub.com/book/data/9781838556334/7/ch07lvl1sec82/underfitting-and-overfitting}}. We can see high bias resulting in an oversimplified model (that is, underfitting); high variance resulting in overcomplicated models (that is, overfitting); and lastly, striking the right balance between bias and variance.}
+		\includegraphics[width=.95\textwidth]{images/overunderfit}
+		\caption[Overfitting and Underfitting.]{Image by "Applied Supervised Learning with R" book \footnote{\url{https://subscription.packtpub.com/book/data/9781838556334/7/ch07lvl1sec82/underfitting-and-overfitting}}. It is possible to see high bias resulting in an oversimplified model (that is underfitting); high variance resulting in overcomplicated models (that is overfitting); and lastly, striking the right balance between bias and variance.}
 		\label{fig:overunderfit}
 	\end{minipage}
 \end{figure}
 
-\noindent On the other hand, if our model is not too expressive and not too complex our data will be linearly representable in the feature space and this means that the performance will be very poor (see Fig. \ref{fig:overunderfit} (left)). We want a trade-off between fits data and being able to generalize (see Fig. \ref{fig:overunderfit} (center)).
+\noindent On the other hand, if the model is not too expressive and not too complex our data will be linearly representable in the feature space and this means that the performance will be very poor (see Fig. \ref{fig:overunderfit} (left)). A trade-off between fits data and being able to generalize (see Fig. \ref{fig:overunderfit} (center)) is desired.
 
 \subsection{Regularization}
-We want to penalize for some features with parameters with high values, if our model is overfitting is very likely that the parameters of our model will have a big magnitude, this means that also the features supply to this parameters will be higher and very low and this cause a lot of problems. \\
+Some features with high values parameters have been penalized, if the model is overfitting, it is very likely that its parameters will have a big magnitude. This means that also the features that supply to these parameters will be higher and very low and this can cause a lot of problems. \\
 
-\noindent In order to control over-fitting we introduce the idea of adding a regularization term to an error fuction, so that the total error function to minimized takes the form:
+\noindent In order to control over-fitting the idea of adding a regularization term to an error function is introduced, so that the total error function to minimized takes the form:
 
 \begin{Equation}[H]
 	\centering
@@ -213,7 +213,7 @@ We want to penalize for some features with parameters with high values, if our m
 	\end{equation}
 \end{Equation}
 
-\noindent Where $\lambda$ is the regularization coefficient and it is the trade-off between how we well fit training set and how to establish the parameters $w$ with low values, therefore having simple hypotesys avoiding over-fitting. $E_D$ is the error based on dataset, while $E_W$ is based on weights.
+\noindent Where $\lambda$ is the regularization coefficient and it is the trade-off between how well fit training set is and how to establish the parameters $w$ with low values, therefore having simple hypotesys avoiding over-fitting. $E_D$ is the error based on dataset, while $E_W$ is based on weights.
 
 \subsection{Cost Function}
 \label{subsec:regcostfun}
@@ -232,9 +232,9 @@ One of the simplest forms of regularizer is given by the sum-of-squares of the w
 \noindent where $||w||_2$ is the euclidean norm $\sqrt{ \sum_{i=1}^{n} x^2_i}$. \\
 
 %https://en.wikipedia.org/wiki/Ridge_regression
-\noindent This is also called ridge regression, a method of estimating the coefficitents of multiple-regression models in scenarios where indipendent variables are highly correlated.
+\noindent This is also called ridge regression, a method of estimating the coefficients of multiple-regression models in scenarios where independent variables are highly correlated.
 
-\noindent If we also consider the sum-of-squares error function given by:
+\noindent If the sum-of-squares error function given by the following formula is considered:
 \begin{Equation}[H]
 	\centering
 		\begin{equation} \label{eq:sumsqinverted}
@@ -256,7 +256,7 @@ One of the simplest forms of regularizer is given by the sum-of-squares of the w
 		\caption[Loss Function for Ridge Regression]{This particular choice of regularizer is known in the machine learning literature as weight decay because in sequential learning algorithms, it encourages weight values to decay towards zero.}
 \end{Equation}
 
-\noindent Setting the gradient of $E(w)$ \gls{wrt} $w$ to zero, and solving for $w$, we obtain:
+\noindent Setting the gradient of $E(w)$ \gls{wrt} $w$ to zero, and solving for $w$, the result obtained is:
 
 \begin{Equation}[H]
 	\centering
@@ -268,15 +268,15 @@ One of the simplest forms of regularizer is given by the sum-of-squares of the w
 		\caption[Ridge regression solution]{This is an extension of the least-squares solution \ref{eq:normeq}.}
 \end{Equation}
 
-\noindent From this side it denotes a better version than before because is also possibile prove that ($\lambda I + \phi^T \phi$) is always invertible if $\lambda > 0$, therefore $w^*$ always exists.
+\noindent From this side it denotes a better version than before because is also possible prove that ($\lambda I + \phi^T \phi$) is always invertible if $\lambda > 0$, therefore $w^*$ always exists.
 
 \subsection{(Batch) Gradient Descent}
 \label{subsec:batchgradientdescen}
 \noindent Gradient descent is a first-order iterative optimization algorithm for finding the minimum $w$ of a function $E(w)$. To achieve this goal, it performs two steps iteratively, until convergence:
 
 \begin{itemize}
-	\item Compute the slope (gradient) that is the first-order derivative of the function at the current point
-	\item Move-in the opposite direction of the slope increase from the current point by the computed amount
+	\item Compute the slope (gradient) that is the first-order derivative of the function at the current point;
+	\item Move-in the opposite direction of the slope increase from the current point by the computed amount.
 \end{itemize}
 
 %it should edit this pic to avoid copyright...
@@ -288,7 +288,7 @@ One of the simplest forms of regularizer is given by the sum-of-squares of the w
 \end{figure}
 
 % https://stats.stackexchange.com/questions/539137/why-use-mse-instead-of-sse-as-cost-function-in-linear-regression
-\noindent Let's now using \gls{mse}, instead of using (\ref{eq:sumsquarereg}) due to the fact that we are able to reach obvious benefits: first of all to keep the value in a expressible range usable by computers, then to make the results comparable across samples regardless of the size of the sample. Infact, the \gls{sse} depends on how many terms are added up (note the case of millions/billions of data points). In addition, using \gls{sse} or \gls{mse} it still leads to find an equivalent solution.
+\noindent Let's now use \gls{mse}, instead of using (\ref{eq:sumsquarereg}) due to the fact that it is possible to reach obvious benefits: first of all to keep the value in a expressible range usable by computers, then to make the results comparable across samples regardless of the size of the sample. In fact, the \gls{sse} depends on how many terms are added up (note the case of millions/billions of data points). In addition, using \gls{sse} or \gls{mse} it still leads to find an equivalent solution.
 
 \begin{Equation}[H]
 	\centering
@@ -297,10 +297,10 @@ One of the simplest forms of regularizer is given by the sum-of-squares of the w
 			E_D(w) = \frac{1}{2N} \sum_{n=1}^{N} [y(x_n,w)-t_n]^2
 		\end{aligned}
 	\end{equation}
-	\caption[Mean Squared Error.]{Mean Squared Error. $1/2$ is added, as in \gls{sse}, so the derivative doesn't need a constant out front. We get away with it because the minima of $E_D(w)$ and $E_D(w) / 2$ are achieved at the same value(s) of $w$.}
+	\caption[Mean Squared Error.]{Mean Squared Error. $1/2$ is added, as in \gls{sse}, so the derivative doesn't need a constant out front. The problem is not an issue, because the minima of $E_D(w)$ and $E_D(w) / 2$ are achieved at the same value(s) of $w$.}
 \end{Equation}
 
-\noindent Concerning the regularisation term $E_W(w)$ (\ref{eq:regularizer}), we could also write:
+\noindent Concerning the regularisation term $E_W(w)$ (\ref{eq:regularizer}), it could have been written:
 \begin{Equation}[H]
 	\centering
 	\begin{equation} \label{eq:regnew}
@@ -311,7 +311,7 @@ One of the simplest forms of regularizer is given by the sum-of-squares of the w
 	\caption[Regularisation term.]{Regularisation term.}
 \end{Equation}
 
-\noindent Note that, conventionally, $m$ starts from $1$, and not from $0$, even if it exists (\ref{eq:weightsandtarget}). Nevertheless, it's important to know that nothing change consistently even if we consider the 0th weight. 
+\noindent Note that, conventionally, $m$ starts from $1$, and not from $0$, even if it exists (\ref{eq:weightsandtarget}). Nevertheless, it's important to know that nothing change consistently even if the 0th weight is considered. 
 
 \noindent Combining together following (\ref{eq:fullreg}) 
 
@@ -329,7 +329,7 @@ One of the simplest forms of regularizer is given by the sum-of-squares of the w
 \noindent Have some function $E(w)$ \\
 \noindent Want $\operatorname*{arg\,min}_w  E(w))$ \\
 
-\noindent Keep changing $w$ to reduce $E(w)$ until we hopefully end up at a minimum:
+\noindent Keep changing $w$ to reduce $E(w)$ until a minimum is hopefully reached:
 
 \begin{Equation}[H]
 	\centering
@@ -361,7 +361,7 @@ One of the simplest forms of regularizer is given by the sum-of-squares of the w
 
 \section{Artificial Neural Networks}
 \label{sec:nn}
-The term  \gls{nn} has its origins in attempts to find mathematical representations of information processing in biological systems. In fact, \glspl{ann}, subset of \gls{ml} field, are models inspired from the biological performance of human brain \cite[]{inbook}. 
+The term \gls{nn} has its origins in attempts to find mathematical representations of information processing in biological systems. In fact, \glspl{ann}, subset of \gls{ml} field, are models inspired from the biological performance of human brain \cite[]{inbook}. 
 
 \begin{figure}[H]
 	\centering
@@ -370,23 +370,23 @@ The term  \gls{nn} has its origins in attempts to find mathematical representati
 	\label{fig:bioneuron}
 \end{figure}
 
-\noindent Neurons have cel body (fig. \ref{fig:bioneuron}) and a number of input wires called dendrites. Neurons also have an output wire called axon, used to send signals to other neurons. At a simplistic level the neuron is a computational unit that gets a number of inputs through its input wires, then does some computation and finally it sends outputs to other neurons connected to it in the brain. \\
+\noindent Neurons have cell body (fig. \ref{fig:bioneuron}) and a number of input wires called dendrites. Neurons also have an output wire called axon, used to send signals to other neurons. At a simplistic level, the neuron is a computational unit that gets a number of inputs through its input wires, does some computation, and finally it sends outputs to other neurons connected to it in the brain. \\
 
 \subsection{Feedforward Fully-Connected Neural Networks}
 \label{nn:feedforward}
 
-\noindent In (fig. \ref{fig:nn}) is visible a \gls{nn}, seen as mathematical model. It's just a group of this different neurons strung together. Trying to underline an analogy with the biological systems: circles identify the cell body where they are feeded with some inputs that pass through the input wires, similar to the dendrites. The neuron does some computation and outputs some value on an output wire, where in the biological neuron it identifies the axon.
+\noindent In (fig. \ref{fig:nn}) it is possible to see a \gls{nn}, seen as mathematical model. It is just a group of these different neurons strung together. Trying to underline an analogy with the biological systems: circles identify the cell body where they are fed with some inputs that pass through the input wires, similar to the dendrites. The neuron does some computation and outputs some value on an output wire, where in the biological neuron it identifies the axon.
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=.7\textwidth]{images/NN}
-	\caption[Feed forward neural network.]{The image graphically shows a \gls{nn} with three layers (or two hidden layers). The input layer has $M^{(0)}$ neurons and the output layer has $K$ outputs. Neurons are organized in  layers to allow parallel copmutation to avoid cyclic dependendices. The process of computing \gls{nn} outputs from inputs is called forward propagation. This kind of network is also called Multi-layer perceptron.}
+	\caption[Feed forward neural network.]{The image graphically shows a \gls{nn} with three layers (or two hidden layers). The input layer has $M^{(0)}$ neurons and the output layer has $K$ outputs. Neurons are organized in  layers to allow parallel computation to avoid cyclic dependencies. The process of computing \gls{nn} outputs from inputs is called forward propagation. This kind of network is also called Multi-layer perceptron.}
 	\label{fig:nn}
 \end{figure}
 
 \noindent The $z^{(l)}_m$ are neurons, each takes its input values and computes a single output value from them. Neurons are organized in layers $1,...,L$ and usually the starting input is considered the 0th layer. Inputs $x_1,...,x_D$ are occasionally called input layer/neurons (even though they do not compute anything). The output of the entire network is then $y=z^{(L)}$, called output layer. Instead, the internal layers are called hidden layers. Each layer $l\in \{1,...,L\}$ has $M^{(l)}$ neurons.
 
-\noindent $M^{(1)}$ neurons perform a preceptron-like computation:
+\noindent $M^{(1)}$ neurons perform a perceptron-like computation:
 
 \begin{Equation}[H]
 	\centering
@@ -419,7 +419,7 @@ The term  \gls{nn} has its origins in attempts to find mathematical representati
 	\end{equation}
 \end{Equation}
 
-\noindent where $m=1,...,M^{(1)}$ and $l=2,...,L$. Weights $w$ are usually indendent for each step. Additionally define $z^{(0)}$ to be the input, i.e.
+\noindent where $m=1,...,M^{(1)}$ and $l=2,...,L$. Weights $w$ are usually independent for each step. Additionally define $z^{(0)}$ to be the input, i.e.
 
 \begin{Equation}[H]
 	\centering
@@ -444,12 +444,12 @@ The term  \gls{nn} has its origins in attempts to find mathematical representati
 	\begin{equation} \label{eq:forwpropag}
 		z^{(l)} = f( W^{(l)} z^{(l-1)} + b^{(l)})
 	\end{equation}
-	\caption[Forward propagation.]{Function that idetifies input transformation at each step $l$ of the net.}	
+	\caption[Forward propagation.]{Function that identifies input transformation at each step $l$ of the net.}	
 \end{Equation}
 
 \noindent The weights $w$ are directed connections between the neurons, e.g. the neurons of layer 2 are connected to the ones of layer 1 by the weights $w^{(2)}_{mn}, m=1,...M^{(1)}, n=1,...,M^{(2)}$. The bias $b$ varies according to the propensity of the neuron to activate, influencing its output. \\
 
-\noindent $f()$ is an activation functions and need to be differentiable, because we wish to apply gradient descent training. For the hidden layers of the nework, the activation function must be nonlinear, because multiple linear computations can be collapsed to a single one, therefore in order to gain power from iterative computation we thus need nonlinear steps.
+\noindent $f()$ is an activation function and needs to be differentiable, so that gradient descent training is applicable. For the hidden layers of the network, the activation function must be nonlinear, because multiple linear computations can be collapsed to a single one, therefore in order to gain power from iterative computation, nonlinear steps are needed.
 
 \noindent Many possible activation functions for the hidden layers of a \gls{nn} exist:
 \begin{itemize}
@@ -459,12 +459,12 @@ The term  \gls{nn} has its origins in attempts to find mathematical representati
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=.7\textwidth]{images/old_act_fun}
+	\includegraphics[width=.9\textwidth]{images/old_act_fun}
 	\caption[Image of a human neuron.]{Neuron and myelinated axon, with signal flow from inputs at dendrites to outputs at axon terminals. The signal represents a short electrical pulse called 'spike'.}
 	\label{fig:old_act_fun}
 \end{figure}
 
-\noindent One of the key characteristics of modern deep learning system is to use non-saturated activation function (e.g. ReLU) to replace its saturated counterpart (e.g. sigmoid, tanh). The advantage of using non-saturated activation function lies in two aspects: the first is to solve the so called "exploding/vanishing gradient" \cite[]{bengio1994learning}, in particular on the difficulty of training \gls{rnn} \cite[]{pascanu2013difficulty}, while the second is to accelerate the convergence speed. More sophisticated activation function as the "leaky ReLU" trying to solve the dying ReLU problem \cite[]{LeakyReL95:online}. In contrast to ReLU, in which the negative part is totally dropped, leaky ReLU assigns a noon-zero slope to it. Leaky ReLU and its variants are consistently better than ReLU in \gls{cnn} \cite[]{xu2015empirical}.
+\noindent One of the key characteristics of modern deep learning system is to use non-saturated activation function (e.g. ReLU) to replace its saturated counterpart (e.g. sigmoid, tanh). The advantage of using non-saturated activation function lies in two aspects: the first is to solve the so called "exploding/vanishing gradient" \cite[]{bengio1994learning}, in particular on the difficulty of training \gls{rnn} \cite[]{pascanu2013difficulty}, while the second is to accelerate the convergence speed. More sophisticated activation function as the "leaky ReLU" try to solve the dying ReLU problem \cite[]{LeakyReL95:online}. In contrast to ReLU, in which the negative part is totally dropped, leaky ReLU assigns a non-zero slope to it. Leaky ReLU and its variants are consistently better than ReLU in \gls{cnn} \cite[]{xu2015empirical}.
 
 \noindent Leaky Rectified linear activation is introduced in acoustic model \cite[]{maas2013rectifier}. Mathematically, it is defined as follows:
 
@@ -477,21 +477,21 @@ The term  \gls{nn} has its origins in attempts to find mathematical representati
 			x & \text{otherwise}
 		\end{cases}
 	\end{equation}
-	\caption[Leaky Rectified linear activation.]{Function that idetifies input transformation at each step $l$ of the net.}
+	\caption[Leaky Rectified linear activation.]{Function that identifies input transformation at each step $l$ of the net.}
 \end{Equation}
 
 \noindent where $a$ is a fixed parameter in range $(1; +\inf)$. In original paper, the authors suggest to set $a$ to a large number like $100$.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=.7\textwidth]{images/leaky_relu}
+	\includegraphics[width=.65\textwidth]{images/leaky_relu}
 	\caption[Leaky Rectified linear activation.]{Neuron and myelinated axon, with signal flow from inputs at dendrites to outputs at axon terminals. The signal represents a short electrical pulse called 'spike'.}
 	\label{fig:leakyrelu}
 \end{figure}
 
 \subsection{\gls{nn} Setup for Classification}
 \label{nn:nnclassification}
-For a classification task with $K$ classes, we use a $K$-idmendional output layer. A sample $x \in R^D$ is classified as belonging to class $k$ if the output neuron $y_k$ has the maximal value:
+For a classification task with $K$ classes, a $K$-dimensional output layer is used. A sample $x \in R^D$ is classified as belonging to class $k$ if the output neuron $y_k$ has the maximal value:
 
 \begin{Equation}[H]
 	\centering
@@ -515,7 +515,7 @@ For a classification task with $K$ classes, we use a $K$-idmendional output laye
 	\end{equation}
 \end{Equation}
 
-\noindent The advantage is that we can derive a differentiable measure of the quality of the output on theoretical grounds, using probability theory. In order to make the network output a probability distribution, we take exponentials and normalize. This is the softmax nonlinearity:
+\noindent The advantage is that a differentiable measure of the quality of the output on theoretical grounds is derivable, using probability theory. In order to make the network output a probability distribution, exponentials are taken and normalized. This is the softmax nonlinearity:
 
 \begin{Equation}[H]
 	\centering
@@ -529,7 +529,7 @@ For a classification task with $K$ classes, we use a $K$-idmendional output laye
 
 \noindent The learning process is structured as a non-convex optimisation problem in which the aim is to minimise a cost function, which measures the distance between a particular solution and an optimal one.
 
-\noindent If we assume a \gls{nn} with softmax output, we can compute the loss by measuring the cross-entropy between the output distribution and the target distribution.
+\noindent If a \gls{nn} with softmax output is assumed, can be computed the loss by measuring the cross-entropy between the output distribution and the target distribution.
 
 \noindent Encoding the target in one-hot style, e.g. if a sample belongs to class k, the target is:
 
@@ -540,7 +540,7 @@ For a classification task with $K$ classes, we use a $K$-idmendional output laye
 	\end{equation}
 \end{Equation}
 
-\noindent We treat this as a probability distribution: in an ideal world, a perfect hypothesis $y$ would exactly match this $t$, assigning probability $1$ to the correct class, and probability $0$ otherwise. The cross-entropy loss is defined as:
+\noindent This is treated as a probability distribution: in an ideal world, a perfect hypothesis $y$ would exactly match this $t$, assigning probability $1$ to the correct class, and probability $0$ otherwise. The cross-entropy loss is defined as:
 
 \begin{Equation}[H]
 	\centering
@@ -550,20 +550,20 @@ For a classification task with $K$ classes, we use a $K$-idmendional output laye
 	\caption[Cross-entropy loss.]{Cross-entropy loss.}
 \end{Equation}
 
-\noindent The intuition about the cross-entropy corresponds to the number of additional bits needed to encode the correct output, given that we have access to the (possibly wrong) prediction of the network. One property of the cross-entropy loss is that is always non-negative. For efficiency and numerical stability, one should merge softmax loss and cross-entropy criterion into one function:
+\noindent The intuition about the cross-entropy corresponds to the number of additional bits needed to encode the correct output, given that the (possibly wrong) prediction of the network is accessible. One property of the cross-entropy loss is that is always non-negative. For efficiency and numerical stability, one should merge softmax loss and cross-entropy criterion into one function:
 
 \begin{Equation}[H]
 	\centering
 	\begin{equation}
 		E_{CE+SM} = -\sum_{k}(t_k \, \log S_k(y))
 	\end{equation}
-	\caption[Softmax cross entropy.]{To train the network with backpropagation, you need to calculate the derivative of the loss. In the general case, that derivative can get complicated, but using the softmax and the cross entropy loss, that complexity fades away.}
+	\caption[Softmax cross entropy.]{To train the network with backpropagation, the calculation of the derivative of the loss is needed. In the general case, that derivative can get complicated, but using the softmax and the cross entropy loss, that complexity fades away.}
 	\label{eq:softmaxcrossentr}
 \end{Equation}
 
 \subsection{Optimisation algorithms}
 \label{nn:optmalgo}
-The choice of optimization algorithms strongly influence the effectiveness of the learning process as they update and calculate the appropriate and optimal values of that model. Specifically if we consider the gradient descent, the most popular optimization strategy used in machine learning, the extent of the update is determined by the learning rate $\lambda$, which guarantees convergence to the global minimum for convex error surfaces and to a local minimum for non-convex surfaces. By the way, there are better optimization as the non linear conjugate gradient \cite[]{conjugategradient}, BFGS, the improved version to decrease memory usage L-BFGS \cite[]{saputro2017limited}, etc... the main advantages are that no need to manually pick $\lambda$ and often are faster than gradient descent, although more complex algorithms. \\
+The choice of optimization algorithms strongly influences the effectiveness of the learning process, as they update and calculate the appropriate and optimal values of that model. Specifically, if the gradient descent is considered, which is the most popular optimization strategy used in machine learning, the extent of the update is determined by the learning rate $\lambda$, which guarantees convergence to the global minimum for convex error surfaces and to a local minimum for non-convex surfaces. By the way, there are better optimization as the non linear conjugate gradient \cite[]{conjugategradient}, BFGS, the improved version to decrease memory usage L-BFGS \cite[]{saputro2017limited}, etc... the main advantages are that there is no need to manually pick $\lambda$ and often are faster than gradient descent, although more complex algorithms. \\
 
 \noindent The optimiser chosen for this thesis project is Adam, an algorithm for first-order gradient-based optimisation of stochastic objective functions, based on adaptive estimates of lower-order moments \cite[]{kingma2017adam}. It is an extension to stochastic gradient descent that has recently seen broader adoption for \gls{dl} applications in computer vision and \gls{nlp}.
 

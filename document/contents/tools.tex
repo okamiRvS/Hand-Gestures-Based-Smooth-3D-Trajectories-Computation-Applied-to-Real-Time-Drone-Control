@@ -6,25 +6,26 @@ This chapter introduces the tools used in this work, starting from the descripti
 
 \section{Tello}
 \label{subsec:tello}
-Tello is a small quadcopter that features a Vision Positioning System and an onboard camera. Using its advanced flight controller, it can hover in place and is suitable for flying indoors. Tello caputers 5MP photos and stream until 720p live video. Its maximum flight time is approximately 12 minutes (tested in windless conditions at a consistent $15km/h$) and its maximum flight distance id $100m$ \cite[]{djitelloguide}.
+Tello is a small quadcopter that features a Vision Positioning System and an onboard camera. Using its advanced flight controller, it can hover in place and it is suitable for flying indoors. Tello captures $5MP$ photos and streams until $720p$ live video. Its maximum flight time is approximately $12$ minutes (tested in windless conditions at a consistent $15km/h$) and its maximum flight distance is $100m$ \cite[]{djitelloguide}.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=.7\textwidth]{images/tello}
+	\includegraphics[width=.8\textwidth]{images/tello}
 	\caption[Tello - Aircraft diagram.]{1.Propellers; 2.Motors; 3.Aircraft Status Indicator; 4.Camera; 5.Power Button; 6.Antennas; 7.Vision Positioning System; 8.Flight Battery; 9.Micro USB Port; 10.Propeller Guards.}
 	\label{fig:telloairdiagr}
 \end{figure}
 
-\noindent The Tello can be controlled manually using the virtual joysticks in the Tello app or using a compatible remote controller. It also has various Intelligent Flight Modes that be used to make Tello perform maneuvers automatically. Propeller Guards can be used to reduce the risk of harm or damage people or objects resulting from accidental collisions with Tello aircraft.
+\noindent Tello can be controlled manually using the virtual joysticks in the Tello app or using a compatible remote controller. It also has various Intelligent Flight Modes that can be used to make Tello perform maneuvers automatically. Propeller Guards can be used to reduce the risk of harm or damage people or objects resulting from accidental collisions with Tello aircraft.
 
 \subsection{Tello Command Types and Results}
 \label{subsec:tellosdk}
-The Tello SDK connects to the aircraft through a Wi-Fi UDP port, allowing users to control the aircraft with text commands. There are Control and Set commands where return "ok" if the command was successful or "error" or an informational result code if the ocmmand failed. There are also Read commands that return the current value of the sub-parameters.
+Tello SDK connects to the aircraft through a Wi-Fi UDP port, allowing users to control the aircraft with text commands. There are Control and Set commands that return "ok" if the command was successful, "error" or an informational result code if the command failed. There are also Read commands that return the current value of the sub-parameters.
 
 % Please add the following required packages to your document preamble:
 % \usepackage{booktabs}
 % \usepackage{multirow}
 \begin{table}[H]
+    \centering
 	\begin{tabular}{@{}|llc|@{}}
 		\toprule
 		\multicolumn{3}{|c|}{\textbf{Main Tello Commands}}                                                                                                                                                                                                                                                                                                                      \\ \midrule
@@ -34,7 +35,7 @@ The Tello SDK connects to the aircraft through a Wi-Fi UDP port, allowing users 
 		\multicolumn{1}{|l|}{streamoff}         & \multicolumn{1}{l|}{Turn off video streaming.}                                                                                                                                                                                                                              &                                                 \\ \cmidrule(r){1-2}
 		\multicolumn{1}{|l|}{takeoff}           & \multicolumn{1}{l|}{Auto takeoff.}                                                                                                                                                                                                                                          &                                                 \\ \cmidrule(r){1-2}
 		\multicolumn{1}{|l|}{land}              & \multicolumn{1}{l|}{Auto landing.}                                                                                                                                                                                                                                          &                                                 \\ \cmidrule(r){1-2}
-		\multicolumn{1}{|l|}{send\_rc\_control} & \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}Set remote control via four channels.\\ Arguments:\\ - left / right velocity: from -100 to +100\\ - forward / backward velocity: from -100 to +100\\ - up / down: from -100 to +100\\ - yaw: from -100 to +100\end{tabular}} &                                                 \\ \midrule
+		\multicolumn{1}{|l|}{send\_rc\_control} & \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}Set remote control via four channels.\\ Arguments:\\ \\ - left / right velocity: \\ \quad \quad from -100 to +100\\ - forward / backward velocity: \\ \quad \quad from -100 to +100\\ - up / down: \\ \quad \quad from -100 to +100\\ - yaw: \\ \quad \quad from -100 to +100\end{tabular}} &                                                 \\ \midrule
 		\multicolumn{1}{|l|}{get\_battery}      & \multicolumn{1}{l|}{Get current battery percentage}                                                                                                                                                                                                                         & \multicolumn{1}{l|}{from 0 to +100}             \\ \bottomrule
 	\end{tabular}
 	\captionof{table}[Tello Python Commands.]{List of the main Tello functions of the python wrapper to interact with the Ryze Tello drone using the official Tello api.}
@@ -45,12 +46,12 @@ The Tello SDK connects to the aircraft through a Wi-Fi UDP port, allowing users 
 \label{subsec:gazebo}
 
 % parlare che si è lavorato su windows, ma gazebo era in una macchina virtuale con immagine ubuntu.
-Gazebo is a 3D simulator, offers the ability to accurately and efficiently simulate robots in complex indoor and outdoor environments. Thanks to Gazebo it was possible to launch the 3D trajectory acquired by hand through the webcam on a simulated drone. 
+Gazebo is a 3D simulator, that offers the ability to accurately and efficiently simulate robots in complex indoor and outdoor environments. Thanks to Gazebo it was possible to launch the 3D trajectory acquired by hand through the webcam on a simulated drone. 
 
 \section{Frameworks}
 \label{subsec:frameworks}
 
-\paragraph*{\texttt{DJITelloPy}} DJI Tello drone python interface using the official Tello SDK and Tello EDU SDK. This library has an implementation of all tello commands, easily retrieve a video stream, receive and parse state packets and other features.\footnote{\url{https://github.com/damiafuentes/DJITelloPy}}.
+\paragraph*{\texttt{DJITelloPy}} DJI Tello drone python interface uses the official Tello SDK and Tello EDU SDK. This library has an implementation of all Tello commands, easily retrieves a video stream, receives and parses state packets and other features.\footnote{\url{https://github.com/damiafuentes/DJITelloPy}}.
 
 \paragraph*{\texttt{TensorFlow}} is an end-to-end open source platform for \gls{ml}. It has a comprehensive, flexible ecosystem of tools, libraries and community resources that lets researchers push the state-of-the-art in \gls{ml}\footnote{\url{https://www.tensorflow.org/}}.
 

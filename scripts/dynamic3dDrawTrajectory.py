@@ -13,9 +13,9 @@ class dynamic3dDrawTrajectory():
     def __init__(self, path, save3dPlot):
 
         plt.ion()
-        self.fig = plt.figure()
+        self.fig = plt.figure(0)
         self.ax = self.fig.add_subplot(111, projection='3d')
-    
+            
         self.clean()
         
         self.nextTime = time.time()
@@ -26,8 +26,8 @@ class dynamic3dDrawTrajectory():
             shrink=0.5, aspect=5
         )
 
-        self.start = self.ax.text3D(0, 0, 0, "", zdir='x', size=10, zorder=1, color='black') 
-        self.end = self.ax.text3D(0, 0, 0, "", zdir='x', size=10, zorder=1, color='black')
+        self.start = self.ax.text3D(0, 0, 0, "", zdir='x', size=15, zorder=1, color='black') 
+        self.end = self.ax.text3D(0, 0, 0, "", zdir='x', size=15, zorder=1, color='black')
 
         self.path = path
         self.save3dPlot = save3dPlot    
@@ -45,12 +45,12 @@ class dynamic3dDrawTrajectory():
             self.nextTime = currentTime + 1 #currentTime + 2
             
             #self.ax.plot3D(xdata, ydata, zdata, c='gray')
-            surf = self.ax.scatter(xdata, ydata, zdata, s=speed,c=speed, vmin = 2, vmax = 10)
+            surf = self.ax.scatter(xdata, ydata, zdata, s=speed, zorder=2, c=speed, vmin = 2, vmax = 10)
 
             # draw vector of direction
             self.ax.quiver(xdata, ydata, zdata, # <-- starting point of vector
                     directionx, directiony, directionz, # <-- directions of vector
-                    length=0.1, normalize=True)
+                    zorder=3, length=0.2, normalize=True, alpha=0.5)
  
 
             lenList = len(xdata)
@@ -72,11 +72,18 @@ class dynamic3dDrawTrajectory():
             self.cbar = self.fig.colorbar(surf, shrink=0.5, aspect=5)
 
             plt.draw()
-            #plt.pause(0.5)
 
             if self.save3dPlot:
-                plt.savefig(f"{self.path}_{self.imgNum}")
-                self.imgNum += 1
+                self.saveFrame()
+
+
+    def saveFrame(self):
+        """
+        Save current plot frame.
+        """
+
+        self.fig.savefig(f"{self.path}_{self.imgNum}")
+        self.imgNum += 1
 
 
     def destroy(self):
@@ -101,11 +108,16 @@ class dynamic3dDrawTrajectory():
         self.ax.set_xlabel('X Label')
         self.ax.set_ylabel('Y Label')
         self.ax.set_zlabel('Z Label')
+        #self.ax.set_title("Dynamic plot")
 
         # Set each axis limits
         self.ax.set_xlim3d([0, 1])
         self.ax.set_ylim3d([1, -1])
         self.ax.set_zlim3d([0, 1])
+
+        # Set start and end point
+        self.start = self.ax.text3D(0, 0, 0, "", zdir='x', size=15, zorder=1, color='black') 
+        self.end = self.ax.text3D(0, 0, 0, "", zdir='x', size=15, zorder=1, color='black')
 
 
 def main():

@@ -1,3 +1,309 @@
 \chapter{Evaluation}
-\label{chap:experiments}
-% hand gesture model evaluation
+\label{chap:evaluation}
+In this chapter, the results obtained from the three models created for hand gesture recognition will be displayed and commented first and then those obtained for the estimates of the 3d trajectories.
+
+\section{Hand gesture recognition model evaluation}
+\label{sec:handeval}
+As said in \ref{sec:model} three models were generated using the same hyperparameters: one using the selected features, one using \gls{pca}, and finally one using all the features. \\ 
+
+\noindent Metric is different from loss function. Loss functions are functions that show a measure of the model performance and are used to train a machine learning model (using some kind of optimization) and are usually differentiable in model’s parameters. On the other hand, metrics are used to monitor and measure the performance of a model and do not need to be differentiable. However, if for some tasks the performance metric is differentiable, it can be used both as a loss function and a metric, such as \gls{mse}.
+
+\noindent Confusion matrix (also known as error matrix) is a tabular visualization of the model predictions versus the ground-truth labels. Diagonal elements of this matrix denote the correct prediction for different classes, while the off-diagonal elements denote the samples which are mis-classified. This calculation will be performed on all three models generated. The feature selection model achieved small percentage points higher in accuracy than \gls{pca}.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=.7\textwidth]{images/cmfeaturesel.png}
+	\caption[Confusion matrix - Features selected.]{Confusion matrix - Features selected.}
+	\label{fig:confselec}
+\end{figure}
+
+\noindent High accuracy in the "features selected" model was encountered, and then excellent prediction results were found. In fact, in the confusion matrix (see Fig. \ref{fig:confselec}) for "detect", "forward" and "ok" gestures all the corresponding tests have been correctly predicted. In parallel, we noted that for "left" and "right" gestures there were $22$ and $20$ cases respectively classified correctly. At the same time, for both cases three examples were not classified correctly. \\
+
+\begin{table}[htb]
+    \centering
+    \begin{tabular}{|lllll|}
+        \hline
+        \multicolumn{1}{|l|}{\textbf{}}             & \multicolumn{1}{l|}{\textbf{precision}} & \multicolumn{1}{l|}{\textbf{recall}} & \multicolumn{1}{l|}{\textbf{f1-score}} & \textbf{support} \\ \hline
+        \multicolumn{1}{|l|}{\textbf{backward}}     & \multicolumn{1}{l|}{0.96}               & \multicolumn{1}{l|}{0.90}            & \multicolumn{1}{l|}{0.93}              & 29               \\ \hline
+        \multicolumn{1}{|l|}{\textbf{detect}}       & \multicolumn{1}{l|}{0.86}               & \multicolumn{1}{l|}{1.00}            & \multicolumn{1}{l|}{0.93}              & 31               \\ \hline
+        \multicolumn{1}{|l|}{\textbf{down}}         & \multicolumn{1}{l|}{0.92}               & \multicolumn{1}{l|}{0.92}            & \multicolumn{1}{l|}{0.92}              & 26               \\ \hline
+        \multicolumn{1}{|l|}{\textbf{forward}}      & \multicolumn{1}{l|}{0.97}               & \multicolumn{1}{l|}{1.00}            & \multicolumn{1}{l|}{0.98}              & 29               \\ \hline
+        \multicolumn{1}{|l|}{\textbf{land}}         & \multicolumn{1}{l|}{1.00}               & \multicolumn{1}{l|}{0.90}            & \multicolumn{1}{l|}{0.95}              & 21               \\ \hline
+        \multicolumn{1}{|l|}{\textbf{left}}         & \multicolumn{1}{l|}{1.00}               & \multicolumn{1}{l|}{0.88}            & \multicolumn{1}{l|}{0.94}              & 25               \\ \hline
+        \multicolumn{1}{|l|}{\textbf{ok}}           & \multicolumn{1}{l|}{1.00}               & \multicolumn{1}{l|}{1.00}            & \multicolumn{1}{l|}{1.00}              & 23               \\ \hline
+        \multicolumn{1}{|l|}{\textbf{right}}        & \multicolumn{1}{l|}{0.83}               & \multicolumn{1}{l|}{0.87}            & \multicolumn{1}{l|}{0.85}              & 23               \\ \hline
+        \multicolumn{1}{|l|}{\textbf{stop}}         & \multicolumn{1}{l|}{0.84}               & \multicolumn{1}{l|}{0.89}            & \multicolumn{1}{l|}{0.86}              & 18               \\ \hline
+        \multicolumn{1}{|l|}{\textbf{up}}           & \multicolumn{1}{l|}{1.00}               & \multicolumn{1}{l|}{0.96}            & \multicolumn{1}{l|}{0.98}              & 25               \\ \hline
+        \multicolumn{5}{|l|}{}                                                                                                                                                                   \\ \hline
+        \multicolumn{1}{|l|}{\textbf{accuracy}}     & \multicolumn{2}{l|}{}                                                          & \multicolumn{1}{l|}{0.94}              & 250              \\ \hline
+        \multicolumn{1}{|l|}{\textbf{macro avg}}    & \multicolumn{1}{l|}{0.94}               & \multicolumn{1}{l|}{0.93}            & \multicolumn{1}{l|}{0.93}              & 250              \\ \hline
+        \multicolumn{1}{|l|}{\textbf{weighted avg}} & \multicolumn{1}{l|}{0.94}               & \multicolumn{1}{l|}{0.94}            & \multicolumn{1}{l|}{0.94}              & 250              \\ \hline
+    \end{tabular}
+	\captionof{table}[Metrics - Feature Selected.]{Metrics - Feature Selected.}
+    \label{tab:featuresel}
+\end{table}
+
+% https://towardsdatascience.com/comprehensive-guide-on-multiclass-classification-metrics-af94cfb83fbd
+\noindent When the class distribution is imbalanced, that is one class is more frequent than others, accuracy is not a good indicator of model performance. In this case, even if all samples are correctly predicted does not make sense at all because the model is not learning anything, in fact it is just predicting everything as the top class. Therefore, look at class specific performance metrics too is needed. Precision is one of such metrics and answers the question of "what proportion of predicted positives are truly positive?" Obviously, this can only answer the question in binary classification. This is why is important to ask the question as many times as the number of classes in the target. Optimize the model for precision when is fundamental to decrease the number of false positives. Recall answers the question of "what proportion of actual positives are correctly classified?" Optimize the model for precision when is fundamental to decrease the number of false negatives. \\
+
+\noindent Due to their nature, precision and recall are in a trade-off relationship. You may have to optimize one at the cost of the other. This is where the f1-score comes in. It is calculated by taking the harmonic mean of precision and recall and ranges from $0$ to $1$. Harmonic mean has a nice arithmetic property representing a truly balanced mean. If either precision or recall is low, it suffers significantly. \\
+
+\noindent In \ref{tab:featuresel} precision, recall and f1-score metrics are visible for each classification object. For precision and recall, "right" and "stop" gestures reach the lowest values among all classes. In fact, this is reflected in the value of f1-score. Despite this, the values are still very high.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=.7\textwidth]{images/cmpca.png}
+	\caption[Confusion matrix - PCA.]{Confusion matrix - PCA.}
+	\label{fig:confpca}
+\end{figure}
+
+\noindent High accuracy in the "\gls{pca}" model was encountered, although only the first six principal components have been selected. Here we have slightly less satisfying predictions. In the confusion matrix (see Fig. \ref{fig:confpca}) for "forward" and "ok" gestures all the corresponding tests have been correctly predicted, but seven examples labeled as "backward" were instead predicted as "down". The results of the predictions related to the other gestures are better.
+
+\begin{table}[H]
+	\centering
+    \begin{tabular}{|l|l|l|l|l|}
+        \hline
+        \textbf{}             & \textbf{precision} & \textbf{recall} & \textbf{f1-score} & \textbf{support} \\ \hline
+        \textbf{backward}     & 1.00               & 0.76            & 0.86              & 29               \\ \hline
+        \textbf{detect}       & 0.88               & 0.90            & 0.89              & 31               \\ \hline
+        \textbf{down}         & 0.75               & 0.92            & 0.83              & 26               \\ \hline
+        \textbf{forward}      & 0.97               & 1.00            & 0.98              & 29               \\ \hline
+        \textbf{land}         & 0.83               & 0.90            & 0.86              & 21               \\ \hline
+        \textbf{left}         & 1.00               & 0.88            & 0.94              & 25               \\ \hline
+        \textbf{ok}           & 1.00               & 1.00            & 1.00              & 23               \\ \hline
+        \textbf{right}        & 0.91               & 0.87            & 0.89              & 23               \\ \hline
+        \textbf{stop}         & 0.85               & 0.94            & 0.89              & 18               \\ \hline
+        \textbf{up}           & 0.96               & 0.92            & 0.94              & 25               \\ \hline
+                              &                    &                 &                   &                  \\ \hline
+        \textbf{accuracy}     &                    &                 & 0.91              & 250              \\ \hline
+        \textbf{macro avg}    & 0.91               & 0.91            & 0.91              & 250              \\ \hline
+        \textbf{weighted avg} & 0.92               & 0.91            & 0.91              & 250              \\ \hline
+        \end{tabular}
+	\captionof{table}[Metrics - PCA.]{Metrics - PCA.}
+    \label{tab:pca}
+\end{table}
+
+\noindent Also in \ref{tab:pca} precision, recall and f1-score metrics are visible for each classification object. This time, for precision, "down" and "land" gestures reach the lowest values among all classes with $75\%$ and $83\%$ respectively, even if their recall values are quite close to the average recall. Max precision is reached with the "backward", "left" and "ok" gestures. With "backward" gestur,e recall is the minimum, while "ok" gesture is always predicted correctly, in fact for the latter f1-score has the maximum value.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=.7\textwidth]{images/cmallfeatures.png}
+	\caption[Confusion matrix - All features.]{Confusion matrix - All features.}
+	\label{fig:confallfeatures}
+\end{figure}
+
+\noindent The highest level of accuracy was found using all features. The model is $2\%$ more accurate than feature selection and $5\%$ more accurate than \gls{pca}. In the confusion matrix (see Fig. \ref{fig:confallfeatures}) for "backward", "forward", "left", "ok" and "stop" gestures all the corresponding tests have been correctly predicted. Problems of little importance in prediction in all other cases.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|lllll|}
+        \hline
+        \multicolumn{1}{|l|}{\textbf{}}             & \multicolumn{1}{l|}{\textbf{precision}} & \multicolumn{1}{l|}{\textbf{recall}} & \multicolumn{1}{l|}{\textbf{f1-score}} & \textbf{support} \\ \hline
+        \multicolumn{1}{|l|}{\textbf{backward}}     & \multicolumn{1}{l|}{0.94}               & \multicolumn{1}{l|}{1.00}            & \multicolumn{1}{l|}{0.97}              & 29               \\ \hline
+        \multicolumn{1}{|l|}{\textbf{detect}}       & \multicolumn{1}{l|}{0.91}               & \multicolumn{1}{l|}{0.94}            & \multicolumn{1}{l|}{0.92}              & 31               \\ \hline
+        \multicolumn{1}{|l|}{\textbf{down}}         & \multicolumn{1}{l|}{0.96}               & \multicolumn{1}{l|}{0.96}            & \multicolumn{1}{l|}{0.96}              & 26               \\ \hline
+        \multicolumn{1}{|l|}{\textbf{forward}}      & \multicolumn{1}{l|}{1.00}               & \multicolumn{1}{l|}{1.00}            & \multicolumn{1}{l|}{1.00}              & 29               \\ \hline
+        \multicolumn{1}{|l|}{\textbf{land}}         & \multicolumn{1}{l|}{0.90}               & \multicolumn{1}{l|}{0.90}            & \multicolumn{1}{l|}{0.90}              & 21               \\ \hline
+        \multicolumn{1}{|l|}{\textbf{left}}         & \multicolumn{1}{l|}{0.96}               & \multicolumn{1}{l|}{1.00}            & \multicolumn{1}{l|}{0.98}              & 25               \\ \hline
+        \multicolumn{1}{|l|}{\textbf{ok}}           & \multicolumn{1}{l|}{1.00}               & \multicolumn{1}{l|}{1.00}            & \multicolumn{1}{l|}{1.00}              & 23               \\ \hline
+        \multicolumn{1}{|l|}{\textbf{right}}        & \multicolumn{1}{l|}{0.95}               & \multicolumn{1}{l|}{0.91}            & \multicolumn{1}{l|}{0.93}              & 23               \\ \hline
+        \multicolumn{1}{|l|}{\textbf{stop}}         & \multicolumn{1}{l|}{1.00}               & \multicolumn{1}{l|}{1.00}            & \multicolumn{1}{l|}{1.00}              & 18               \\ \hline
+        \multicolumn{1}{|l|}{\textbf{up}}           & \multicolumn{1}{l|}{1.00}               & \multicolumn{1}{l|}{0.88}            & \multicolumn{1}{l|}{0.94}              & 25               \\ \hline
+        \multicolumn{5}{|l|}{}                                                                                                                                                                   \\ \hline
+        \multicolumn{1}{|l|}{\textbf{accuracy}}     & \multicolumn{2}{l|}{}                                                          & \multicolumn{1}{l|}{0.96}              & 250              \\ \hline
+        \multicolumn{1}{|l|}{\textbf{macro avg}}    & \multicolumn{1}{l|}{0.96}               & \multicolumn{1}{l|}{0.96}            & \multicolumn{1}{l|}{0.96}              & 250              \\ \hline
+        \multicolumn{1}{|l|}{\textbf{weighted avg}} & \multicolumn{1}{l|}{0.96}               & \multicolumn{1}{l|}{0.96}            & \multicolumn{1}{l|}{0.96}              & 250              \\ \hline
+    \end{tabular}
+	\captionof{table}[Metrics - All features.]{Metrics - All features.}
+    \label{tab:featuresall}
+\end{table}
+
+\noindent In \ref{tab:featuresall} for precision, "detect" gesture reach the lowest value among all classes with $91\%$, even if still remains an extremely positive value. Max precision is reached with the "forward" and "ok" gestures. With "up" gesture recall is the minimum, while "backward", "forward", "left", "ok" and "stop" gesture have the max recall score. In fact, for the latter the f1-score have the maximum value as well.
+
+\section{3D trajectory evaluation}
+\label{sec:3dtrajeval}
+After fitting data, is important evaluate the goodness of fit. A visual examination of the fitted curve should be the first step. Beyond that, plenty methods to assess goodness of fit for both linear and nonlinear parametric fits are provided in literature.
+
+\subsection{Fitting trajectory}
+\label{sec:fittraj}
+In \ref{fig:trajstep} are visible nine different frames, where the first eight are plots of the trajectory captured in live (in different times) and the last one represents the transformation of the \gls{3d} trajectory $g$ in $g_{smooth}$. Each plot consisting of three axis where the depth is described by the $y$ axis, $x$ describes the camera width and $z$ the camera height. Each point is the position in the space, while the vector on it describes the orientation in that instant. The orientation vector is perpendicular to the palm of the hand. In addition, each point is assigned the mean speed value of the journey between the points at the interval $t$ and $t-1$. The more yellow the color tends, the faster the speed at that point is. Otherwise, the more the color tends to violet, the slower you are in that instant of time.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/10_0}
+        \caption[]{}
+        \label{fig:trajA}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/10_2}
+        \caption[]{}
+        \label{fig:trajB}
+    \end{subfigure}
+    \\[\smallskipamount]
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/10_4}
+        \caption[]{}
+        \label{fig:trajC}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/10_6}
+        \caption[]{}
+        \label{fig:trajD}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/10_8}
+        \caption[]{}
+        \label{fig:trajE}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/10_10}
+        \caption[]{}
+        \label{fig:trajF}
+    \end{subfigure}
+    \\[\smallskipamount]
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/10_12}
+        \caption[]{}
+        \label{fig:trajG}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/10_13}
+        \caption[]{}
+        \label{fig:trajH}
+    \end{subfigure}
+    \caption[Complete acquisition of a 3d trajectory in all its steps.]{Complete acquisition of a 3d trajectory in all its steps.}
+    \label{fig:trajstep}
+\end{figure}
+
+\subsection{Fitting evaluation}
+\label{sec:fiteval}
+% https://it.mathworks.com/help/curvefit/evaluating-goodness-of-fit.html
+As is common in statistical literature, the term goodness of fit might be a model that the data could reasonably have come from (given the assumptions of least-squares fitting), in which the model coefficients can be estimated with little uncertainty, or that explains a high proportion of the variability in your data, and is able to predict new observations with high certainty. \\
+
+\noindent A particular application might dictate still other aspects of model fitting that are important to achieving a good fit, such as a simple model that is easy to interpret. It is possible group into two types the methods of analysis \cite[]{Evaluati10:online}: graphical and numerical. Plotting residuals and prediction bounds are graphical methods that aid visual interpretation, while computing goodness-of-fit statistics and coefficient confidence bounds yield numerical measures that aid statistical reasoning.\\
+
+\noindent Generally speaking, graphical measures are more beneficial than numerical measures because they allow users to view the entire data set at once, and they can easily display a wide range of relationships between the model and the data. The numerical measures are more narrowly focused on a particular aspect of the data and often try to compress that information into a single number. \\
+
+\noindent Metrics used to evaluate regression models should be able to work on a set of continuous values (with infinite cardinality), and are therefore slightly different from classification metrics. There are many different evaluation metrics out there but only some of them are suitable to be used for regression. After using graphical methods to evaluate the goodness of fit, was evaluated:
+
+\begin{itemize}
+    \item \texttt{R-square}
+    \\ This statistic measures how successful the fit is in explaining the variation of the data. Put another way, R-square is the square of the correlation between the response values and the predicted response values. It is also called the square of the multiple correlation coefficient and the coefficient of multiple determination. R-square is defined as the ratio of the \gls{ssr} and the \gls{sst}. R-square is expressed as
+  
+    \begin{Equation}[H]
+        \centering
+        \begin{equation} \label{eq:r2}
+            \begin{aligned}
+            	R^2 &= \frac{SSR}{SST} = \\
+            	&= \frac{\sum_{i=1}^{n} w_i(\widehat{y_i} - \overline{y})^2}{\sum_{i=1}^{n} w_i(y_i - \overline{y})^2}
+        	\end{aligned}
+        \end{equation}
+    	\caption[R-square.]{R-square}
+    \end{Equation}
+    
+    R-square can take on any value between $0$ and $1$, with a value closer to $1$ indicating that a greater proportion of variance is accounted for by the model.
+    
+    R-Square is a good measure to determine how well the model fits the dependent variables. However, it does not take into consideration of overfitting problem. If your regression model has many independent variables, because the model is too complicated. That is why Adjusted R Square is introduced because it will penalize additional independent variables added to the model and adjust the metric to prevent overfitting issues. It is possible to get a negative R-square for equations that do not contain a constant term. Because R-square is defined as the proportion of variance explained by the fit, if the fit is actually worse than just fitting a horizontal line then R-square is negative. In this case, R-square cannot be interpreted as the square of a correlation. Such situations indicate that a constant term should be added to the model;
+
+    \item \texttt{Adjusted R-square}
+    \\ This statistic uses the R-square statistic defined above, and adjusts it based on the residual degrees of freedom. The residual degrees of freedom is defined as the number of response values $n$ minus the number of fitted coefficients $m$ estimated from the response values.
+    
+    \begin{Equation}[H]
+        \centering
+        \begin{equation} \label{eq:r2}
+            \begin{aligned}
+            	v = n-m
+        	\end{aligned}
+        \end{equation}
+    	\caption[Degrees of Freedom Adjusted R-Square.]{Degrees of Freedom Adjusted R-Square.}
+    \end{Equation}
+    
+    $v$ indicates the number of independent pieces of information involving the n data points that are required to calculate the sum of squares. Note that if parameters are bounded and one or more of the estimates are at their bounds, then those estimates are regarded as fixed. The degrees of freedom is increased by the number of such parameters.
+
+    \noindent The adjusted R-square statistic is generally the best indicator of the fit quality when you compare two models that are nested — that is, a series of models each of which adds additional coefficients to the previous model.
+    
+    \begin{Equation}[H]
+        \centering
+        \begin{equation} \label{eq:r2}
+            \begin{aligned}
+            	R^2_{adjusted} &= 1 - \frac{ (n-1) \sum_{i=1}^{n} w_i(y_i - \widehat{y})^2}{ v \sum_{i=1}^{n} w_i(y_i - \overline{y})^2}
+        	\end{aligned}
+        \end{equation}
+    	\caption[R-square.]{R-square.}
+    \end{Equation}
+    
+    The adjusted R-square statistic can take on any value less than or equal to 1, with a value closer to 1 indicating a better fit. 
+
+    \item \texttt{Root mean squared error.}
+    \\ This statistic is also known as the fit standard error and the standard error of the regression. It is an estimate of the standard deviation of the random component in the data, and is defined as
+    
+   \begin{Equation}[H]
+        \centering
+        \begin{equation} \label{eq:r2}
+            \begin{aligned}
+            	RMSE &= \sqrt{MSE} \\
+            	&= \sqrt{\frac{\sum_{i=1}^{n} w_i(y_i - \widehat{y})^2}{v}}
+        	\end{aligned}
+        \end{equation}
+    	\caption[RMSE.]{RMSE.}
+    \end{Equation}
+    
+    Value closer to $0$ indicates a fit that is more useful for prediction. It is used more commonly than \gls{mse} because firstly sometimes \gls{mse} value can be too big to compare easily. Secondly, \gls{mse} is calculated by the square of error, and thus square root brings it back to the same level of prediction error and makes it easier for interpretation.
+\end{itemize}
+
+\noindent With reference to the trajectory \ref{fig:trajstep} were calculated on it $3$ ridge regression for $x$, $y$ and $z$ component, as explained in \ref{sec:smoothing}, increasing the degree of the fitting polynomial from $2$ to $9$.
+
+\noindent In \ref{fig:rmse} it is possible to envision how \gls{rmse} behaves as the degree of the fitting polynomial increases. In the specific, it is evident that \gls{rmse} decreases dramatically when we take a grade greater than four, and is true for all three components. The value definitely stabilizes when the degree is equal to seven. In fact, a value of less than 5\% is reached.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=.7\textwidth]{images/rmse}
+	\caption[RMSE.]{RMSE plot.}
+	\label{fig:rmse}
+\end{figure}
+
+\noindent In \ref{fig:r2} is present the R-square plot. Here, unlike the previous chart the closer the value is to $1$, the better the result. A value of $0.91$ means that the fit explains $91\%$ of the total variation in the data about the average. If we take a grade higher than four then we get excellent values capable of capturing more than $90\%$ of variance.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=.7\textwidth]{images/r2}
+	\caption[R-Squared.]{R-Squared plot.}
+	\label{fig:r2}
+\end{figure}
+
+\noindent In \ref{fig:adjr2} is present the Adjusted R-squared plot. Since $R^2$ always increases as more predictors are added to the model, adjusted $R^2$ can serve as a metric that tells how useful a model is, adjusted for the number of predictors in a model. The graph is very similar to the previous one (see Fig. \ref{fig:rmse}), but it’s slightly different. Since the Adjusted R-squared has high values despite the growth of the degree, it explains that does not occur overfitting, then we can perfectly explain the trajectory.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=.7\textwidth]{images/adjr2}
+	\caption[Adjusted R-Squared.]{Adjusted R-Squared plot.}
+	\label{fig:adjr2}
+\end{figure}
+
+\noindent Following the study by \gls{rmse}, R-squared and Adjusted R-squared it has come to the conclusion that a degree of 7 is more than enough to describe a trajectory as necessary.
+
+% sono stati fatti dei video?
+
+\section{Drone in action}
+\label{sec:drinact}
+% (forse questa da mettere nell'evaluation) come viene visualizzata tale traiettoria? per essere certi dell'esecuzione? (palline verdi)
+
+
+\section{Real}
+\label{sec:drcontr}
+% La veridicità della traiettoria è visibile a occhio nudo. Per il fine dell'obiettivo del progetto non siamo alla ricerca della perfezione dell'esecuzione della traiettoria, ma piuttosto che rispecchi la veridicità della dimensione fissata della traiettoria. Questo punto è importante in quanto se il range d'azione in cui il drone opera è incontrollato allora potrebbe essere pericoloso per chi è intorno ad esso. Ben presto si è notato che il drone non esegue le traiettorie in un range di circa 1m, ma queste sembrano essere di dimensione inferiore. Infatti, in seguito a diversi test, si è notato che fissando un tempo di viaggio di 3 secondi, un intervallo di invio segnale 0.25s e di velocità del drone a 15cm/s non risultava essere corretto lo spazio totale percorso. Facendo la media su tutti i tentativi di test si era arrivati alla conclusione che 15cm/s in realtà corrispondeva a circa 11,7cm/s. Quindi si è costruita una mappa che desse idea della spaizo percorso lungo gli assi xy e xz.
+
+The trajectory veracity is visible to the naked eye. For the project purpose, the perfection of the trajectory execution was not a requirement, but rather that it reflects the correctness of the fixed dimension of the trajectory. This point is important as if the range of action in which the drone operates is uncontrolled then it could be dangerous for those around it. It was soon noticed that the drone does not perform trajectories in a range of about $1m$, but these appear to be smaller in size. In fact, following several tests, it was observed that by setting a travel time of $3$ seconds, a $0.25s$ signal sending interval and a drone speed of $15cm/s$, the total distance traveled was not correct. Taking the average over all the test attempts it was concluded that 15cm/s actually corresponded to about $11.7cm/s$. Then, a map was built that gave an idea of the space traveled along the $xy$ and $xz$ axes. \\

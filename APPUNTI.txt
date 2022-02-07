@@ -183,4 +183,47 @@ catturare solo il primo frame della mano quando questa è simbolo detect (serve 
 #https://www.kaggle.com/residentmario/model-fit-metrics/notebook
 # for 1 gesto con k gradi diversi e salvare r^2, MSE e RMSE
 
-fixare immagine output
+fixare immagine output, da vettorizzare possibilmente e scritte ben visibili
+fare recall, precision roc con grafici, mostrare che pca è migliore (prendere 20 componenti anche)
+
+
+
+introduzione
+per raggiungere questo obiettivo, prima di tutto si è fatta una ricerca nella letteratura per vedere se esistesse un sistema di hand tracking. Esistono diverse soluzioni come [Efficient Model-based 3D Tracking of Hand Articulations using Kinect] where with extensive experiments with a prototype GPU-based implementation of the proposed method demonstrates that accurate and robust 3D tracking of hand articulations can be achieved in near real-time (15Hz), using a kinect sensor. Un lavoro più recente [Hand Tracking on Oculus Quest]  marking another important VR input milestone in the evolution of VR input with the announcement of hand tracking on Oculus Quest—enabling natural interaction in VR using your own hands on an all-in-one standalone device, no extra hardware required. All without the need for a controller, external sensors, gloves, or a PC to power it. E infine, uno delle ultime ricerche [MEDIAPIPE] solution that does not require any additional hardware and performs in real-time on mobile devices (quello usato effettivamente in questo progetto e ampiamente parlato nel capitolo letteratura).
+
+
+Grazie a questo sistema è stato possibile costruire una rete neurale profonda per riconoscere dei specifici gesti della mano. è stata inoltre stimata l'orientamento di uno gesto specifico "detect gesture" col fine di ottenere informazioni anche sulla depth. Attraverso l'hand gesture recognition e la stima dell'orientamento, una pipeline per rilevare una traiettoria 3d è stata definita. Tale traiettoria g però è perturbata dalgli errori di stima. Pertanto si è applicato un algoritmo di data fitting sulla traiettoria g per ottenerne una g_smooth smussata. 
+
+ 
+As a proof of concept (POC), the captured trajectory was launched first on a drone, in simulation, implemented in the ROS framework. After carrying out the simulation experiments in the Gazebo environment, the DJI Ryze Tello drone (see Sec. \ref{subsec:tello}) was used to test the application in real life. DJITelloPy is the DJI Tello drone python interface, used in the project to make the application communicating with the drone. The trajectory veracity is visible to the naked eye. The correctness of the fixed dimension of the trajectory was extremely important for the project’s purpose since, if the range of action in which the drone operates is uncontrolled, then it could get dangerous for those around it. 
+
+
+L'obiettivo del progetto è stato raggiunto con successo e l'intera pipeline per l'acquisizione della traiettoria può essere sfruttata in scenari di ar e vr in quanto consentirebbe di poter interagire con oggetti virtuali e/o eseguire azioni.
+
+
+conclusione
+Stabilità drone perchè se no è un problema.
+
+Da qualcosa di "plug and play" a costruire un sistema molto più complesso: costruire combinazioni di gesti, cioè un linguaggio. Utilizzare l'interazione di due mani per esempio per definire una scala. Migliorare la sicurezza, ad esempio inserendo un face recognition, così che non tutti necesseriamente possono interagire con il drone. Costruire un'applicazione smartphone-desktop user friendly. Esecuzione della traiettoria senza un gesto di chiusura, in qualche modo capire in automatico quando termina (per esempio si potrebbe tenere conto della velocità). Salvare delle traiettorie prima e rieseguirle, eseguirle anche su multipli droni.
+
+
+
+
+
+
+
+
+Q:
+Dove hai fatto i test real? é stato pericoloso?
+R:
+attenzione qui bisogna tenere molto a mente questo:
+	Before you start using your drone in public, it’s important to spend some time learning how to fly your drone in a safe and capable manner! You’ll need to practice the craft of taking off, keeping your drone steady, manoeuvring through the air, before landing safely. Once you’ve got the basics mastered, you can start to introduce the tricky task of filming whilst flying.
+
+	Calibrating your drone’s inertial measurement unit (IMU) is vital as it will ensure that you will always know where your drone is, which direction that it’s flying in, and the velocity at which it’s flying at.
+
+	Modern drones have the capacity to fly for a maximum of 30 minutes. It’s quite easy to get caught up in the task at hand, and completely lose track of your flight time. Some drones (such as DJI) will begin automatically landing when the battery begins to get low, however there are still a lot of other drones that don’t have this intelligence and will literally crash out of the sky when you run out of battery! If you don’t moderate your flight time, and keep a close eye on your battery levels, that’s an accident waiting to happen.
+
+Q:
+è vero che si potrebbe utilizzare per le riprese, ma non avresti problemi nell'essere preciso?
+R:
+Sì, infatti, on top, sarebbe ideale introdurre un sistema di tracking della persona. così che il drone esegue la traiettoria, ma inoltre mette in focus chi ha davanti a sè. Ma dipende sempre che cosa si vuole fare, non necessariamente si vuole seguire qualcosa. Potrebbe essere interessante creare un sistema che focalizza ciò che è interessante in una scena, per esempio seguendo quello che si muove in una scena.

@@ -25,7 +25,7 @@ class tracking():
             self.drawTraj = d3dT.dynamic3dDrawTrajectory(path, save3dPlot)
         self.log3D = log3D
 
-        self.smoothing = sm.smoothing(skipEveryNpoints)
+        self.smoothing = sm.smoothing(skipEveryNpoints, path)
 
         self.traj = traj.trajectory(skipEveryNsec, trajTimeDuration)
         self.trajCOMPLETE = []
@@ -33,7 +33,8 @@ class tracking():
         self.height = 0
         self.width = 0
 
-        self.timeToCatchAnotherTraj = 1
+        # SET THIS TO 1, BUT FOR GET METRIC SHOULD BE 3
+        self.timeToCatchAnotherTraj = 3
 
         self.idxPoint = 0
         self.delayToExecuteTrajectory = 50
@@ -324,10 +325,6 @@ class tracking():
                 self.smoothing.setPoints(xdata, ydata, zdata, directionx, directiony, directionz, dtime, speed)
                 self.smoothing.skipEveryNpointsFunc()
 
-                # this is useful otherwise there is overlap of old and new points
-                if self.log3D:
-                    self.drawTraj.clean()
-
             elif checkStartTracking < self.tolleranceTRACKING and self.queueObj.checkGesture("detect"):
 
                 # if totaltime is under the time of trajectory execution
@@ -369,6 +366,7 @@ class tracking():
             self.draw2dTraj(img, xdata, zdata)
 
             if self.log3D:
+                self.drawTraj.clean()
                 self.drawTraj.run(xdata, ydata, zdata, rolldata, yawdata, pitchdata, speed)
 
             self.drawLog(img, (0,0,255), 0, val)
