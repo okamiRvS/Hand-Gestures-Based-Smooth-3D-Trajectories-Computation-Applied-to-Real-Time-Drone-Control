@@ -241,6 +241,9 @@ class FullControll():
 
     def autoSet(self, path, isWebcam=True, resize=False, showPlot=True, isSimulation=False, allHandTransformed=True, save3dPlot=False):
 
+        if isSimulation:
+            path = "/home/usiusi/catkin_ws/src/DJI-Tello-3D-Hand-Gesture-control/src/video_src"
+
         # Set if webcam or drone camera source
         # True is webcam, False is drone camera
         self.getFromWebcam = isWebcam
