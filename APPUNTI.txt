@@ -204,11 +204,14 @@ L'obiettivo del progetto è stato raggiunto con successo e l'intera pipeline per
 conclusione
 Stabilità drone perchè se no è un problema.
 
-Da qualcosa di "plug and play" a costruire un sistema molto più complesso: costruire combinazioni di gesti, cioè un linguaggio. Utilizzare l'interazione di due mani per esempio per definire una scala. Migliorare la sicurezza, ad esempio inserendo un face recognition, così che non tutti necesseriamente possono interagire con il drone. Costruire un'applicazione smartphone-desktop user friendly. Esecuzione della traiettoria senza un gesto di chiusura, in qualche modo capire in automatico quando termina (per esempio si potrebbe tenere conto della velocità). Salvare delle traiettorie prima e rieseguirle, eseguirle anche su multipli droni.
+Il nostro contributo dà spazio a innumerevoli sviluppi: potrebbe essere interessante pensare a un sistema di combinazioni di gesti, instaurando così un vero e proprio linguaggio. Ovviamente, questo renderebbe più complessa l'interazione utente - drone. I benefici però sono che porterebbero a tipi di applicazioni ancora più interessanti in cui i task potrebbe essere combinazioni di azioni programmate parametrizzabili. Infatti, se ad esempio compio con la stessa mano due gesti diversi, in tempi diversi, allora vengono eseguite due azioni le cui intensità potrebbero essere determinate dalla velocità di passaggio da un gesto all'altro o dalla direzione con cui viene eseguito tale passaggio. Inoltre, essendo che viene eseguita la stima dell'orientamento, si può fare in modo che questa informazione venga effettiamente usata per fare delle riprese in cui il drone rispetta non solo la posizione ma anche l'orientamento. Nel caso del tello è possibile gestire solo lo yaw, ma con alcuni bracci meccanici si ha un totale controllo anche sul row e pitch. Mediapipe dà modo di individuare più di una mano nella scena. Questo significa che potrebbe essere possibile combinare non solo diversi gesti nella stessa mano nello scorrere del tempo, ma anche diversi gesti nello stesso istante e nello scorrere del tempo. 
+
+Da qualcosa di "plug and play" a costruire un sistema molto più complesso: costruire combinazioni di gesti, cioè un linguaggio. Utilizzare l'interazione di due mani per esempio per definire una scala. Migliorare la sicurezza, ad esempio inserendo un face recognition, così che non tutti necesseriamente possono interagire con il drone. Costruire un'applicazione smartphone e/o desktop user friendly. Esecuzione della traiettoria senza un gesto di chiusura, in qualche modo capire in automatico quando termina (per esempio si potrebbe tenere conto della velocità). Salvare delle traiettorie prima e rieseguirle, eseguirle anche su multipli droni, magari effettuando dei mirror delle traiettorie (da gestire la distribuzione).
 
 
+la ricerca ha portato fin qui, noi cosa abbiamo aggiunto?
 
-
+sono state valide le metodologie applicate? C'è stata qualche difficoltà? Dalle valutazioni cosa si è riscontrato generalmente parlando? QUali sono gli attuali limiti del sistema? Si possono superare? Siamo soddisfatti del lavoro?
 
 
 
@@ -227,3 +230,40 @@ Q:
 è vero che si potrebbe utilizzare per le riprese, ma non avresti problemi nell'essere preciso?
 R:
 Sì, infatti, on top, sarebbe ideale introdurre un sistema di tracking della persona. così che il drone esegue la traiettoria, ma inoltre mette in focus chi ha davanti a sè. Ma dipende sempre che cosa si vuole fare, non necessariamente si vuole seguire qualcosa. Potrebbe essere interessante creare un sistema che focalizza ciò che è interessante in una scena, per esempio seguendo quello che si muove in una scena.
+
+
+
+si decide un menu
+
+
+
+
+
+http://www.100barolo.it/
+18.00
+
+antica osteria
+menu, possiamo farli:
+menu più bassi, 
+
+menu' base: 
+30neuro almeno
+
+20 max persone:
+comprende acqua w oni 4 oers 1 litro vino + caffe. 
+torta: posso portarla o chiedere 
+
+
+for exampl -> e.g.
+"detect gesture" or "detect" gesture?
+
+
+2116
+2209 - 93
+2304 - 95
+2401 - 97
+2500 - 99
+
+
+If you can't explain something simply, you don't know it well enough
+It's not a lie if you believe it

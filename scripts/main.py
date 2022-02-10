@@ -254,7 +254,9 @@ class keyboardControl:
         xz[0] = xz[0] - xz[0][0]
         xz[1] = xz[1] - xz[1][0]
         y = resTraj[1] - resTraj[1][0] ###################################
-        
+        y[y>1] = 1 
+        y[y<-1] = -1
+
         # Scale x,z coordinates wrt max value (is just one, the biggest)
         maxXZ = np.max(np.abs(xz))
         xz = xz / maxXZ
@@ -264,7 +266,7 @@ class keyboardControl:
         aspectRatio = width/height
         xz[1] = xz[1] / aspectRatio 
 
-        fig = plt.figure() 
+        fig = plt.figure(figsize=(10, 10)) 
         plt.subplot(2, 2, 1)
         plt.title('XY')
         plt.xlabel('X')
@@ -284,7 +286,7 @@ class keyboardControl:
         # move coordinates of traj in range from -range cm to range cm
         range = 100
         xz = xz * range
-        y = y * (range/2) # reduce range of z space... ########################################
+        y = y * range # reduce range of z space... ########################################
 
         plt.subplot(2, 2, 3)
         plt.title('XZ')
