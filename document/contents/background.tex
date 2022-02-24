@@ -12,15 +12,12 @@ presented in this thesis.
 %aperti e dei possibili sviluppi futuri.
 
 \section{Regression}
+\label{sec:regression}
 % Bishop -pattern recognition and machine learning (pg. 137)
 % andrew ng - Da pag 3 fino a pag 11 (cioè Polynomial Regression)
-The goal of regression is to predict the value of one or more continuous target variables $t$ given the value of a $D$-dimensional vector $x$ of input variables. \cite[]{bishop:2006:PRML}
+The goal of regression is to predict the value of one or more continuous target variables $t$ given the value of a $D$-dimensional vector $\bm{x}$ of input variables \cite[]{bishop:2006:PRML}. Given a training data set comprising $N$ observations ${x_n}$, where $n = 1,...,N$, together with corresponding target values ${t_n}$, the goal is to predict the value of $t$ for a new value of $\bm{x}$. \\
 
-\noindent Given a training data set comprising $N$ observations ${x_n}$, where $n = 1,...,N$,
-together with corresponding target values ${t_n}$, the goal is to predict the value of $t$
-for a new value of $x$.
-
-\noindent From a probabilistic perspective, the aim is to model the predictive distribution $p(t|x)$ because this expresses the uncertainty about the value of $t$ for each value of $x$.
+\noindent From a probabilistic perspective, the aim is to model the predictive distribution $p(t | \bm{x})$ because this expresses the uncertainty about the value of $t$ for each value of $\bm{x}$.
 
 \subsection{Linear Models for Regression}
 \label{subsec:reglinuniv}
@@ -29,31 +26,31 @@ The simplest linear model for regression is one that involved a linear combinati
 \begin{Equation}[H]
 	\centering
 	\begin{equation} \label{eq:lincomb}
-		y(x,w)=w_0 + w_1x_1+...w_D x_D
+		y(\bm{x}, \bm{w})=w_0 + w_1x_1+...w_D x_D .
 	\end{equation}
+	\caption[Linear combination of the input variables.]{Linear combination of the input variables.}
 \end{Equation}
 
-\noindent where $x=(x_1,...,x_D)^T$. This is often simply known as linear regression. The key property of this model is that it is a linear function of the parameters $w_i$, but also of $x_i$ and establishes significant limitations on the model. It is possible extend the class of models by considering linear combinations of fixed nonlinear functions of the input variables:
+\noindent where $\bm{x}=(x_1,...,x_D)^T$. This is often simply known as linear regression. The key property of this model is that it is a linear function of the parameters $w_i$, but also of $x_i$ and establishes significant limitations on the model. It is possible extend the class of models by considering linear combinations of fixed nonlinear functions of the input variables:
 \begin{Equation}[H]
 	\centering
 	\begin{equation} \label{eq:lincombbasis}
-		y(x,w)=w_0 + \sum_{j=1}^{M-1}w_j \phi_j(x)
+		y(\bm{x}, \bm{w})=w_0 + \sum_{j=1}^{M-1}w_j \phi_j( \bm{x}) .
 	\end{equation}
+	\caption[Linear combinations of fixed nonlinear functions of the input variables.]{Linear combinations of fixed nonlinear functions of the input variables.}
 \end{Equation}
 
-\noindent where $\phi_j(x)$ are known as basis functions. The total number of parameters in this model will be $M$.
-
-\noindent The parameter $w_0$ is called bias parameter. It is often convenient to define an additional dummy "basis function" $\phi_0(x)=1$, so that:
+\noindent where $\phi_j( \bm{x} )$ are known as basis functions. The total number of parameters in this model will be $M$. The parameter $w_0$ is called bias parameter. It is often convenient to define an additional dummy "basis function" $\phi_0( \bm{x} )=1$, so that:
 
 \begin{Equation}[H]
 	\centering
 	\begin{equation} \label{eq:vectlincomb}
-		y(x,w)=\sum_{j=0}^{M-1}w_j \phi_j(x) = w^T\phi(x)
+		y(\bm{x}, \bm{w})=\sum_{j=0}^{M-1}w_j \phi_j( \bm{x} ) = \bm{w}^T \bm{\phi(x)} .
 	\end{equation}
-	\caption[Linear combinations of fixed nonlinear basis functions.]{By using non linear basis functions, the function $y(x,w)$ can be a non linear function of the input vector $x$.}
+	\caption[Linear combinations of fixed nonlinear basis functions.]{Linear combinations of fixed nonlinear basis functions. By using non linear basis functions, the function $y(\bm{x}, \bm{w})$ can be a non linear function of the input vector $\bm{x}$.}
 \end{Equation}
 
-\noindent where $w=(w_0,...,w_{M-1})$ and $\phi=(\phi_0,...,\phi_{M-1})^T$. \\
+\noindent where $\bm{w}=(w_0,...,w_{M-1})$ and $\bm{\phi}=(\phi_0,...,\phi_{M-1})^T$. \\
 
 \noindent A particle example of this model where there is a single input variable $x$ is the polynomial regression. The basis functions take the form of powers of $x$ so that $\phi_j(x)=x^j$.
 
@@ -62,31 +59,31 @@ The simplest linear model for regression is one that involved a linear combinati
 \begin{Equation}[H]
 	\centering
 	\begin{equation} \label{eq:gausbasfun}
-		\resizebox{.25\hsize}{!}{$ \phi_j(x)=e^{\frac{-(x-u_j)^2}{2s^2}} $}
+		\resizebox{.25\hsize}{!}{$ \phi_j(x)=e^{\frac{-(x-u_j)^2}{2s^2}} .$}
 	\end{equation}
-	\caption[Gaussian basis function.]{These are usually referred to as "Gaussian" basis functions.}
+	\caption[Gaussian basis function.]{Gaussian basis function. These are usually referred to as "Gaussian" basis functions.}
 \end{Equation}
 
 \noindent where $u_j$ regulates the locations of the basis functions in input space, while the parameter $s$ is their spatial scale.
-\noindent The identity basis functions in which the vector $\phi(x)=x$ can be simply used.
+\noindent The identity basis functions in which the vector $\bm{\phi}(\bm{x})=\bm{x}$ can be simply used.
 
-\subsection{Normal equations}
+\subsection{Normal Equations}
 \label{subsec:reglinmulnormeq}
 % Bishop -pattern recognition and machine learning (pg. 25 intro chap 1.1)
 %https://en.wikipedia.org/wiki/Mean_squared_error
-The values of the coefficients will be determined by fitting the polynomial to the training data. This can be done by minimizing an error function that measures the misfit between the function $y(x, w)$, for any given value of $w$, and the training set data points. One simple choice of error function, which is widely used, is given by the \gls{sse} between the predictions $y(x_n, w)$ for each data point $x_n$ and the corresponding target values $t_n$ (called also sum of squares regression \cite[]{sum-squares}), so that the following is minimised:
+The values of the coefficients will be determined by fitting the polynomial to the training data. This can be done by minimizing an error function that measures the misfit between the function $y(x, \bm{w})$, for any given value of $\bm{w}$, and the training set data points. One simple choice of error function, which is widely used, is given by the \gls{sse} between the predictions $y(x_n, \bm{w})$ for each data point $x_n$ and the corresponding target values $t_n$ (called also sum of squares regression \cite[]{sum-squares}), so that the following is minimised:
 
 \begin{Equation}[H]
 	\centering
 	\begin{equation} \label{eq:sumsquarereg}
-		E(w)=\frac{1}{2} \sum_{n=1}^{N} [y(x_n,w)-t_n]^2
+		E(\bm{w})=\frac{1}{2} \sum_{n=1}^{N} [y(x_n, \bm{w})-t_n]^2 .
 	\end{equation}
 	\caption[Sum of squares regression.]{Is a statistical technique used in regression analysis to determine the dispersion of data points and the function that best fits (varies least) from the data.}
 \end{Equation}
 
-\noindent where the factor of 1/2 is included for mathematical convenience. It is a nonnegative quantity that would be zero if, and only if, the function $y(x, w)$ were to pass exactly through each training data point.
+\noindent where the factor of 1/2 is included for mathematical convenience. It is a nonnegative quantity that would be zero if, and only if, the function $y(x, \bm{w})$ were to pass exactly through each training data point. \\
 
-\noindent The curve fitting problem can be solved by choosing the value of $w$ for which $E(w)$ is as small as possible. Because the error function is a quadratic function of the coefficients $w$, its derivatives with respect to the coefficients will be linear in the elements of $w$, and so the minimization of the error function has a unique solution $w^*$. The resulting polynomial is given by the function $y(x, w^*)$.
+\noindent The curve fitting problem can be solved by choosing the value of $\bm{w}$ for which $E(\bm{w})$ is as small as possible. Because the error function is a quadratic function of the coefficients $\bm{w}$, its derivatives with respect to the coefficients will be linear in the elements of $\bm{w}$, and so the minimization of the error function has a unique solution $\bm{w^*}$. The resulting polynomial is given by the function $y(\bm{x}, \bm{w^*})$. \\
 
 % Leggere gli articoli che chiariscono differenza tra MSE e RSS...
 %https://stats.stackexchange.com/questions/73540/what-is-the-relationship-between-the-mean-squared-error-and-the-residual-sum-of
@@ -106,9 +103,9 @@ The values of the coefficients will be determined by fitting the polynomial to t
 \begin{Equation}[H]
 	\centering
 	\begin{equation} \label{eq:sumsquareregvec}
-	\frac{1}{2} (\phi w - t)^T (\phi w - t)
+	    \frac{1}{2} (\bm{\phi} \bm{w} - \bm{t})^T (\bm{\phi} \bm{w} - \bm{t}) .
 	\end{equation}
-	\caption[Sum of squares regression in matrix notation.]{This is the sum of squares regression in matrix notation.}
+	\caption[Sum of squares regression in matrix notation.]{Sum of squares regression in matrix notation.}
 \end{Equation}
 
 \noindent where $\phi$ is an $N x M$ matrix, so that:
@@ -117,43 +114,43 @@ The values of the coefficients will be determined by fitting the polynomial to t
 \begin{Equation}[!htb]
 	\centering
 	\begin{equation} \label{eq:designmatrix}
-	\phi =
+	\bm{\phi} =
 		\begin{pmatrix}
-			\phi_0(x_1) & \phi_1(x_1) & \dots & \phi_{M-1}(x_1) \\
-			\phi_0(x_2) & \phi_1(x_1) & \dots & \phi_{M-1}(x_1) \\
+			\phi_0(\bm{x_1}) & \phi_1(\bm{x_1}) & \dots & \phi_{M-1}(\bm{x_1}) \\
+			\phi_0(\bm{x_2}) & \phi_1(\bm{x_1}) & \dots & \phi_{M-1}(\bm{x_1}) \\
 			\vdots & \vdots & \ddots & \vdots \\
-			\phi_0(x_N) & \phi_1(x_N) & \dots & \phi_{M-1}(x_N) \\
-		\end{pmatrix}
+			\phi_0(\bm{x_N}) & \phi_1(\bm{x_N}) & \dots & \phi_{M-1}(\bm{x_N}) \\
+		\end{pmatrix} .
 	\end{equation}
-	\caption[Design matrix.]{This is called the design matrix whose elements are given by $\phi_{nj} = \phi_j(x_n)$.}
+	\caption[Design matrix.]{Design matrix. The elements are given by $\phi_{nj} = \phi_j(\bm{x_n})$.}
 \end{Equation}
 
 \begin{Equation}[!htb]
 	\centering
 	\begin{equation} \label{eq:weightsandtarget}
-		w = 
+		\bm{w} = 
 		\begin{pmatrix}
 			w_0 \\
 			\vdots \\
 			w_{M-1}
-		\end{pmatrix}
-		\quad t =
+		\end{pmatrix};
+		\quad \bm{t} =
 		\begin{pmatrix}
 			t_1 \\
 			\vdots \\
 			t_N \\
-		\end{pmatrix}
+		\end{pmatrix}.
 	\end{equation}
-	\caption[Weights of $M-1$ features and target of $N$ examples.]{Weights of $M-1$ features and target of $N$ examples.}
+	\caption[Weights of M-1 features and target of N examples.]{Weights of $M-1$ features and target of $N$ examples.}
 \end{Equation}
 
-\noindent Therefore, the optimization problem has to be solved finding the minimum of the cost function $E(w)$:
+\noindent Therefore, the optimization problem has to be solved finding the minimum of the cost function $E(\bm{w})$:
 \begin{Equation}[H]
 	\centering
 	\begin{equation} \label{eq:mincostregr}
-		w^*= \operatorname*{arg\,min}_w  \frac{1}{2}(\phi w - t)^T (\phi w - t)
+		\bm{w^*}= \operatorname*{arg\,min}_{\bm{w}}  \frac{1}{2}(\bm{\phi} \bm{w} - \bm{t})^T (\bm{\phi} \bm{w} - \bm{t}).
 	\end{equation}
-	\caption[Optimization problem for ridge regression.]{The goal is to find the weight $w$ that minimize the cost function $E(w)$.}
+	\caption[Optimization problem for ridge regression.]{Optimization problem for ridge regression. The goal is to find the weight $\bm{w}$ that minimize the cost function $E(\bm{w})$.}
 \end{Equation}
 
 \noindent The gradient is computed and solving for $w$ the result obtained is:
@@ -161,30 +158,30 @@ The values of the coefficients will be determined by fitting the polynomial to t
 	\centering
 	\begin{equation} \label{eq:normeq}
 		\begin{aligned}
-			\nabla E(w) = \phi^T(\phi w - t) &= 0 \\
-			\phi^T \phi w - \phi^T &= 0 \\
-			\phi^T \phi w &= \phi^T t \\
-			w^* &= (\phi^T \phi)^{-1} \phi^T t
+			\nabla E(\bm{w}) = \bm{\phi}^T(\bm{\phi} \bm{w} - \bm{t}) &= 0 \\
+			\bm{\phi}^T \bm{\phi} \bm{w} - \bm{\phi}^T &= 0 \\
+			\bm{\phi}^T \bm{\phi} \bm{w} &= \bm{\phi}^T \bm{t} \\
+			\bm{w^*} &= (\bm{\phi}^T \bm{\phi})^{-1} \bm{\phi}^T \bm{t}.
 		\end{aligned}
 	\end{equation}
-	\caption[Normal equations.]{They are known as the normal equations for the least squares problem}
+	\caption[Normal equations.]{They are known as the normal equations for the least squares problem.}
 \end{Equation}
 
-\noindent This is the real minimum because if the second derivative $\nabla^2 E(w) = \phi^T \phi$ is taken, this is a symmetric matrix, so it's also positive definitive matrix, which means that this objective function that is being minimized is convex. So if a stationary point is found, such that derivative is zero, a global minimum is also found. Furthermore, to find a solution the matrix $\phi^T \phi$ needs to be inverted, so some condition that assures this is invertible is needed, and this is the case when the columns of the matrix are linearly independent. \\
+\noindent This is the real minimum because if the second derivative $\nabla^2 E(\bm{w}) = \bm{\phi}^T \bm{\phi}$ is taken, this is a symmetric matrix, so it's also positive definitive matrix, which means that this objective function that is being minimized is convex. So if a stationary point is found, such that derivative is zero, a global minimum is also found. Furthermore, to find a solution the matrix $\bm{\phi}^T \bm{\phi}$ needs to be inverted, so some condition that assures this is invertible is needed, and this is the case when the columns of the matrix are linearly independent. \\
 
-\noindent Once the solution $w^*$ is found and a new data point that has never been seen during training is received, the new target $t^*$ is predicted as:
+\noindent Once the solution $\bm{w^*}$ is found and a new data point that has never been seen during training is received, the new target $\bm{t^*}$ is predicted as:
 
 \begin{Equation}[H]
 	\centering
 	\begin{equation} \label{eq:soloptridgereg}
 		\begin{aligned}
-			t^* = w^{*^T} \phi(x)
+			\bm{t^*} = \bm{w^{*^T}} \phi(\bm{x}).
 		\end{aligned}
 	\end{equation}
-	\caption[Prediction in ridge regression.]{The goal is to find the weight $w$ that minimize the cost function $E(w)$.}
+	\caption[Prediction in ridge regression.]{The goal is to find the weight $\bm{w}$ that minimize the cost function $E(\bm{w})$.}
 \end{Equation}
 
-\section{The Problem Of Overfitting}
+\section{The Problem of Overfitting}
 \label{subsec:poverfitting}
 If an expensive set of features is used (for example a ten polynomial grade $x^{10}$), then the model interpolates very close the training data, because there is a model with $10$ parameters where the data points can be perfectly represented. The risk is that the model overfit data points (see Fig. \ref{fig:overunderfit} (center)).
 
@@ -202,18 +199,19 @@ If an expensive set of features is used (for example a ten polynomial grade $x^{
 \subsection{Regularization}
 Some features with high values parameters have been penalized, if the model is overfitting, it is very likely that its parameters will have a big magnitude. This means that also the features that supply to these parameters will be higher and very low and this can cause a lot of problems. \\
 
-\noindent In order to control over-fitting the idea of adding a regularization term to an error function is introduced, so that the total error function to minimized takes the form:
+\noindent In order to control over-fitting the idea of adding a regularization term to an error function is introduced, so that the total minimization error function takes the form of:
 
 \begin{Equation}[H]
 	\centering
-	\begin{equation}\label{eq:fullreg}
+	\begin{equation} \label{eq:fullreg}
 		\begin{aligned}
-			E(w) = E_D(w) + \lambda E_W(w)
+			E(\bm{w}) = E_D(\bm{w}) + \lambda E_W(\bm{w}) .
 		\end{aligned}
 	\end{equation}
+	\caption[Total Minimization Error Function.]{Total Minimization Error Function.}
 \end{Equation}
 
-\noindent Where $\lambda$ is the regularization coefficient and it is the trade-off between how well fit training set is and how to establish the parameters $w$ with low values, therefore having simple hypotesys avoiding over-fitting. $E_D$ is the error based on dataset, while $E_W$ is based on weights.
+\noindent Where $\lambda$ is the regularization coefficient and it is the trade-off between how well fit training set is and how to establish the parameters $\bm{w}$ with low values, therefore having simple hypotheses avoiding over-fitting. $E_D(\bm{w})$ is the error based on dataset, while $E_W(\bm{w})$ is based on weights.
 
 \subsection{Cost Function}
 \label{subsec:regcostfun}
@@ -223,56 +221,43 @@ One of the simplest forms of regularizer is given by the sum-of-squares of the w
 	\centering
 	\begin{equation}\label{eq:regularizer}
 		\begin{aligned}
-			E_W(w) = \frac{1}{2} w^T w = \frac{||w||^2_2}{2}
+			E_W(\bm{w}) = \frac{1}{2} \bm{w}^T \bm{w} = \frac{||\bm{w}||^2_2}{2} .
 		\end{aligned}
 	\end{equation}
-	\caption[Cost function | Regularisation term.]{Cost function | Regularisation term.}
+	\caption[Cost function - Regularisation term.]{Cost function - Regularisation term.}
 \end{Equation}
 
-\noindent where $||w||_2$ is the euclidean norm $\sqrt{ \sum_{i=1}^{n} x^2_i}$. \\
+\noindent where $||\bm{w}||_2$ is the euclidean norm $\sqrt{ \sum_{i=1}^{n} x^2_i}$. \\
 
 %https://en.wikipedia.org/wiki/Ridge_regression
-\noindent This is also called ridge regression, a method of estimating the coefficients of multiple-regression models in scenarios where independent variables are highly correlated.
-
-\noindent If the sum-of-squares error function given by the following formula is considered:
-\begin{Equation}[H]
-	\centering
-		\begin{equation} \label{eq:sumsqinverted}
-			\begin{aligned}
-				E_D(w) = \frac{1}{2} [t_n - w^T \phi(x_n)]^2
-			\end{aligned}
-		\end{equation}
-	
-\end{Equation}
-
-\noindent then the total error function becomes:
+\noindent This is also called ridge regression, a method of estimating the coefficients of multiple-regression models in scenarios where independent variables are highly correlated. The total error function becomes:
 \begin{Equation}[H]
 	\centering
 		\begin{equation} \label{eq:lossridgereg}
 			\begin{aligned}
-				E(w) = \frac{1}{2} \sum_{n=1}^{N}[t_n - w^T \phi(x_n)]^2 + \frac{\lambda}{2} w^T w
+				E(\bm{w}) = \frac{1}{2} \sum_{n=1}^{N}[t_n - \bm{w}^T \bm{\phi}(\bm{x_n})]^2 + \frac{\lambda}{2} \bm{w}^T \bm{w} .
 			\end{aligned}
 		\end{equation}
-		\caption[Loss Function for Ridge Regression]{This particular choice of regularizer is known in the machine learning literature as weight decay because in sequential learning algorithms, it encourages weight values to decay towards zero.}
+		\caption[Loss Function for Ridge Regression]{Loss Function for Ridge Regression. This particular choice of regularizer is known in the machine learning literature as weight decay because in sequential learning algorithms, it encourages weight values to decay towards zero.}
 \end{Equation}
 
-\noindent Setting the gradient of $E(w)$ \gls{wrt} $w$ to zero, and solving for $w$, the result obtained is:
+\noindent Setting the gradient of $E(\bm{w})$ \gls{wrt} $\bm{w}$ to zero, and solving for $\bm{w}$, the result obtained is:
 
 \begin{Equation}[H]
 	\centering
 		\begin{equation} \label{eq:least-square-stepf}
 			\begin{aligned}
-				w^* = (\lambda I + \phi^T \phi)^{-1} \phi^T t
+				\bm{w^*} = (\lambda \bm{I} + \bm{\phi}^T \bm{\phi})^{-1} \bm{\phi}^T \bm{t} .
 			\end{aligned}
 		\end{equation}
-		\caption[Ridge regression solution]{This is an extension of the least-squares solution \ref{eq:normeq}.}
+		\caption[Ridge regression solution.]{Ridge regression solution. This is an extension of the least-squares solution \ref{eq:normeq}.}
 \end{Equation}
 
-\noindent From this side it denotes a better version than before because is also possible prove that ($\lambda I + \phi^T \phi$) is always invertible if $\lambda > 0$, therefore $w^*$ always exists.
+\noindent From this side it denotes a better version than before because is also possible prove that ($\lambda \bm{I} + \bm{\phi}^T \bm{\phi}$) is always invertible if $\lambda > 0$, therefore $\bm{w^*}$ always exists.
 
 \subsection{(Batch) Gradient Descent}
 \label{subsec:batchgradientdescen}
-\noindent Gradient descent is a first-order iterative optimization algorithm for finding the minimum $w$ of a function $E(w)$. To achieve this goal, it performs two steps iteratively, until convergence:
+\noindent Gradient descent is a first-order iterative optimization algorithm for finding the minimum $\bm{w}$ of a function $E(\bm{w})$. To achieve this goal, it performs two steps iteratively, until convergence:
 
 \begin{itemize}
 	\item Compute the slope (gradient) that is the first-order derivative of the function at the current point;
@@ -283,7 +268,7 @@ One of the simplest forms of regularizer is given by the sum-of-squares of the w
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=.6\textwidth]{images/grad_desc}
-	\caption[Gradient descent.]{Gradient descent is based on the observation that if the multi-variable function $E(w)$ is defined and differentiable in a neighborhood of a point $w_0$ , then $w_0$ decreases fastest if one goes from $w_0$  in the direction of the negative gradient of $E(w)$ at $w_0$, $-\nabla E(w_0)$.}
+	\caption[Gradient descent.]{Gradient descent is based on the observation that if the multi-variable function $E(\bm{w})$ is defined and differentiable in a neighborhood of a point $\bm{w_0}$ , then $\bm{w_0}$ decreases fastest if one goes from $\bm{w_0}$  in the direction of the negative gradient of $E(\bm{w})$ at $\bm{w_0}$, $-\nabla E(\bm{w_0})$.}
 	\label{fig:grad_desc}
 \end{figure}
 
@@ -294,18 +279,18 @@ One of the simplest forms of regularizer is given by the sum-of-squares of the w
 	\centering
 	\begin{equation} \label{eq:mser}
 		\begin{aligned}
-			E_D(w) = \frac{1}{2N} \sum_{n=1}^{N} [y(x_n,w)-t_n]^2
+			E_D(\bm{w}) = \frac{1}{2N} \sum_{n=1}^{N} [y(x_n,\bm{w})-t_n]^2 .
 		\end{aligned}
 	\end{equation}
-	\caption[Mean Squared Error.]{Mean Squared Error. $1/2$ is added, as in \gls{sse}, so the derivative doesn't need a constant out front. The problem is not an issue, because the minima of $E_D(w)$ and $E_D(w) / 2$ are achieved at the same value(s) of $w$.}
+	\caption[Mean Squared Error.]{Mean Squared Error. $1/2$ is added, as in \gls{sse}, so the derivative doesn't need a constant out front. The problem is not an issue, because the minima of $E_D(\bm{w})$ and $E_D(\bm{w}) / 2$ are achieved at the same value(s) of $\bm{w}$.}
 \end{Equation}
 
-\noindent Concerning the regularisation term $E_W(w)$ (\ref{eq:regularizer}), it could have been written:
+\noindent Concerning the regularisation term $E_W(\bm{w})$ (\ref{eq:regularizer}), it could have been written:
 \begin{Equation}[H]
 	\centering
 	\begin{equation} \label{eq:regnew}
 		\begin{aligned}
-			E_W(w) = \frac{ \sum_{m=1}^{M} {w^2_m}}{2}
+			E_W(\bm{w}) = \frac{ \sum_{m=1}^{M} {\bm{w}^2_m}}{2} .
 		\end{aligned}
 	\end{equation}
 	\caption[Regularisation term.]{Regularisation term.}
@@ -320,28 +305,29 @@ One of the simplest forms of regularizer is given by the sum-of-squares of the w
 	\centering
 	\begin{equation} \label{eq:fullregnew}
 	\begin{aligned}
-	E(w) = \frac{1}{2N} \left\{ \sum_{n=1}^{N} [ y(x_n,w)-t_n ]^2 + \lambda \sum_{m=1}^{M} {w^2_m} \right\}
+	E(\bm{w}) = \frac{1}{2N} \left\{ \sum_{n=1}^{N} [ y(x_n, \bm{w})-t_n ]^2 + \lambda \sum_{m=1}^{M} {\bm{w}^2_m} \right\} .
 	\end{aligned}
 	\end{equation}
-	\caption{Gradient Descent.}
+	\caption[Loss Function for Ridge Regression alternative form.]{Loss Function for Ridge Regression alternative form.}
 \end{Equation}
 
-\noindent Have some function $E(w)$ \\
-\noindent Want $\operatorname*{arg\,min}_w  E(w))$ \\
+\noindent The problem is set as follows: \\
+\noindent - Let $E(\bm{w})$ \\
+\noindent - Find $\operatorname*{arg\,min}_{\bm{w}}  E(\bm{w}))$ \\
 
-\noindent Keep changing $w$ to reduce $E(w)$ until a minimum is hopefully reached:
+\noindent Keep changing $\bm{w}$ to reduce $E(\bm{w})$ until a minimum is hopefully reached:
 
 \begin{Equation}[H]
 	\centering
 	\begin{equation} \label{eq:graddesc}
 		\begin{aligned}
 			Repeat = \{ \\
-				w_0 &:= w_0 - \alpha \frac{1}{N} \sum_{n=1}^{N} [ y(x_n,w)-t_n ]^2 \, x_0 \\
-				w_j &:= w_j - \alpha \frac{1}{N} \sum_{n=1}^{N} [ y(x_n,w)-t_n ]^2 \, x_j + \frac{\lambda}{M} w_j\\
+				w_0 &:= w_0 - \alpha \frac{1}{N} \sum_{n=1}^{N} [ y(x_n, \bm{w})-t_n ]^2 \, x_0 ; \\
+				w_j &:= w_j - \alpha \frac{1}{N} \sum_{n=1}^{N} [ y(x_n, \bm{w})-t_n ]^2 \, x_j + \frac{\lambda}{M} w_j .\\
 			\}
 		\end{aligned}
 	\end{equation}
-	\caption[Gradient Descent in compact form.]{Cost function for Gradient Descent in compact form.}
+	\caption[Gradient Descent for Ridge Regression.]{Gradient Descent for Ridge Regression.}
 \end{Equation}
 
 \noindent where in compact form is:
@@ -350,15 +336,14 @@ One of the simplest forms of regularizer is given by the sum-of-squares of the w
 	\begin{equation} \label{eq:graddesccompact}
 	\begin{aligned}
 		Repeat = \{ \\
-			w_j &:= w_j(1-\alpha \frac{\lambda}{N}) - \alpha \frac{1}{N} \sum_{n=1}^{N} [ y(x_n,w)-t_n ]^2 \, x_j \\
+			w_j &:= w_j(1-\alpha \frac{\lambda}{N}) - \alpha \frac{1}{N} \sum_{n=1}^{N} [ y(x_n, \bm{w})-t_n ]^2 \, x_j .\\
 		\}
 	\end{aligned}
 	\end{equation}
-	\caption[Cost function for Gradient Descent.]{Cost function for Gradient Descent.}
+	\caption[Gradient Descent for Ridge Regression in compact form.]{Gradient Descent for Ridge Regression in compact form.}
 \end{Equation}
 
-
-
+\newpage
 \section{Artificial Neural Networks}
 \label{sec:nn}
 The term \gls{nn} has its origins in attempts to find mathematical representations of information processing in biological systems. In fact, \glspl{ann}, subset of \gls{ml} field, are models inspired from the biological performance of human brain \cite[]{inbook}. 
@@ -379,24 +364,25 @@ The term \gls{nn} has its origins in attempts to find mathematical representatio
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=.7\textwidth]{images/NN}
-	\caption[Feed forward neural network.]{The image graphically shows a \gls{nn} with three layers (or two hidden layers). The input layer has $M^{(0)}$ neurons and the output layer has $K$ outputs. Neurons are organized in  layers to allow parallel computation to avoid cyclic dependencies. The process of computing \gls{nn} outputs from inputs is called forward propagation. This kind of network is also called Multi-layer perceptron.}
+	\includegraphics[width=.8\textwidth]{images/NN}
+	\caption[Feed forward neural network.]{The image graphically shows a \gls{nn} with three layers (or two hidden layers). The input layer has $\bm{M}^{(0)}$ neurons and the output layer has $\bm{K}$ outputs. Neurons are organized in  layers to allow parallel computation to avoid cyclic dependencies. The process of computing \gls{nn} outputs from inputs is called forward propagation. This kind of network is also called Multi-layer perceptron.}
 	\label{fig:nn}
 \end{figure}
 
-\noindent The $z^{(l)}_m$ are neurons, each takes its input values and computes a single output value from them. Neurons are organized in layers $1,...,L$ and usually the starting input is considered the 0th layer. Inputs $x_1,...,x_D$ are occasionally called input layer/neurons (even though they do not compute anything). The output of the entire network is then $y=z^{(L)}$, called output layer. Instead, the internal layers are called hidden layers. Each layer $l\in \{1,...,L\}$ has $M^{(l)}$ neurons.
+\noindent The $z^{(l)}_m$ are neurons, each takes its input values and computes a single output value from them. Neurons are organized in layers $1,...,L$ and usually the starting input is considered the $0$-th layer. Inputs $x_1,...,x_D$ are occasionally called input layer/neurons (even though they do not compute anything). The output of the entire network is then $\bm{y}=\bm{z}^{(L)}$, called output layer. Instead, the internal layers are called hidden layers. Each layer $l\in \{1,...,L\}$ has $M^{(l)}$ neurons. \\
 
 \noindent $M^{(1)}$ neurons perform a perceptron-like computation:
 
 \begin{Equation}[H]
 	\centering
 	\begin{equation} \label{eq:neurbas}
-		u^{(1)}_m = (w^{(1)}_m)^T x + b^{(1)}_m,  
+		u^{(1)}_m = (\bm{w}^{(1)}_m)^T \bm{x} + b^{(1)}_m ; 
 		\quad \quad
-		z^{(1)}_m = f(u{(1)}_m),
+		z^{(1)}_m = f(u^{(1)}_m) ;
 		\quad \quad
-		m=1,...,M^{(1)}
-	\end{equation}	
+		m=1,...,M^{(1)} .
+	\end{equation}
+	\caption[Neurons functions of the first layer.]{Neurons functions of the first layer.}
 \end{Equation}
 
 \noindent with a differentiable activation function $f$ for gradient descent. This step is iterated multiple times taking the outputs of the previous step:
@@ -404,8 +390,9 @@ The term \gls{nn} has its origins in attempts to find mathematical representatio
 \begin{Equation}[H]
 	\centering
 	\begin{equation} \label{eq:neurbas2}
-		z^{(l-1)} = (z^{(l-1)}_m)_{m=1,...,M^{(l-1)}}
+		\bm{z}^{(l-1)} = (z^{(l-1)}_m)_{m=1,...,M^{(l-1)}} .
 	\end{equation}	
+	\caption[Chain of neurons functions.]{Chain of neurons functions.}
 \end{Equation}
 
 \noindent as input of:
@@ -413,28 +400,31 @@ The term \gls{nn} has its origins in attempts to find mathematical representatio
 \begin{Equation}[H]
 	\centering
 	\begin{equation} \label{eq:neurbas3}
-		u^{(l)}_m = (w^{(l)}_m)^T z^{(l-1)} + b^{(l)}_m,  
+		u^{(l)}_m = (\bm{w}^{(l)}_m)^T \bm{z}^{(l-1)} + b^{(l)}_m ;
 		\quad \quad
-		z^{(l)}_m = f(u^{(l)}_m)
+		z^{(l)}_m = f(u^{(l)}_m) .
 	\end{equation}
+	\caption[Neurons functions of a specific layer l.]{Neurons functions of a specific layer l.}
 \end{Equation}
 
-\noindent where $m=1,...,M^{(1)}$ and $l=2,...,L$. Weights $w$ are usually independent for each step. Additionally define $z^{(0)}$ to be the input, i.e.
+\noindent where $m=1,...,M^{(1)}$ and $l=2,...,L$. Weights $w$ are usually independent for each step. Additionally define $\bm{z}^{(0)}$ to be the input, i.e.
 
 \begin{Equation}[H]
 	\centering
 	\begin{equation} \label{eq:neurbas4}
-		z^{(0)} = x
+		\bm{z}^{(0)} = x .
 	\end{equation}
+	\caption[Input layer as zeroth layer.]{Input layer as zeroth layer.}
 \end{Equation}
 
-\noindent For each layer $l \in 1,...,L$ the computation is
+\noindent For each layer $l \in 1,...,L$ the computation is:
 
 \begin{Equation}[H]
 	\centering
 	\begin{equation} \label{eq:neurbas5}
-		z^{(l)}_m = f( (w^{(l)}_m)^T z^{(l-1)} + b^{(l)}_m)
+		z^{(l)}_m = f( (\bm{w}^{(l)}_m)^T \bm{z}^{(l-1)} + b^{(l)}_m) .
 	\end{equation}
+	\caption[Forward propagation.]{Forward propagation.}
 \end{Equation}
 
 \noindent which can be written as a matrix multiplication:
@@ -442,12 +432,12 @@ The term \gls{nn} has its origins in attempts to find mathematical representatio
 \begin{Equation}[H]
 	\centering
 	\begin{equation} \label{eq:forwpropag}
-		z^{(l)} = f( W^{(l)} z^{(l-1)} + b^{(l)})
+		\bm{z}^{(l)} = f( \bm{W}^{(l)} \bm{z}^{(l-1)} + \bm{b}^{(l)}) .
 	\end{equation}
-	\caption[Forward propagation.]{Function that identifies input transformation at each step $l$ of the net.}	
+	\caption[Forward propagation as a matrix multiplication.]{Forward propagation as a matrix multiplication. Function that identifies input transformation at each step $l$ of the net.}	
 \end{Equation}
 
-\noindent The weights $w$ are directed connections between the neurons, e.g. the neurons of layer 2 are connected to the ones of layer 1 by the weights $w^{(2)}_{mn}, m=1,...M^{(1)}, n=1,...,M^{(2)}$. The bias $b$ varies according to the propensity of the neuron to activate, influencing its output. \\
+\noindent The weights $\bm{w}$ are directed connections between the neurons, e.g. the neurons of layer 2 are connected to the ones of layer 1 by the weights $w^{(2)}_{mn}, m=1,...M^{(1)}, n=1,...,M^{(2)}$. The bias $b$ varies according to the propensity of the neuron to activate, influencing its output. \\
 
 \noindent $f()$ is an activation function and needs to be differentiable, so that gradient descent training is applicable. For the hidden layers of the network, the activation function must be nonlinear, because multiple linear computations can be collapsed to a single one, therefore in order to gain power from iterative computation, nonlinear steps are needed.
 
@@ -464,7 +454,7 @@ The term \gls{nn} has its origins in attempts to find mathematical representatio
 	\label{fig:old_act_fun}
 \end{figure}
 
-\noindent One of the key characteristics of modern deep learning system is to use non-saturated activation function (e.g. ReLU) to replace its saturated counterpart (e.g. sigmoid, tanh). The advantage of using non-saturated activation function lies in two aspects: the first is to solve the so called "exploding/vanishing gradient" \cite[]{bengio1994learning}, in particular on the difficulty of training \gls{rnn} \cite[]{pascanu2013difficulty}, while the second is to accelerate the convergence speed. More sophisticated activation function as the "leaky ReLU" try to solve the dying ReLU problem \cite[]{LeakyReL95:online}. In contrast to ReLU, in which the negative part is totally dropped, leaky ReLU assigns a non-zero slope to it. Leaky ReLU and its variants are consistently better than ReLU in \gls{cnn} \cite[]{xu2015empirical}.
+\noindent One of the key characteristics of modern deep learning system is to use non-saturated activation function (e.g. ReLU) to replace its saturated counterpart (e.g. sigmoid, tanh). The advantage of using non-saturated activation function lies in two aspects: the first is to solve the so called "exploding/vanishing gradient" \cite[]{bengio1994learning}, in particular on the difficulty of training \gls{rnn} \cite[]{pascanu2013difficulty}, while the second is to accelerate the convergence speed. More sophisticated activation function as the "leaky ReLU" try to solve the dying ReLU problem \cite[]{LeakyReL95:online}. In contrast to ReLU, in which the negative part is totally dropped, leaky ReLU assigns a non-zero slope to it. Leaky ReLU and its variants are consistently better than ReLU in \gls{cnn} \cite[]{xu2015empirical}. \\
 
 \noindent Leaky Rectified linear activation is introduced in acoustic model \cite[]{maas2013rectifier}. Mathematically, it is defined as follows:
 
@@ -475,7 +465,7 @@ The term \gls{nn} has its origins in attempts to find mathematical representatio
 			\begin{cases}
 			\frac{x}{a} & \text{if $x < 0 $} \\
 			x & \text{otherwise}
-		\end{cases}
+		\end{cases} .
 	\end{equation}
 	\caption[Leaky Rectified linear activation.]{Function that identifies input transformation at each step $l$ of the net.}
 \end{Equation}
@@ -485,34 +475,36 @@ The term \gls{nn} has its origins in attempts to find mathematical representatio
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=.65\textwidth]{images/leaky_relu}
-	\caption[Leaky Rectified linear activation.]{Neuron and myelinated axon, with signal flow from inputs at dendrites to outputs at axon terminals. The signal represents a short electrical pulse called 'spike'.}
+	\caption[Leaky Rectified linear activation.]{Neuron and myelinated axon, with signal flow from inputs at dendrites to outputs at axon terminals. The signal represents a short electrical pulse called "spike".}
 	\label{fig:leakyrelu}
 \end{figure}
 
-\subsection{\gls{nn} Setup for Classification}
+\subsection{Neural Network Setup for Classification}
 \label{nn:nnclassification}
 For a classification task with $K$ classes, a $K$-dimensional output layer is used. A sample $x \in R^D$ is classified as belonging to class $k$ if the output neuron $y_k$ has the maximal value:
 
 \begin{Equation}[H]
 	\centering
 	\begin{equation} \label{eq:nnclass}
-		c^*= \operatorname*{arg\,max}_k  y_k
+		c^*= \operatorname*{arg\,max}_k  y_k .
 	\end{equation}
+	\caption[Sample of a class k.]{Sample of a class k.}
 \end{Equation}
 
-\noindent The problem is that the $arg max$ function is not differentiable. Therefore, this is solved by letting the \gls{nn} output a probability distribution over classes:
+\noindent The problem is that the $arg\,max$ function is not differentiable. Therefore, this is solved by letting the \gls{nn} output a probability distribution over classes:
 
 \begin{Equation}[H]
 	\centering
 	\begin{equation} \label{eq:nnclass2}
-		y = (y_k)_{k=1,...,K}
+		\bm{y} = (y_k)_{k=1,...,K} ;
 		\quad
 		\quad
 		\quad
-		y_k \geq 0,
+		y_k \geq 0 ;
 		\quad
-		\sum_{k} y_k = 1
+		\sum_{k} y_k = 1 .
 	\end{equation}
+	\caption[Probability distribution over classes.]{Probability distribution over classes.}
 \end{Equation}
 
 \noindent The advantage is that a differentiable measure of the quality of the output on theoretical grounds is derivable, using probability theory. In order to make the network output a probability distribution, exponentials are taken and normalized. This is the softmax nonlinearity:
@@ -520,32 +512,33 @@ For a classification task with $K$ classes, a $K$-dimensional output layer is us
 \begin{Equation}[H]
 	\centering
 	\begin{equation} \label{eq:softmax}
-		S(y) = (\frac{e^{y_1}}{\sum_k e^{y_k}},...,\frac{e^{y_K}}{\sum_k e^{y_k}})
+		S(\bm{y}) = \left( \frac{e^{y_1}}{\sum_k e^{y_k}},...,\frac{e^{y_K}}{\sum_k e^{y_k}} \right) .
 	\end{equation}
 	\caption[Softmax nonlinearity.]{Softmax nonlinearity.}
 \end{Equation}
 
-\noindent In contrast to other activation functions, it is applied to the full last layer of the \gls{nn}, not to each indipendent component. The hidden layers can have any nonlinear activation function.
+\noindent In contrast to other activation functions, it is applied to the full last layer of the \gls{nn}, not to each indipendent component. The hidden layers can have any nonlinear activation function. \\
 
-\noindent The learning process is structured as a non-convex optimisation problem in which the aim is to minimise a cost function, which measures the distance between a particular solution and an optimal one.
+\noindent The learning process is structured as a non-convex optimisation problem in which the aim is to minimise a cost function, which measures the distance between a particular solution and an optimal one. \\
 
-\noindent If a \gls{nn} with softmax output is assumed, can be computed the loss by measuring the cross-entropy between the output distribution and the target distribution.
+\noindent If a \gls{nn} with softmax output is assumed, can be computed the loss by measuring the cross-entropy between the output distribution and the target distribution. \\
 
-\noindent Encoding the target in one-hot style, e.g. if a sample belongs to class k, the target is:
+\noindent Encoding the target in one-hot style, e.g. if a sample belongs to class $k$, the target is:
 
 \begin{Equation}[H]
 	\centering
 	\begin{equation} \label{eq:nnclass3}
-		t=(0,...,0,1,0,...,0)
+		\bm{t}=(0,...,0,1,0,...,0) .
 	\end{equation}
+	\caption[One-hot style target.]{One-hot style target.}
 \end{Equation}
 
-\noindent This is treated as a probability distribution: in an ideal world, a perfect hypothesis $y$ would exactly match this $t$, assigning probability $1$ to the correct class, and probability $0$ otherwise. The cross-entropy loss is defined as:
+\noindent This is treated as a probability distribution: in an ideal world, a perfect hypothesis $\bm{y}$ would exactly match this $\bm{t}$, assigning probability $1$ to the correct class, and probability $0$ otherwise. The cross-entropy loss is defined as:
 
 \begin{Equation}[H]
 	\centering
 	\begin{equation} \label{eq:cross-entropy}
-		E_{CE} = -\sum_{k}(t_k \, \log y_k)
+		E_{CE} = -\sum_{k}(t_k \, \log y_k) .
 	\end{equation}
 	\caption[Cross-entropy loss.]{Cross-entropy loss.}
 \end{Equation}
@@ -555,15 +548,142 @@ For a classification task with $K$ classes, a $K$-dimensional output layer is us
 \begin{Equation}[H]
 	\centering
 	\begin{equation}
-		E_{CE+SM} = -\sum_{k}(t_k \, \log S_k(y))
+		E_{CE+SM} = -\sum_{k}(t_k \, \log S_k(\bm{y})) .
 	\end{equation}
-	\caption[Softmax cross entropy.]{To train the network with backpropagation, the calculation of the derivative of the loss is needed. In the general case, that derivative can get complicated, but using the softmax and the cross entropy loss, that complexity fades away.}
+	\caption[Softmax cross entropy.]{Softmax cross entropy. To train the network with Backpropagation, the calculation of the derivative of the loss is needed. In the general case, that derivative can get complicated, but using the softmax and the cross entropy loss, that complexity fades away.}
 	\label{eq:softmaxcrossentr}
 \end{Equation}
 
-\subsection{Optimisation algorithms}
+\subsection{Backpropagation}
+\label{sec:backpropagation}
+The term Backpropagation strictly refers only to the algorithm for computing the gradient, not how the gradient is used. First the mathematical aspect will be presented in \ref{subsubsec:training} and then the algorithm \ref{subsubsec:graddescbyback}.
+
+\subsubsection{Training}
+\label{subsubsec:training}
+To train a \gls{nn} is possible to use the Gradient Descent. This requires to compute the gradient of the \gls{nn} error \gls{wrt} each weight. In order to perform this computation in an efficient way it is important to derive the Backpropagation algorithm. Since the Eq. \ref{eq:neurbas4} has this form then we have chain rule \ref{eq:neurbaschainrule}, assuming that the non-linearity $f$ is computed independently for each neuron, that is always true except for the softmax nonlinearity.
+
+\begin{Equation}[H]
+	\centering
+	\begin{equation} \label{eq:neurbas4}
+		z^{(l)}_n = f(u^{(l)}_n) = f \left( \sum_{m} w^{(l)}_{mn} \, z^{(l-1)}_m + b^{(l)}_n \right) .
+	\end{equation}
+\end{Equation}
+
+\begin{Equation}[H]
+	\centering
+	\begin{equation} \label{eq:neurbaschainrule}
+		\begin{aligned}
+			\frac{\partial z^{(l)}_n}{\partial w^{(l)}_{mn}} &= f' \left( u^{(l)}_n \right) \, z^{(l-1)}_m ;\\
+			\frac{\partial z^{(l)}_n}{\partial b^{(l)}_n} &= f' \left( u^{(l)}_n \right) ;\\
+			\frac{\partial z^{(l)}_n}{\partial w^{(l-1)}_m} &= f' \left( u^{(l)}_n \right) \, w^{(l)}_{mn} .\\
+		\end{aligned}
+	\end{equation}
+	\caption[Chain Rule.]{Chain Rule.}
+\end{Equation}
+
+\noindent for any $l=1,...,L$. Now, assuming that for a given sample $\bm{x}$ the error $E(\bm{y})= E(\bm{z}^{(L)})$, then, for the last layer, gradients are immediately calculable as in Eq \ref{eq:neurbaschainrulell}.
+
+\begin{Equation}[H]
+	\centering
+	\begin{equation} \label{eq:neurbaschainrulell}
+		\begin{aligned}
+			\frac{\partial E}{\partial w^{(L)}_{mn}} &= \frac{\partial E}{\partial z^{(L)}_n} \frac{\partial z^{(L)}_n}{\partial w^{(L)}_{mn}} = \frac{\partial E}{\partial z^{(L)}_n} \, f' \left( u^{(l)}_n \right) \, z^{(l-1)}_m ;\\
+			\frac{\partial E}{\partial b^{(L)}_n} &= \frac{\partial E}{\partial z^{(L)}_n} \frac{\partial z^{(L)}_n}{\partial b^{(L)}_n} = \frac{\partial E}{\partial z^{(L)}_n} \, f' \left( u^{(l)}_n \right) .\\
+		\end{aligned}
+	\end{equation}
+	\caption[Gradients for the last layer.]{Gradients for the last layer.}
+\end{Equation}
+
+\noindent This calculation is more complicated for the lower layers since all paths leading to a certain weight must be considered. In Eq. \ref{eq:neurbackgencas} the general case.
+
+\begin{Equation}[H]
+	\centering
+	\begin{equation} \label{eq:neurbackgencas}
+    	\begin{aligned}
+    		\frac{\partial E}{\partial z^{(l)}} = 
+    		    \begin{pmatrix} 
+    		        \frac{\partial E}{\partial z^{(l)}_1} & \dots & \frac{\partial E}{\partial z^{(l)}_{M^{(l)}}}
+    		    \end{pmatrix} \in \mathbb{R}^{1 x M^{(l)}}; \\[10pt]
+    		\frac{\partial z^{(l)}}{\partial z^{(l-1)}} =
+        		\begin{pmatrix}
+        			\frac{\partial z^{(l)}_1}{\partial z^{(l-1)}_1} & \dots & \frac{\partial z^{(l)}_1}{\partial z^{(l-1)}_{M^{(l-1)}}} \\
+        			\vdots & \ddots & \vdots \\
+        			\frac{\partial z^{(l)}_{M^{(l)}}}{\partial z^{(l-1)}_1} & \dots & \frac{\partial z^{(l)}_{M^{(l)}}}{\partial z^{(l-1)}_{M^{(l-1)}}} \\
+        		\end{pmatrix} \in \mathbb{R}^{M^{(l)} x M^{(l-1)}}; \\[10pt]
+    		\frac{\partial z^{(l)}}{\partial w^{(l)}_{ij}} = 
+    		    \begin{pmatrix} 
+    		        \frac{\partial z^{(l)}_1}{\partial w^{(l)}_{ij}} \\
+    		        \vdots \\
+    		        \frac{\partial z^{(l)}_{M^{(l)}}}{\partial w^{(l)}_{ij}} 
+    		    \end{pmatrix} \in {\mathbb{R}}^{M^{(l)} x 1}.
+		\end{aligned}
+	\end{equation}
+	\caption[Backpropagation Training.]{Backpropagation Training.}
+\end{Equation}
+
+\noindent Furthermore, it is possible to decompose $\frac{\partial z^{(l+1)}}{\partial z^{(l)}}$ into the gradient of the nonlinearity and the network part as in Eq \ref{eq:neurdecomps}. 
+
+\begin{Equation}[H]
+	\centering
+	\begin{equation} \label{eq:neurdecomps}
+		\frac{\partial z^{(l+1)}}{\partial z^{(l)}} = \frac{\partial z^{(l+1)}}{\partial u^{(l+1)}} \, \frac{\partial u^{(l+1)}}{\partial z^{(l)}}.
+	\end{equation}
+\end{Equation}
+
+\noindent We define $\bm{F}^{(l+1)}:= \frac{\partial z^{(l+1)}}{\partial u^{(l+1)}}$ and $\bm{W}^{(l+1)}:= \frac{\partial u^{(l+1)}}{\partial z^{(l)}}$. Then, by chain rule:
+
+\begin{Equation}[H]
+	\centering
+	\begin{equation} \label{eq:neurdecomps}
+		\frac{\partial E}{\partial w^{(l)}_{ij}} = \frac{\partial E}{\partial z^{(L)}} \, \frac{\partial z^{(L)}}{\partial z^{(L-1)}} ... \frac{\partial z^{(l+1)}}{\partial z^{(l)}} \, \frac{\partial z^{(l)}}{\partial w^{(l)}_{ij}}.
+	\end{equation}
+\end{Equation}
+
+\noindent The bias update is similar. Let $\delta^{(l)}$ be the gradient of the loss \gls{wrt} the activation of the $l$-th layer:
+
+\begin{Equation}[H]
+	\centering
+	\begin{equation} \label{eq:neurdecomps}
+		\delta^{(l)} = \frac{\partial E}{\partial z^{(L)}} \, \frac{\partial z^{(L)}}{\partial z^{(L-1)}} ... \frac{\partial z^{(l+1)}}{\partial z^{(l)}} \in \mathbb{R}^{1 x M^{(l)}} .
+	\end{equation}
+\end{Equation}
+
+\noindent and note that:
+
+\begin{Equation}[H]
+	\centering
+	\begin{equation} \label{eq:neurdecomps}
+		\delta^{(l)} = \delta^{(l+1)} \frac{\partial z^{(l+1)}}{\partial z^{(l)}} = \delta^{(l+1)} \bm{F}^{(l+1)}; \, \bm{W}^{(l+1)} \quad\quad \delta^{(L)} = \frac{\partial E}{\partial z^{(L)}} .
+	\end{equation}
+\end{Equation}
+
+\noindent Finally, combining prior results:
+\begin{Equation}[H]
+	\centering
+	\begin{equation} \label{eq:neurdecomps}
+		\frac{\partial E}{\partial w^{(l)}_{ij}} = \delta^{(l)} \frac{\partial z^{(l)}}{\partial w^{(l)}_{ij}} = \delta^{(l)} \bm{F}^{(l)} \, z^{(l-1)}_i .
+	\end{equation}
+\end{Equation}
+
+\subsubsection{Gradient Descent by Backpropagation}
+\label{subsubsec:graddescbyback}
+Follows the complete algorithm to perform a gradient step in \gls{nn} training, using the Backpropagation algorithm to compute the gradients:
+
+\begin{enumerate}
+  \item Perform the forward pass, save intermediate results
+  \item For l = L,...,1,
+  \item \quad Compute $\delta^{(l)}$ from $\delta^{(l+1)}$ (except for $l=L$, the recursion start)
+  \item \quad Compute and save the weight gradients for layer $l$
+  \item Update all weights simultaneously: $\bm{w} = \bm{w} - \eta \nabla \bm{w}$
+\end{enumerate}
+
+\noindent where $\eta$ is the learning rate, and $\nabla \bm{w}$ collects the gradients. In the forward case we compute neurons activation from layer $1$ to layer $L$; instead, in the backward case we compute errors from layer $L$ to layer $1$. 
+
+\subsection{Optimisation Algorithms}
 \label{nn:optmalgo}
-The choice of optimization algorithms strongly influences the effectiveness of the learning process, as they update and calculate the appropriate and optimal values of that model. Specifically, if the gradient descent is considered, which is the most popular optimization strategy used in machine learning, the extent of the update is determined by the learning rate $\lambda$, which guarantees convergence to the global minimum for convex error surfaces and to a local minimum for non-convex surfaces. By the way, there are better optimization as the non linear conjugate gradient \cite[]{conjugategradient}, BFGS, the improved version to decrease memory usage L-BFGS \cite[]{saputro2017limited}, etc... the main advantages are that there is no need to manually pick $\lambda$ and often are faster than gradient descent, although more complex algorithms. \\
+Gradient descent can be adapted to minimize the loss function of a predictive model on a training dataset, such as a classification or regression model. This adaptation is called stochastic gradient descent, it represents an extension of the gradient descent optimization algorithm for minimizing a loss function of a predictive model on a training dataset \cite{Differen84:online}. The algorithm is referred to as "stochastic" because the gradients of the target function \gls{wrt} the input variables are probabilistic approximation. A challenge when using stochastic gradient descent to train a neural network is how to calculate the gradient for nodes in hidden layers in the network. This requires a specific technique from calculus called the chain rule and an efficient algorithm that implements it that can be used to calculate gradients for any parameter in the network. This algorithm is called Backpropagation \ref{sec:backpropagation}. Hence, to sum up: Gradient Descent is an optimization method and Backpropagation is used to compute gradients which are required for gradient descent. \\
+
+\noindent The choice of optimization algorithms strongly influences the effectiveness of the learning process, as they update and calculate the appropriate and optimal values of that model. Specifically, if the gradient descent is considered, which is the most popular optimization strategy used in machine learning, the extent of the update is determined by the learning rate $\lambda$, which guarantees convergence to the global minimum for convex error surfaces and to a local minimum for non-convex surfaces. By the way, there are better optimization as the non linear conjugate gradient \cite[]{conjugategradient}, BFGS, the improved version to decrease memory usage L-BFGS \cite[]{saputro2017limited}, etc... the main advantages are that there is no need to manually pick $\lambda$ and often are faster than gradient descent, although more complex algorithms. \\
 
 \noindent The optimiser chosen for this thesis project is Adam, an algorithm for first-order gradient-based optimisation of stochastic objective functions, based on adaptive estimates of lower-order moments \cite[]{kingma2017adam}. It is an extension to stochastic gradient descent that has recently seen broader adoption for \gls{dl} applications in computer vision and \gls{nlp}.
 
@@ -575,3 +695,12 @@ The choice of optimization algorithms strongly influences the effectiveness of t
 		\label{fig:adam}
 	\end{minipage}
 \end{figure}
+
+\noindent To be more specific, Adam combines the advantages of two other extensions of stochastic gradient descent:
+
+\begin{itemize}
+    \item Adaptive Gradient Algorithm (AdaGrad), maintains a per-parameter learning rate that improves performance on problems with sparse gradients e.g. \gls{nlp} and computer vision problems;
+    \item Root Mean Square Propagation (RMSProp), maintains per-parameter learning rates that are adapted based on the average of recent magnitudes of the gradients for the weight. Therefore, the algorithm works pretty well on online and non-stationary problems e.g. noisy.
+\end{itemize}
+
+\noindent Instead of adapting the parameter learning rates based on the average first moment (the mean) as in RMSProp, Adam also makes use of the average of the second moments of the gradients (the uncentered variance). In the Fig. \ref{fig:adam} the performance of Adam in action.

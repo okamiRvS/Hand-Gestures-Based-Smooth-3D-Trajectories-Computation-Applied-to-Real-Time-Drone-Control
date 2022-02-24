@@ -1,6 +1,24 @@
-\chapter*{Conclusions and Future works}
-\addcontentsline{toc}{chapter}{Conclusion and perspectives}
+\chapter*{Conclusion and Perspectives}
+\addcontentsline{toc}{chapter}{Conclusion and Perspectives}
 \label{chap:concl}
+This chapter presents first, in \ref{sec:concl}, concluding thoughts and finally suggestions for possible future research lines in \ref{sec:fut}.
 
+\section{Concluding Thoughts}
+\label{sec:concl}
+%Il vento è un problema attualmente. Il test è stato eseguito con un drone di fascia media/bassa, non è stabile abbastanza e quindi non si riesce a individuare la traiettoria come si deve. Per il tello nello spcifico, al di sotto dei 5km/h si riesce a lavorare, al di sopra, soprattutto sopra 10km/h diventa praticamente impossibile. Sarebbe quindi meglio provare su un drone più stabile, più resistente al vento. 
 
-%Il vento è un problema attualmente. Il test è stato eseguito con un drone di fascia media/bassa, non è stabile abbastanza e quindi non si riesce a individuare la traiettoria come si deve. Sarebbe quindi meglio provare su un drone più stabile, più resistente al vento. Potrebbe essere anche utile applicare un algortimo di stabilizzazione dell'immagine in tempo reale, così da avere un livello di precisione più alta nell'individuare la traiettoria. Da tenere conto anche un invio dei dati più veloce così da permettergli di fare una curva, oppure computarla prima così da evitare che se perso un pacchetto udp il drone compie altri tipi di traiettorie
+Our work makes a further step in the direction of Motion Tracking approaches, and aims to find feasible solutions in a practical scenario, that of drone filming. The hand gesture \gls{3d} tracking technology provides a detailed view of digitizing the measurement data, positional movement (tracked on the X, Y and Z axes of a \gls{3d} coordinate system) and orientation data calculated through Rotation (roll, pitch and yaw). This movement is reported in relation to the "detect" gesture. \\
+
+\noindent \gls{3d} tracking technology bridges the gap between static images and dynamic movements and brings the physical world into digital interfaces (and vice-versa). This system is tied to its accuracy. In fact, the difference between arriving exactly at the destination or being off by miles (or millimetres in surgical navigation applications) is a requirement to keep absolutely in mind. Our system tries to establish itself not in an environment of absolute precision, but instead it tries to capture the user’s idea by helping him, for the success of the shooting. In this meaning, the original goal is reached with success. \\
+
+\noindent The methods applied have been suitable and have led to the construction of a useful and working system. The main difficulties were those related to the estimation of orientation to obtain information on three-dimensionality, because it was necessary to reason on unconventional approaches. \\
+
+\noindent The Tello is a mini drone that, despite containing several advanced features is mainly dedicated to novice users. Weighing only $80gr$, it does not remain stable in case of a very wind day. During the test phase, it was verified that trying to capture a trajectory directly from the drone’s camera in a day with a wind travelling over $10km/h$ is unfeasible. The drone is constantly pushed by the wind, making it unstable and generating too much noise on the trajectory not allowing the correct reading. Otherwise, with a wind slower than $5km/h$ the tests were carried out without any problem. This leads to the conclusion that it would be ideal to use a heavier drone, or at least a more wind resistant one, so that the latter can generate not too much noise to overpower the acquisition process of the \gls{3d} trajectory.
+
+\section{Future Works}
+\label{sec:fut}
+
+%Potrebbe essere anche utile applicare un algortimo di stabilizzazione dell'immagine in tempo reale, così da avere un livello di precisione più alta nell'individuare la traiettoria. Da tenere conto anche un invio dei dati più veloce così da permettergli di fare una curva, oppure computarla prima così da evitare che se perso un pacchetto udp il drone compie altri tipi di traiettorie
+Our contribution gives space to numerous developments: it might be interesting to think of a gestures combinations system, thus establishing a real language. Obviously, this would make user-drone interaction more complex. Even though benefits are more interesting types of applications as for example combinations of parameterizable programmed actions. In fact, if two different gestures with the same hand (at different times) are done, then two actions are performed whose intensity could be determined by the speed of passage from one gesture to another or by the direction in which this passage is made. \\
+
+\noindent Since the orientation estimation is performed, it can be also exploited in such a way that this information is effectively used to make shots. This would permit the drone not only to respect the position in space, but also the orientation. In the case of Tello, is it possible handle only the yaw. However, there are plenty robots (like mechanical arms) capable to control also the row and pitch. Mediapipe gives a way to locate more than one hand in the scene. This means that it may be possible to combine not only different gestures with the same hand as time goes further, but also multiple hands with different gestures in the same instant or as time goes further.

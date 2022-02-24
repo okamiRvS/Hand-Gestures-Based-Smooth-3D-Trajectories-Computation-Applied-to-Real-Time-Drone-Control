@@ -1,25 +1,72 @@
 \chapter{Evaluation}
 \label{chap:evaluation}
-In this chapter, the results obtained from the three models created for hand gesture recognition will be displayed and commented first and then those obtained for the estimates of the 3d trajectories.
+In this chapter, the results obtained from the three models created for hand gesture recognition and those for the estimates of the 3d trajectories will be displayed and commented in \ref{sec:handeval}. Then an analysis is made on the \gls{3d} trajectories both in simulation and in real \ref{sec:3dtrajeval}. 
 
-\section{Hand gesture recognition model evaluation}
+\section{Hand Gesture Recognition Model Evaluation}
 \label{sec:handeval}
-As said in \ref{sec:model} three models were generated using the same hyperparameters: one using the selected features, one using \gls{pca}, and finally one using all the features. \\ 
+As said in \ref{sec:model} three models were generated using the same hyper-parameters: one using the selected features, one using \gls{pca}, and one using all the features. \\ 
 
-\noindent Metric is different from loss function. Loss functions are functions that show a measure of the model performance and are used to train a machine learning model (using some kind of optimization) and are usually differentiable in model’s parameters. On the other hand, metrics are used to monitor and measure the performance of a model and do not need to be differentiable. However, if for some tasks the performance metric is differentiable, it can be used both as a loss function and a metric, such as \gls{mse}.
+\noindent Metric is different from loss function: loss functions are functions that show a measure of the model performance, are used to train a machine learning model (using some kind of optimization), and are usually differentiable in model’s parameters. On the other hand, metrics are used to monitor and measure the performance of a model and do not need to be differentiable. However, if for some tasks the performance metric is differentiable, it can be used both as a loss function and a metric, such as \gls{mse}. \\
 
-\noindent Confusion matrix (also known as error matrix) is a tabular visualization of the model predictions versus the ground-truth labels. Diagonal elements of this matrix denote the correct prediction for different classes, while the off-diagonal elements denote the samples which are mis-classified. This calculation will be performed on all three models generated. The feature selection model achieved small percentage points higher in accuracy than \gls{pca}.
+% https://towardsdatascience.com/comprehensive-guide-on-multiclass-classification-metrics-af94cfb83fbd
+\noindent When the class distribution is imbalanced, that is one class is more frequent than others, accuracy is not a good indicator of model performance. In this case, even if all samples are correctly predicted does not make sense at all because the model is not learning anything, in fact it is just predicting everything as the top class. Therefore, look at class specific performance metrics too is needed. \\
 
-\begin{figure}[H]
+\noindent Precision is one of such metrics and answers the question of "what proportion of predicted positives are truly positive?" Obviously, this can only answer the question in binary classification. This is why is important to ask the question as many times as the number of classes in the target. Optimizing the model for precision when is fundamental to decrease the number of false positives. \\ 
+
+\noindent Recall answers the question of "what proportion of actual positives are correctly  classified?" Optimize the model for precision when is fundamental to decrease the number of false negatives. \\
+
+\noindent Due to their nature, precision and recall are in a trade-off relationship. It may be necessary to optimize one at the cost of the other. This is where the f1-score comes in: it is calculated by taking the harmonic mean of precision and recall and ranges from $0$ to $1$. Harmonic mean has a nice arithmetic property representing a truly balanced mean. If either precision or recall is low, it suffers significantly. \\
+
+\noindent Support is the number of actual occurrences of the class in the test data set. Imbalanced support in the training data may indicate the need for stratified sampling or re-balancing. \\
+
+\noindent Confusion matrix, also known as error matrix, is a tabular visualization of the model predictions versus the ground-truth labels. Diagonal elements of this matrix denote the correct prediction for different classes, while the off-diagonal elements denote the samples which are mis-classified. \\
+
+% https://www.analyticsvidhya.com/blog/2020/06/auc-roc-curve-machine-learning/
+\noindent The \gls{roc} curves are typically used in binary classification to study the output of a classifier \cite{Receiver5:online}. It is a graphical plot which illustrates the performance of a binary classifier system as its discrimination threshold is varied. It is created by plotting the fraction of true positives out of the positives (TPR = true positive rate) vs. the fraction of false positives out of the negatives (FPR = false positive rate), at various threshold settings. TPR is also known as sensitivity, and FPR is one minus the specificity or true negative rate. The Area Under the Curve (AUC) is the measure of the ability of a classifier to distinguish between classes. It is used as a summary of the \gls{roc} curve. The higher the \gls{auc}, the better the performance of the model at distinguishing between the positive and negative classes. When \gls{auc}=$1$, the classifier is able to perfectly distinguish between all the Positive and the Negative class points correctly. If, however, the \gls{auc} had been $0$, then the classifier would be predicting all Negatives as Positives, and all Positives as Negatives. When $0.5<$\gls{auc}$<1$, there is a high chance that the classifier will be able to distinguish the positive class values from the negative class values. When \gls{auc}=$0.5$, then the classifier is not able to distinguish between Positive and Negative class points. Meaning either the classifier is predicting random class or constant class for all the data points. The \gls{auc} curve is only for binary classification problems, but multi-class classification problems by using the One-vs-Rest technique can be extended. For each class $i$, the classification $i$ against all other classes, except $i$, will be generated. \\
+
+\noindent For each model generated the previous metrics will be calculated. 
+
+\subsection{Model Evaluation - Feature Selection}
+\label{subsec:featselec}
+Not all variables were used in the feature selection model, but only $9$, following a correlation analysis as described in \ref{sec:pearsoncorr}. After training the model with $749$ examples (using only $9$ variables), the test data, composed of $251$ examples and obtained from the train test split, to predict the output was used. After, the predicted classes and the actual output classes from the test data to visualize the confusion matrix were used. In the image \ref{fig:confselec}, its confusion matrix.
+
+\begin{figure}[h]
 	\centering
-	\includegraphics[width=.7\textwidth]{images/cmfeaturesel.png}
+	\includegraphics[width=.85\textwidth]{images/cmfeaturesel.png}
 	\caption[Confusion matrix - Features selected.]{Confusion matrix - Features selected.}
 	\label{fig:confselec}
 \end{figure}
 
-\noindent High accuracy in the "features selected" model was encountered, and then excellent prediction results were found. In fact, in the confusion matrix (see Fig. \ref{fig:confselec}) for "detect", "forward" and "ok" gestures all the corresponding tests have been correctly predicted. In parallel, we noted that for "left" and "right" gestures there were $22$ and $20$ cases respectively classified correctly. At the same time, for both cases three examples were not classified correctly. \\
+\noindent For "detect", "forward" and "ok" gestures all the corresponding tests have been correctly predicted. In parallel, we noted that for "left" and "right" gestures there were $22$ and $20$ cases respectively classified correctly. At the same time, for both cases three examples were not classified correctly. \\
 
-\begin{table}[htb]
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=.55\textwidth]{images/prec_recall_featSelec.png}
+	\caption[Bar-plot for Precision and Recall - Features selected.]{Bar-plot for Precision and Recall - Features selected.}
+	\label{fig:precrecfeatsel}
+\end{figure}
+
+\noindent In \ref{fig:precrecfeatsel} plot there are precision and recall values for each class. Note that the values are rather balanced and generally higher than 80\%. This means that both the proportion of positive forecasts when true positives and the proportion of actual positives correctly classified are high. \\
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=.65\textwidth]{images/f1scorefeatsel.png}
+	\caption[Horizontal bar chart for F1 score - Features selected.]{Horizontal bar chart for F1 score - Features selected.}
+	\label{fig:f1featsel}
+\end{figure}
+
+\noindent From \ref{fig:f1featsel}, it is possible to see that the classifier works better to classify "ok" gesture since it reached $100\%$ as f1-score. In fact this represents the maximum of all the graph. The smallest value achieved is "right" gesture with a value of $85\%$. \\
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=.5\textwidth]{images/rocmulticlass_featsel.png}
+	\caption[ROC curves for the multiclass problem - Features selected.]{ROC curves for the multiclass problem - Features selected.}
+	\label{fig:roccurvesfeatsel}
+\end{figure}
+
+\noindent Through \ref{fig:roccurvesfeatsel} is it possible to see $10$ \gls{roc} curves related to each variable vs all others, hence, to express the behavior between one variable and all the others. Specifically, we note that for each \gls{roc} the value of \gls{auc} is always higher than $96\%$, then the classifier is able to perfectly distinguish between all the Positive and the Negative class points correctly. The one-vs-rest \gls{auc} score is $0.995$ weighted by prevalence. \\
+
+\begin{table}[h]
     \centering
     \begin{tabular}{|lllll|}
         \hline
@@ -43,21 +90,47 @@ As said in \ref{sec:model} three models were generated using the same hyperparam
     \label{tab:featuresel}
 \end{table}
 
-% https://towardsdatascience.com/comprehensive-guide-on-multiclass-classification-metrics-af94cfb83fbd
-\noindent When the class distribution is imbalanced, that is one class is more frequent than others, accuracy is not a good indicator of model performance. In this case, even if all samples are correctly predicted does not make sense at all because the model is not learning anything, in fact it is just predicting everything as the top class. Therefore, look at class specific performance metrics too is needed. Precision is one of such metrics and answers the question of "what proportion of predicted positives are truly positive?" Obviously, this can only answer the question in binary classification. This is why is important to ask the question as many times as the number of classes in the target. Optimize the model for precision when is fundamental to decrease the number of false positives. Recall answers the question of "what proportion of actual positives are correctly classified?" Optimize the model for precision when is fundamental to decrease the number of false negatives. \\
+\noindent In table \ref{tab:featuresel} precision, recall and f1-score metrics are visible for each classification object. For precision and recall, "right" and "stop" gestures reach the lowest values among all classes. In fact, this is reflected in the value of f1-score. Despite this, the values are still very high. \\
 
-\noindent Due to their nature, precision and recall are in a trade-off relationship. You may have to optimize one at the cost of the other. This is where the f1-score comes in. It is calculated by taking the harmonic mean of precision and recall and ranges from $0$ to $1$. Harmonic mean has a nice arithmetic property representing a truly balanced mean. If either precision or recall is low, it suffers significantly. \\
+\subsection{Model Evaluation - PCA}
+\label{subsec:pcamodel}
+\noindent Here the large dataset has been transformed into a small one through a linear transformation, bringing the old data into a new set of uncorrelated variables. The model with 749 examples was also trained here. After that, the test data composed of $251$ examples to predict the output was used. This test set before being input to the model, is first transformed with the same transformation applied for the training set. Then we proceeded to visualize the confusion matrix. High accuracy in the "\gls{pca}" model was encountered, although only the first six principal components have been selected. Here there are slightly less satisfying predictions then the feature selected model. \\
 
-\noindent In \ref{tab:featuresel} precision, recall and f1-score metrics are visible for each classification object. For precision and recall, "right" and "stop" gestures reach the lowest values among all classes. In fact, this is reflected in the value of f1-score. Despite this, the values are still very high.
-
-\begin{figure}[H]
+\begin{figure}[h]
 	\centering
-	\includegraphics[width=.7\textwidth]{images/cmpca.png}
+	\includegraphics[width=.85\textwidth]{images/cmpca.png}
 	\caption[Confusion matrix - PCA.]{Confusion matrix - PCA.}
 	\label{fig:confpca}
 \end{figure}
 
-\noindent High accuracy in the "\gls{pca}" model was encountered, although only the first six principal components have been selected. Here we have slightly less satisfying predictions. In the confusion matrix (see Fig. \ref{fig:confpca}) for "forward" and "ok" gestures all the corresponding tests have been correctly predicted, but seven examples labeled as "backward" were instead predicted as "down". The results of the predictions related to the other gestures are better.
+\noindent In the confusion matrix (see Fig. \ref{fig:confpca}) all the corresponding tests have been correctly predicted for "forward" and "ok" gestures, but seven examples labeled as "backward" were instead predicted as "down". The results of the predictions related to the other gestures are better. The feature selection model achieved small percentage points higher in accuracy than \gls{pca}. \\
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=.75\textwidth]{images/prec_recall_PCA.png}
+	\caption[Bar-plot for Precision and Recall - PCA.]{Bar-plot for Precision and Recall - PCA.}
+	\label{fig:precrecpca}
+\end{figure}
+
+\noindent In \ref{fig:precrecpca} plot there are precision and recall values for each class. Here is a slight discrepancy between the results obtained. In particular between "backward" and "down" gesture. Despite this, all precision results are above 75\% and all results for recall are also greater than 75\%. In both cases the maximum possible peaks are reached. This means that both the proportion of positive forecasts when true positives and the proportion of actual positives correctly classified are high. \\
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=.8\textwidth]{images/f1scorepca.png}
+	\caption[Horizontal bar chart for F1 score - PCA.]{Horizontal bar chart for F1 score - PCA.}
+	\label{fig:f1pca}
+\end{figure}
+
+\noindent From \ref{fig:f1pca}, it is possible to see that the classifier works better to classify "ok" gesture since it reached $100\%$ as f1-score. In fact this represents the maximum of all the graph. This is the same maximum achieved in the model with selected features. The smallest value achieved is "down" gesture with a value of $83\%$. A minimum slightly lower than that in selected features.\\
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=.6\textwidth]{images/rocmulticlass_pca.png}
+	\caption[ROC curves for the multiclass problem - PCA.]{ROC curves for the multiclass problem - PCA.}
+	\label{fig:roccurvespca}
+\end{figure}
+
+\noindent Through \ref{fig:roccurvespca} is it possible to see $10$ \gls{roc} curves related to each variable vs all others, hence, to express the behavior between one variable and all the others. Specifically, we note that for each \gls{roc} the value of \gls{auc} is always higher than $98\%$, then the classifier is able to perfectly distinguish between all the Positive and the Negative class points correctly. The one-vs-rest \gls{auc} score is $0.997$ weighted by prevalence. \\
 
 \begin{table}[H]
 	\centering
@@ -83,18 +156,49 @@ As said in \ref{sec:model} three models were generated using the same hyperparam
     \label{tab:pca}
 \end{table}
 
-\noindent Also in \ref{tab:pca} precision, recall and f1-score metrics are visible for each classification object. This time, for precision, "down" and "land" gestures reach the lowest values among all classes with $75\%$ and $83\%$ respectively, even if their recall values are quite close to the average recall. Max precision is reached with the "backward", "left" and "ok" gestures. With "backward" gestur,e recall is the minimum, while "ok" gesture is always predicted correctly, in fact for the latter f1-score has the maximum value.
+\noindent Also in \ref{tab:pca} precision, recall and f1-score metrics are visible for each classification object. This time, for precision, "down" and "land" gestures reach the lowest values among all classes with $75\%$ and $83\%$ respectively, even if their recall values are quite close to the average recall. Max precision is reached with the "backward", "left" and "ok" gestures. With "backward" gesture recall is the minimum, while "ok" gesture is always predicted correctly, in fact for the latter f1-score has the maximum value.
 
-\begin{figure}[H]
+\subsection{Model Evaluation - All Features}
+\label{subsec:pcamodel}
+Unlike the previous cases, no transformation and no features selection were performed in the dataset. The original dataset was used here. Also here the model with 749 examples was trained. After that, the test data composed of $251$ examples to predict the output was used. From the results obtained, the report is extremely positive.
+
+\begin{figure}[h]
 	\centering
 	\includegraphics[width=.7\textwidth]{images/cmallfeatures.png}
 	\caption[Confusion matrix - All features.]{Confusion matrix - All features.}
 	\label{fig:confallfeatures}
 \end{figure}
 
-\noindent The highest level of accuracy was found using all features. The model is $2\%$ more accurate than feature selection and $5\%$ more accurate than \gls{pca}. In the confusion matrix (see Fig. \ref{fig:confallfeatures}) for "backward", "forward", "left", "ok" and "stop" gestures all the corresponding tests have been correctly predicted. Problems of little importance in prediction in all other cases.
+\noindent The highest level of accuracy was found using all features. The model is $2\%$ more accurate than feature selection and $5\%$ more accurate than \gls{pca}. In the confusion matrix (see Fig. \ref{fig:confallfeatures}) for "backward", "forward", "left", "ok" and "stop" gestures all the corresponding tests have been correctly predicted. Problems of little importance in prediction in all other cases. \\
 
-\begin{table}[H]
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=.6\textwidth]{images/prec_recall_allFeat.png}
+	\caption[Bar-plot for Precision and Recall - All features.]{Bar-plot for Precision and Recall - All features.}
+	\label{fig:precrecallfeat}
+\end{figure}
+
+\noindent In \ref{fig:precrecallfeat} plot there are precision and recall values for each class. Both the precision and recall values are $95\%$ higher, and this is true for each class. The model reaches the peak of precision and recall with "forward", "ok" and "stop" gestures. This means that both the proportion of positive forecasts when true positives and the proportion of actual positives correctly classified are high. \\
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=.7\textwidth]{images/f1scoreallfeat.png}
+	\caption[Horizontal bar chart for F1 score - All features.]{Horizontal bar chart for F1 score - All features.}
+	\label{fig:f1allfeat}
+\end{figure}
+
+\noindent From \ref{fig:f1allfeat}, it is possible to see that the classifier works perfectly to classify more than a single gesture. In fact, with "forward, "ok" and "stop" gestures the model reached $100\%$ as f1-score, as they represent the maximum of all the graph. The smallest value achieved is "land" gesture with a value of $90\%$. All values were satisfactory. \\
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=.6\textwidth]{images/rocmulticlass_allfeat.png}
+	\caption[ROC curves for the multiclass problem - All features.]{ROC curves for the multiclass problem - All featues.}
+	\label{fig:roccurvesallfeatu}
+\end{figure}
+
+\noindent Through \ref{fig:roccurvesallfeatu} is it possible to see $10$ \gls{roc} curves related to each variable vs all others, hence, to express the behavior between one variable and all the others. Specifically, we note that for each \gls{roc} the value of \gls{auc} is always higher than $99\%$, then the classifier is able to perfectly distinguish between all the Positive and the Negative class points correctly. The one-vs-rest \gls{auc} score is $0.998$ weighted by prevalence. High accuracy in the "all features" model was encountered, hence excellent prediction results were found. \\
+
+\begin{table}[h]
     \centering
     \begin{tabular}{|lllll|}
         \hline
@@ -120,13 +224,36 @@ As said in \ref{sec:model} three models were generated using the same hyperparam
 
 \noindent In \ref{tab:featuresall} for precision, "detect" gesture reach the lowest value among all classes with $91\%$, even if still remains an extremely positive value. Max precision is reached with the "forward" and "ok" gestures. With "up" gesture recall is the minimum, while "backward", "forward", "left", "ok" and "stop" gesture have the max recall score. In fact, for the latter the f1-score have the maximum value as well.
 
-\section{3D trajectory evaluation}
-\label{sec:3dtrajeval}
-After fitting data, is important evaluate the goodness of fit. A visual examination of the fitted curve should be the first step. Beyond that, plenty methods to assess goodness of fit for both linear and nonlinear parametric fits are provided in literature.
+\subsection{Choosing the best model}
+\label{subsec:choosingthebest}
+Following the analysis of the three different models, it has been found that each model reaches truly satisfying levels of predictions. \\
 
-\subsection{Fitting trajectory}
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|lllll|}
+        \hline
+        \multicolumn{1}{|l|}{\textbf{weighted avg}}             & \multicolumn{1}{l|}{\textbf{precision}} & \multicolumn{1}{l|}{\textbf{recall}} & \multicolumn{1}{l|}{\textbf{f1-score}}\\ 
+        \hline
+        \multicolumn{1}{|l|}{\textbf{Feature Selected}}     & \multicolumn{1}{l|}{0.94}               & \multicolumn{1}{l|}{0.94}            & \multicolumn{1}{l|}{0.94}\\
+        \hline
+        \multicolumn{1}{|l|}{\textbf{PCA}}     & \multicolumn{1}{l|}{0.92}               & \multicolumn{1}{l|}{0.91}            & \multicolumn{1}{l|}{0.91}\\
+        \hline
+        \multicolumn{1}{|l|}{\textbf{All features}}     & \multicolumn{1}{l|}{0.96}               & \multicolumn{1}{l|}{0.96}            & \multicolumn{1}{l|}{0.96}\\
+        \hline
+    \end{tabular}
+	\captionof{table}[Metrics - Best Model.]{Metrics - Best Model.}
+    \label{tab:bestmod}
+\end{table}
+
+\noindent It is not possible to say that one model is actually better than the other because the percentage levels are almost the same. That said, it has to be confirmed that despite the high levels of correlation identified, the model that best captures the internal structure is the one that makes use of all the variables. Despite this, the model with only $9$ variables out of $42$ manages to possess an average score of $94\%$ against the $96\%$ of the model with all the features. If the number of selected variables were increased, the value with all the features could have been easily reached. The same applies to the PCA, although in this case the percentage difference is more significant. On one side there is the $91\%$ of the PCA model, on the other there is the $96\%$ of the model with all the features. Here there is a $5\%$ difference, which is not negligible at all. That being said, only $6$ main components out of $42$ were taken. In fact, increasing the number of selected main components from $6$ to $20$ has reached a value that was around $97\%$. In the end, the model with all the variables has been chosen, as it does not require to transform the input of the $42$ variables in $20$ every time.
+
+\section{3D Trajectory Evaluation}
+\label{sec:3dtrajeval}
+After fitting data, it is important to evaluate the goodness of fit. A visual examination of the fitted curve should be the first step. Beyond that, plenty of methods to assess goodness of fit for both linear and nonlinear parametric fits are provided in literature.
+
+\subsection{Fitting Trajectory}
 \label{sec:fittraj}
-In \ref{fig:trajstep} are visible nine different frames, where the first eight are plots of the trajectory captured in live (in different times) and the last one represents the transformation of the \gls{3d} trajectory $g$ in $g_{smooth}$. Each plot consisting of three axis where the depth is described by the $y$ axis, $x$ describes the camera width and $z$ the camera height. Each point is the position in the space, while the vector on it describes the orientation in that instant. The orientation vector is perpendicular to the palm of the hand. In addition, each point is assigned the mean speed value of the journey between the points at the interval $t$ and $t-1$. The more yellow the color tends, the faster the speed at that point is. Otherwise, the more the color tends to violet, the slower you are in that instant of time.
+In \ref{fig:trajstep} nine different frames are visible, where the first eight are plots of the trajectory captured in live (in different times) and the last one represents the transformation of the \gls{3d} trajectory $G()$ in $G_{smooth}()$. Each plot consisting of three axis where the depth is described by the $y$ axis, $x$ describes the camera width and $z$ the camera height. Each point is the position in the space, while the vector on it describes the orientation in that instant. The orientation vector is perpendicular to the palm of the hand. In addition, each point is assigned the mean speed value of the journey between the points at the interval $t$ and $t-1$. The more the color tends to yellow, the faster the speed at that point is. Otherwise, the more the color tends to violet, the slower you are in that instant of time.
 
 \begin{figure}
     \centering
@@ -188,20 +315,20 @@ In \ref{fig:trajstep} are visible nine different frames, where the first eight a
     \label{fig:trajstep}
 \end{figure}
 
-\subsection{Fitting evaluation}
+\subsection{Fitting Evaluation}
 \label{sec:fiteval}
 % https://it.mathworks.com/help/curvefit/evaluating-goodness-of-fit.html
-As is common in statistical literature, the term goodness of fit might be a model that the data could reasonably have come from (given the assumptions of least-squares fitting), in which the model coefficients can be estimated with little uncertainty, or that explains a high proportion of the variability in your data, and is able to predict new observations with high certainty. \\
+As is common in statistical literature, the term goodness of fit might be a model that the data could reasonably have come from, in which the model coefficients can be estimated with little uncertainty, or that explains a high proportion of the variability in the data, and is able to predict new observations with high certainty. \\
 
-\noindent A particular application might dictate still other aspects of model fitting that are important to achieving a good fit, such as a simple model that is easy to interpret. It is possible group into two types the methods of analysis \cite[]{Evaluati10:online}: graphical and numerical. Plotting residuals and prediction bounds are graphical methods that aid visual interpretation, while computing goodness-of-fit statistics and coefficient confidence bounds yield numerical measures that aid statistical reasoning.\\
+\noindent A particular application might still dictate other aspects of model fitting that are important for achieving a good fit, such as a simple model that is easy to interpret. It is possible to group the methods of analysis \cite[]{Evaluati10:online} into two types: graphical and numerical. Plotting residuals and prediction bounds are graphical methods that aid visual interpretation, while computing goodness-of-fit statistics and coefficient confidence bounds yield numerical measures that aid statistical reasoning.\\
 
 \noindent Generally speaking, graphical measures are more beneficial than numerical measures because they allow users to view the entire data set at once, and they can easily display a wide range of relationships between the model and the data. The numerical measures are more narrowly focused on a particular aspect of the data and often try to compress that information into a single number. \\
 
-\noindent Metrics used to evaluate regression models should be able to work on a set of continuous values (with infinite cardinality), and are therefore slightly different from classification metrics. There are many different evaluation metrics out there but only some of them are suitable to be used for regression. After using graphical methods to evaluate the goodness of fit, was evaluated:
+\noindent Metrics used to evaluate regression models should be able to work on a set of continuous values (with infinite cardinality), and therefore they are slightly different from classification metrics. There are many different evaluation metrics out there but only some of them are suitable to be used for regression. After using graphical methods to evaluate the goodness of fit, the followings were evaluated:
 
 \begin{itemize}
-    \item \texttt{R-square}
-    \\ This statistic measures how successful the fit is in explaining the variation of the data. Put another way, R-square is the square of the correlation between the response values and the predicted response values. It is also called the square of the multiple correlation coefficient and the coefficient of multiple determination. R-square is defined as the ratio of the \gls{ssr} and the \gls{sst}. R-square is expressed as
+    \item \texttt{R squared}
+    \\ This statistic measures how successful the fit is in explaining the variation of the data. Putting in another way, R squared is the square of the correlation between the response values and the predicted response values. It is also called the square of the multiple correlation coefficient and the coefficient of multiple determination. R squared is defined as the ratio of the \gls{ssr} and the \gls{sst}. R squared is expressed as
   
     \begin{Equation}[H]
         \centering
@@ -209,43 +336,43 @@ As is common in statistical literature, the term goodness of fit might be a mode
             \begin{aligned}
             	R^2 &= \frac{SSR}{SST} = \\
             	&= \frac{\sum_{i=1}^{n} w_i(\widehat{y_i} - \overline{y})^2}{\sum_{i=1}^{n} w_i(y_i - \overline{y})^2}
-        	\end{aligned}
+        	\end{aligned} .
         \end{equation}
-    	\caption[R-square.]{R-square}
+    	\caption[R squared.]{R squared}
     \end{Equation}
     
-    R-square can take on any value between $0$ and $1$, with a value closer to $1$ indicating that a greater proportion of variance is accounted for by the model.
+    R squared can take on any value between $0$ and $1$, with a value closer to $1$ indicating that a greater proportion of variance is accounted for by the model. \\
     
-    R-Square is a good measure to determine how well the model fits the dependent variables. However, it does not take into consideration of overfitting problem. If your regression model has many independent variables, because the model is too complicated. That is why Adjusted R Square is introduced because it will penalize additional independent variables added to the model and adjust the metric to prevent overfitting issues. It is possible to get a negative R-square for equations that do not contain a constant term. Because R-square is defined as the proportion of variance explained by the fit, if the fit is actually worse than just fitting a horizontal line then R-square is negative. In this case, R-square cannot be interpreted as the square of a correlation. Such situations indicate that a constant term should be added to the model;
+    R squared is a good measure to determine how well the model fits the dependent variables. However, it does not take into consideration the overfitting problem. If the regression model has many independent variables, it is because the model is too complicated. That is why Adjusted R Square is introduced because it will penalize additional independent variables added to the model and adjust the metric to prevent overfitting issues. It is possible to get a negative R squared for equations that do not contain a constant term. Because R squared is defined as the proportion of variance explained by the fit, if the fit is actually worse than just fitting a horizontal line then R squared is negative. In this case, R squared cannot be interpreted as the square of a correlation. Such situations indicate that a constant term should be added to the model;
 
-    \item \texttt{Adjusted R-square}
-    \\ This statistic uses the R-square statistic defined above, and adjusts it based on the residual degrees of freedom. The residual degrees of freedom is defined as the number of response values $n$ minus the number of fitted coefficients $m$ estimated from the response values.
+    \item \texttt{Adjusted R squared}
+    \\ This statistic uses the R squared statistic defined above, and adjusts it based on the residual degrees of freedom. The residual degrees of freedom is defined as the number of response values $n$ minus the number of fitted coefficients $m$ estimated from the response values.
     
     \begin{Equation}[H]
         \centering
         \begin{equation} \label{eq:r2}
             \begin{aligned}
-            	v = n-m
+            	v = n-m .
         	\end{aligned}
         \end{equation}
-    	\caption[Degrees of Freedom Adjusted R-Square.]{Degrees of Freedom Adjusted R-Square.}
+    	\caption[Degrees of Freedom Adjusted R squared.]{Degrees of Freedom Adjusted R squared.}
     \end{Equation}
     
-    $v$ indicates the number of independent pieces of information involving the n data points that are required to calculate the sum of squares. Note that if parameters are bounded and one or more of the estimates are at their bounds, then those estimates are regarded as fixed. The degrees of freedom is increased by the number of such parameters.
+    $v$ indicates the number of independent pieces of information involving the n data points that are required to calculate the sum of squares. Note that if parameters are bounded and one or more of the estimates are at their bounds, then those estimates are regarded as fixed. The degrees of freedom is increased by the number of such parameters. \\
 
-    \noindent The adjusted R-square statistic is generally the best indicator of the fit quality when you compare two models that are nested — that is, a series of models each of which adds additional coefficients to the previous model.
+    \noindent The adjusted R squared statistic is generally the best indicator of the fit quality when you compare two models that are nested — that is, a series of models each of which adds additional coefficients to the previous model.
     
     \begin{Equation}[H]
         \centering
         \begin{equation} \label{eq:r2}
             \begin{aligned}
             	R^2_{adjusted} &= 1 - \frac{ (n-1) \sum_{i=1}^{n} w_i(y_i - \widehat{y})^2}{ v \sum_{i=1}^{n} w_i(y_i - \overline{y})^2}
-        	\end{aligned}
+        	\end{aligned} .
         \end{equation}
-    	\caption[R-square.]{R-square.}
+    	\caption[R squared.]{R squared.}
     \end{Equation}
     
-    The adjusted R-square statistic can take on any value less than or equal to 1, with a value closer to 1 indicating a better fit. 
+    The adjusted R squared statistic can take on any value less than or equal to 1, with a value closer to 1 indicating a better fit. 
 
     \item \texttt{Root mean squared error.}
     \\ This statistic is also known as the fit standard error and the standard error of the regression. It is an estimate of the standard deviation of the random component in the data, and is defined as
@@ -254,41 +381,38 @@ As is common in statistical literature, the term goodness of fit might be a mode
         \centering
         \begin{equation} \label{eq:r2}
             \begin{aligned}
-            	RMSE &= \sqrt{MSE} \\
-            	&= \sqrt{\frac{\sum_{i=1}^{n} w_i(y_i - \widehat{y})^2}{v}}
+            	RMSE &= \sqrt{\frac{\sum_{i=1}^{n} w_i(y_i - \widehat{y})^2}{v}} .
         	\end{aligned}
         \end{equation}
     	\caption[RMSE.]{RMSE.}
     \end{Equation}
     
-    Value closer to $0$ indicates a fit that is more useful for prediction. It is used more commonly than \gls{mse} because firstly sometimes \gls{mse} value can be too big to compare easily. Secondly, \gls{mse} is calculated by the square of error, and thus square root brings it back to the same level of prediction error and makes it easier for interpretation.
+    A value closer to $0$ indicates a fit that is more useful for prediction. It is used more commonly than \gls{mse} because firstly sometimes \gls{mse} value can be too big to compare easily. Secondly, \gls{mse} is calculated by the square of error, and thus square root brings it back to the same level of prediction error and makes it easier for interpretation.
 \end{itemize}
 
-\noindent With reference to the trajectory \ref{fig:trajstep} were calculated on it $3$ ridge regression for $x$, $y$ and $z$ component, as explained in \ref{sec:smoothing}, increasing the degree of the fitting polynomial from $2$ to $9$.
-
-\noindent In \ref{fig:rmse} it is possible to envision how \gls{rmse} behaves as the degree of the fitting polynomial increases. In the specific, it is evident that \gls{rmse} decreases dramatically when we take a grade greater than four, and is true for all three components. The value definitely stabilizes when the degree is equal to seven. In fact, a value of less than 5\% is reached.
+\noindent With reference to the trajectory \ref{fig:trajstep}, $3$ ridge regressions for $x$, $y$ and $z$ component were calculated on it, as explained in \ref{sec:smoothing}, increasing the degree of the fitting polynomial from $2$ to $9$. In \ref{fig:rmse} it is possible to envision how \gls{rmse} behaves as the degree of the fitting polynomial increases. In the specific, it is evident that \gls{rmse} decreases dramatically when we take a grade greater than four, and is true for all three components. The value definitely stabilizes when the degree is equal to seven. In fact, a value of less than 5\% is reached.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=.7\textwidth]{images/rmse}
+	\includegraphics[width=.6\textwidth]{images/rmse}
 	\caption[RMSE.]{RMSE plot.}
 	\label{fig:rmse}
 \end{figure}
 
-\noindent In \ref{fig:r2} is present the R-square plot. Here, unlike the previous chart the closer the value is to $1$, the better the result. A value of $0.91$ means that the fit explains $91\%$ of the total variation in the data about the average. If we take a grade higher than four then we get excellent values capable of capturing more than $90\%$ of variance.
+\noindent In \ref{fig:r2} the R squared plot is present. Here, unlike the previous chart, the closer the value is to $1$, the better the result. A value of $0.91$ means that the fit explains $91\%$ of the total variation in the data about the average. If a grade higher than four is taken, then excellent values capable of capturing more than $90\%$ of variance are obtained.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=.7\textwidth]{images/r2}
+	\includegraphics[width=.6\textwidth]{images/r2}
 	\caption[R-Squared.]{R-Squared plot.}
 	\label{fig:r2}
 \end{figure}
 
-\noindent In \ref{fig:adjr2} is present the Adjusted R-squared plot. Since $R^2$ always increases as more predictors are added to the model, adjusted $R^2$ can serve as a metric that tells how useful a model is, adjusted for the number of predictors in a model. The graph is very similar to the previous one (see Fig. \ref{fig:rmse}), but it’s slightly different. Since the Adjusted R-squared has high values despite the growth of the degree, it explains that does not occur overfitting, then we can perfectly explain the trajectory.
+\noindent In \ref{fig:adjr2} the Adjusted R-squared plot is shown. Since $R^2$ always increases as more predictors are added to the model, adjusted $R^2$ can serve as a metric that tells how useful a model is, adjusted for the number of predictors in a model. The graph is very similar to the previous one (see Fig. \ref{fig:rmse}), but it’s slightly different. Since the Adjusted R-squared has high values despite the growth of the degree, it explains that does not occur overfitting, then it can perfectly explain the trajectory.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=.7\textwidth]{images/adjr2}
+	\includegraphics[width=.6\textwidth]{images/adjr2}
 	\caption[Adjusted R-Squared.]{Adjusted R-Squared plot.}
 	\label{fig:adjr2}
 \end{figure}
@@ -297,13 +421,245 @@ As is common in statistical literature, the term goodness of fit might be a mode
 
 % sono stati fatti dei video?
 
-\section{Drone in action}
+\section{Simulation Evaluation}
 \label{sec:drinact}
 % (forse questa da mettere nell'evaluation) come viene visualizzata tale traiettoria? per essere certi dell'esecuzione? (palline verdi)
 
+To have a clearer view of the trajectory, a sphere SDF model has been created . An SDF model refers to the <model> SDF tag, and it is essentially a collection of links, joints, collision objects, visuals, and plugins.
 
-\section{Real}
+\medskip
+\begin{lstlisting}
+<?xml version="1.0" ?>
+<sdf version="1.5">
+    <model name="my1stmodel">
+    <static>true</static> 
+    <link name="link">
+        <gravity>0</gravity>
+        <visual name="sphere">
+            <geometry>
+                <sphere>
+                    <radius>0.02</radius>
+                </sphere>
+            </geometry>
+            <material> <!-- Wheel material -->
+                <ambient>0.1 1 0.1 1</ambient>
+                <diffuse>1 1 1 1</diffuse>
+                <specular>0 0 0 0</specular>
+                <emissive>0 0 0 1</emissive>
+            </material> <!-- End wheel material -->
+        </visual>
+    </link>
+    </model>
+</sdf>
+\end{lstlisting}
+
+\begin{lstlisting}[frame=none,caption={Sphere SDF model.}, 
+label=lst:sdfmod]
+\end{lstlisting}
+
+\noindent To prevent the sphere from colliding with the drone, the static tag has been set to "true". To prevent the sphere from falling, the gravity tag has been set to $0$. 
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=.9\textwidth]{images/simulgaz3dplt}
+	\caption[Trajectory in Gazebo plot.]{Trajectory in Gazebo plot.}
+	\label{fig:trjgazpl}
+\end{figure}
+
+\noindent During the simulation of the trajectory, each tot seconds a sphere is spawned to indicate the position of the drone in space at that precise moment. In \ref{fig:trjgazpl} the acquired trajectory and in \ref{fig:trjexgaz} execution of the trajectory on a drone that is coming to an end are reported.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=.65\textwidth]{images/simulgaz}
+	\caption[Trajectory example in Gazebo.]{Trajectory example in Gazebo.}
+	\label{fig:trjexgaz}
+\end{figure}
+
+\noindent The intersection between the blue vertical axis and the green ball represents the point of origin of the trajectory.
+
+\section{Real World Evaluation}
 \label{sec:drcontr}
 % La veridicità della traiettoria è visibile a occhio nudo. Per il fine dell'obiettivo del progetto non siamo alla ricerca della perfezione dell'esecuzione della traiettoria, ma piuttosto che rispecchi la veridicità della dimensione fissata della traiettoria. Questo punto è importante in quanto se il range d'azione in cui il drone opera è incontrollato allora potrebbe essere pericoloso per chi è intorno ad esso. Ben presto si è notato che il drone non esegue le traiettorie in un range di circa 1m, ma queste sembrano essere di dimensione inferiore. Infatti, in seguito a diversi test, si è notato che fissando un tempo di viaggio di 3 secondi, un intervallo di invio segnale 0.25s e di velocità del drone a 15cm/s non risultava essere corretto lo spazio totale percorso. Facendo la media su tutti i tentativi di test si era arrivati alla conclusione che 15cm/s in realtà corrispondeva a circa 11,7cm/s. Quindi si è costruita una mappa che desse idea della spaizo percorso lungo gli assi xy e xz.
 
-The trajectory veracity is visible to the naked eye. For the project purpose, the perfection of the trajectory execution was not a requirement, but rather that it reflects the correctness of the fixed dimension of the trajectory. This point is important as if the range of action in which the drone operates is uncontrolled then it could be dangerous for those around it. It was soon noticed that the drone does not perform trajectories in a range of about $1m$, but these appear to be smaller in size. In fact, following several tests, it was observed that by setting a travel time of $3$ seconds, a $0.25s$ signal sending interval and a drone speed of $15cm/s$, the total distance traveled was not correct. Taking the average over all the test attempts it was concluded that 15cm/s actually corresponded to about $11.7cm/s$. Then, a map was built that gave an idea of the space traveled along the $xy$ and $xz$ axes. \\
+The human-drone interaction takes place by means of commands. These are gestures that after processing are sent as a packet to the drone. The connection is UDP. In the figure \ref{fig:right}, it is possible to see two consecutive moments, in which the drone moves from left to right.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49 \textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/righta.png}
+        \caption[]{Screenshot at the instant $t_1$.}
+        \label{fig:righta}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49 \textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/rightb.png}
+        \caption[]{Screenshot at the instant $t_2$.}
+        \label{fig:rightb}
+    \end{subfigure}
+    \caption[Human-drone interaction with the "right" gesture.]{Human-drone interaction with the "right" gesture. The larger image is captured directly from the front PC camera, while the bottom-right image represents the captured video of the drone, at the same time.}
+    \label{fig:right}
+\end{figure}
+
+\noindent In figure \ref{fig:left}, it is possible to see two consecutive moments, in which the drone moves from right to left. Note that, in images \ref{fig:lefta} and \ref{fig:leftb} it actually seems that the drone is moving from left to right, but this is simply due to the fact that the video from the PC camera to the drone are captured, hence it is mirrored.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49 \textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/lefta.png}
+        \caption[]{Screenshot at the instant $t_1$.}
+        \label{fig:lefta}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49 \textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/leftb.png}
+        \caption[]{Screenshot at the instant $t_2$.}
+        \label{fig:leftb}
+    \end{subfigure}
+    \caption[Human-drone interaction with the "left" gesture.]{Human-drone interaction with the "left" gesture. The larger image is captured directly from the back PC camera, while the bottom-right image represents the captured video of the drone, at the same time.}
+    \label{fig:left}
+\end{figure}
+
+\noindent In figure \ref{fig:down}, it is possible to see two consecutive moments in which the drone moves from top to bottom.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49 \textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/downa.png}
+        \caption[]{Screenshot at the instant $t_1$.}
+        \label{fig:downa}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49 \textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/downb.png}
+        \caption[]{Screenshot at the instant $t_2$.}
+        \label{fig:downb}
+    \end{subfigure}
+    \caption[Human-drone interaction with the "down" gesture.]{Human-drone interaction with the "down" gesture.}
+    \label{fig:down}
+\end{figure}
+
+\noindent In figure \ref{fig:up}, it is possible to see two consecutive moments in which the drone moves from bottom to top.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.7 \textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/upa.png}
+        \caption[]{Screenshot at the instant $t_1$.}
+        \label{fig:upa}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.7 \textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/upb.png}
+        \caption[]{Screenshot at the instant $t_2$.}
+        \label{fig:upb}
+    \end{subfigure}
+    \caption[Human-drone interaction with the "up" gesture.]{Human-drone interaction with the "up" gesture. The larger image is captured directly from the drone camera, while the bottom-left image represents the captured video of the front PC camera at the same time.}
+    \label{fig:up}
+\end{figure}
+
+\noindent When using the "detect" gesture, the middle point $\bm{p}$ at each frame is saved in a circular tail composed of $n$ elements (in the figures \ref{fig:midpa} and \ref{fig:midpb} is the green dot, in the center of the hand). In the image \ref{fig:midp}, the blue dot represents the midpoint $\bm{b}$ of the $n$ points added to the tail. If it coincides with the green point $\bm{p}$ it means that the hand has been stationary in space for a short time, otherwise it means that it has moved. There are two circles: one red of radius $r_1$ and one green of radius $r_2$, where $r2>r1$. When the current midpoint $\bm{p}$ is inside the red circle, the points $p$ in the tail are saved. When the blue point $\bm{b}$ is outside the red circle, the last $5$ points are saved in such a way that they represent the first points of the trajectory $G()$.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49 \textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/midpa.png}
+        \caption[]{Screenshot at the instant $t_1$.}
+        \label{fig:midpa}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49 \textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/midpb.png}
+        \caption[]{Screenshot at the instant $t_2$.}
+        \label{fig:midpb}
+    \end{subfigure}
+    \caption[Middle point p and average of middle points b of the hand.]{Middle point $\bm{p}$ and average of middle points $\bm{b}$ of the hand. Images captured from the front PC camera.}
+    \label{fig:midp}
+\end{figure}
+
+\noindent In the image \ref{fig:traj}, the \gls{3d} trajectory becomes active. There are only $3$ instants of the acquisition. The trajectory starts with the "detect" gesture. Afterwards, it is processed by moving the hand in space. At the end it is necessary to close the trajectory with the "ok" gesture. Specifically, the trajectory acquired has the objective of allowing the drone to make a slight bending forward, to the right. \\
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.7 \textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/traj1.png}
+        \caption[]{Screenshot at the instant $t_1$.}
+        \label{fig:traj1}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.7 \textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/traj2.png}
+        \caption[]{Screenshot at the instant $t_2$.}
+        \label{fig:traj2}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.7 \textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/traj3.png}
+        \caption[]{Screenshot at the instant $t_3$.}
+        \label{fig:traj3}
+    \end{subfigure}
+    \caption[Capture of a 3D trajectory in real.]{Capture of a 3D trajectory in real. In the images on the left the front camera coming from the PC and pointing the hand of the user, in the images on the right is the camera of the drone pointing the scene.}
+    \label{fig:traj}
+\end{figure}
+
+\noindent After acquiring the \gls{3d} trajectory, the latter is launched on the drone. In the image \ref{fig:trajex}, it is observable how the camera follows the trajectory of \ref{fig:traj} in $3$ different moments. \\
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.65 \textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/trajex1.png}
+        \caption[]{Screenshot at the instant $t_1$.}
+        \label{fig:trajex1}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.65 \textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/trajex2.png}
+        \caption[]{Screenshot at the instant $t_2$.}
+        \label{fig:trajex2}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.65 \textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/trajex3.png}
+        \caption[]{Screenshot at the instant $t_3$.}
+        \label{fig:trajex3}
+    \end{subfigure}
+    \caption[Execution of the acquired 3D trajectory.]{Execution of the acquired 3D trajectory.}
+    \label{fig:trajex}
+\end{figure}
+
+\noindent In \ref{fig:viewtraj}, there is the \gls{3d} trajectory \gls{wrt} $XY$ axis and $XZ$ axis in the first two images at the top, whose values are in the range from $-1$ to $+1$. In the $XY$ axis, the $x$ axis the width of the camera and in $y$ the depth are found. Moving to the right means that the drone will move from left to the right, similar to the left. When at the y-axis, the more the value is $1$ the more the drone will go forward. Instead, if $y$ assumes values close to $-1$ then the drone goes backwards. When the drone is at $y=0$, it means that the drone does not go forward and backward \gls{wrt} the starting position. Each trajectory always starts from the origin. In this case that the trajectory expands from left to right and continues going forward all the way is shown. In the $XZ$ axis, the $z$ axis, the camera height, is found. When at the $z$ axis, the more the value is $1$ the more the drone will rise higher. Instead, if $z$ assumes values close to $-1$ then the drone will target the floor. When the drone is at $z=0$ it means that the drone does not go up and does not go down \gls{wrt} the starting position. In this case the trajectory expands from left to right and rises slightly towards the end is shown. \\
+
+\noindent In \ref{fig:viewtraj}, there is always the same trajectory, in the last two images at the bottom, but scaled \gls{wrt} a fixed value. This will tell how much the trajectory approximately will move in the surrounding space. In the image the set value is $100$, so that the trajectory moves in a range of $100cm$. \\
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1 \textwidth]{images/direectiontraj}
+	\caption[Trajectory example in Gazebo.]{Trajectory example in Gazebo.}
+	\label{fig:viewtraj}
+\end{figure}
+
+\noindent The trajectory veracity is visible to the naked eye. For the project purpose, the perfection of the trajectory execution was not a requirement, but rather that it reflects the correctness of the fixed dimension of the trajectory. This point is important as if the range of action in which the drone operates is uncontrolled then it could be dangerous for those around it. It was soon noticed that the drone does not perform trajectories in a range of about $1m$, but these appear to be smaller in size. In fact, following several tests, it was observed that by setting a travel time of $3$ seconds, a $0.25s$ signal sending interval and a drone speed of $15cm/s$, the total distance traveled was not correct. Taking the average over all the test attempts it was concluded that 15cm/s actually corresponded to about $11.7cm/s$. Then, a map was built that gave an idea of the space traveled along the $XY$ and $XZ$ axes. \\
+
+\noindent The acquisition can also be captured directly from the drone camera. It is important to keep in mind that this process can be poor in very strong wind conditions, because the built algorithm does not have ways to stabilize the image dynamically. This is especially true when the trajectory is launched on a lightweight drone like the DJI Ryze Tello.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1 \textwidth]{images/dronehuman}
+	\caption[Human-drone interaction directly from the drone camera.]{Human-drone interaction directly from the drone camera.}
+	\label{fig:humdrdr}
+\end{figure}

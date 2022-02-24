@@ -1,10 +1,17 @@
 \chapter{Tools}
 \label{chap:impl}
-\glsreset{ir}
+This chapter introduces the tools used in this work, starting from the description of the target platform, then describing the simulator and finally mentioning the frameworks used for the implementation.
 
-This chapter introduces the tools used in this work, starting from the description of the target platform in, then describing the simulator in and finally mentioning the frameworks used for the implementation in.
+\noindent As a general overview, in the image \ref{fig:toolsused} are the programs and frameworks used to realize this project. The tools are grouped according to their characteristics. For example, on the left we find git, visual studio etc... for code creation and management. At the center tools for viewing graphics and image processing such as Matplotlib and Photoshop. On the right the processing of three-dimensional models and the execution of Visual Effects as Blender and After Effects. In other the area of machine learning through Tensorflow and Scikit-learn.
 
-\section{Tello}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=.8\textwidth]{images/tools.png}
+	\caption[All tools used.]{The image delineates all the main tools used to achieve the goal of the project.}
+	\label{fig:toolsused}
+\end{figure}
+
+\section{DJI Ryze Tello}
 \label{subsec:tello}
 Tello is a small quadcopter that features a Vision Positioning System and an onboard camera. Using its advanced flight controller, it can hover in place and it is suitable for flying indoors. Tello captures $5MP$ photos and streams until $720p$ live video. Its maximum flight time is approximately $12$ minutes (tested in windless conditions at a consistent $15km/h$) and its maximum flight distance is $100m$ \cite[]{djitelloguide}.
 
@@ -17,7 +24,7 @@ Tello is a small quadcopter that features a Vision Positioning System and an onb
 
 \noindent Tello can be controlled manually using the virtual joysticks in the Tello app or using a compatible remote controller. It also has various Intelligent Flight Modes that can be used to make Tello perform maneuvers automatically. Propeller Guards can be used to reduce the risk of harm or damage people or objects resulting from accidental collisions with Tello aircraft.
 
-\subsection{Tello Command Types and Results}
+\subsection{Command Types and Results}
 \label{subsec:tellosdk}
 Tello SDK connects to the aircraft through a Wi-Fi UDP port, allowing users to control the aircraft with text commands. There are Control and Set commands that return "ok" if the command was successful, "error" or an informational result code if the command failed. There are also Read commands that return the current value of the sub-parameters.
 
@@ -42,14 +49,29 @@ Tello SDK connects to the aircraft through a Wi-Fi UDP port, allowing users to c
 	\label{tab:modeln5dist}
 \end{table}
 
-\section{Gazebo}
-\label{subsec:gazebo}
+\section{Simulation Tools}
+\label{sec:simultools}
+The tools used for the simulation are \gls{ros} \ref{subsec:ros} the meta-operating system, virtualization to use Ubuntu \ref{subsec:virtual} and Gazebo to operate with the model of the Tello in \gls{3d} \ref{subsec:gazebo}.
+
+\subsection{Robot Operating System}
+\label{subsec:ros}
 
 % parlare che si è lavorato su windows, ma gazebo era in una macchina virtuale con immagine ubuntu.
-Gazebo is a 3D simulator, that offers the ability to accurately and efficiently simulate robots in complex indoor and outdoor environments. Thanks to Gazebo it was possible to launch the 3D trajectory acquired by hand through the webcam on a simulated drone. 
+\gls{ros} is an open-source, meta-operating system for robot. It provides the services from an operating system, including hardware abstraction, low-level device control, implementation of commonly-used functionality, message-passing between processes, and package management. It also provides tools and libraries for obtaining, building, writing, and running code across multiple computers. The \gls{ros} runtime "graph" is a peer-to-peer network of processes that are loosely coupled using the \gls{ros} communication infrastructure. \gls{ros} implements several different styles of communication, including synchronous RPC-style communication over services, asynchronous streaming of data over topics, and storage of data on a Parameter Server. \\
+
+\noindent The primary goal of \gls{ros} is to support code reuse in robotics research and development. \gls{ros} is a distributed node framework that allows executables to be individually designed and freely coupled to runtime. These processes can be grouped into Packages and Stacks, which can be easily shared and distributed. \gls{ros} also supports a federated system of code Repositories that enable collaboration to be distributed as well. \gls{ros} currently only runs on Unix-based platforms. Software for \gls{ros} is primarily tested on Ubuntu and Mac OS X systems, though the \gls{ros} community has been contributing support for Fedora, Gentoo, Arch Linux and other Linux platforms. A port to Microsoft Windows for \gls{ros} is possible, it has not yet been fully explored. \\
+
+\subsection{Virtualization}
+\label{subsec:virtual}
+\noindent In this regard, we worked on a virtual machine to simulate the Ubuntu system, installed on windows 7. This environment, called a "virtual machine", is created by the virtualization software by intercepting access to certain hardware components and certain features. The physical computer is then usually called the host, while the virtual machine is often called a guest. Most of the guest code runs unmodified, directly on the host computer, and the guest operating system thinks like it is running on a real machine. VirtualBox is a powerful x86 and AMD64/Intel64 virtualization product for enterprise as well as home use. Not only is VirtualBox an extremely feature rich, high performance product for enterprise customers, it is also the only professional solution that is freely available as Open Source Software. \\
+
+\subsection{Gazebo}
+\label{subsec:gazebo}
+\noindent While \gls{ros} serves as the interface for the robot, Gazebo is a \gls{3d} simulator, that offers the ability to accurately and efficiently simulate robots in complex indoor and outdoor environments. Gazebo can use multiple high-performance physics engines, such as Open Dynamics Engine (ODE), Bullet, etc (the default is ODE). It provides realistic rendering of environments achieving high-quality lighting, shadows and textures. It can model sensors that "see" the simulated environment, such as laser range finders, cameras (including wide-angle), Kinect style sensors, etc. Gazebo is an independent project like any other project used by \gls{ros} \cite{Gazebosi92:online}. For this project ROS Noetic with a 11.x version of Gazebo was used. Thanks to Gazebo it was possible to launch the \gls{3d} trajectory acquired by hand through the webcam on a simulated drone. 
 
 \section{Frameworks}
 \label{subsec:frameworks}
+The main frameworks used in this project are listed below.
 
 \paragraph*{\texttt{DJITelloPy}} DJI Tello drone python interface uses the official Tello SDK and Tello EDU SDK. This library has an implementation of all Tello commands, easily retrieves a video stream, receives and parses state packets and other features.\footnote{\url{https://github.com/damiafuentes/DJITelloPy}}.
 

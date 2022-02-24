@@ -3,7 +3,7 @@
 \usepackage[utf8]{inputenc} 
 \usepackage[T1]{fontenc}
 \usepackage{textcomp}
-\usepackage{amsmath} % new
+\usepackage{amsmath, bm} % new
 
 \usepackage{setspace}
 
@@ -37,7 +37,7 @@
 %\bibliographystyle{dinat}
 %\bibliographystyle{alpha}
 %\bibliographystyle{dcu}
-\bibliographystyle{plainnat}
+\bibliographystyle{IEEEtran}
 \setcitestyle{authoryear,open={[},close={]}}
 
 \newfloat{Equation}{htbp}{equ}[chapter]
@@ -189,7 +189,7 @@ morecomment=[l]{//s},
 \Year{2022} %compulsory, put only the year
 \place{Lugano} %compulsory
 
-\dedication{-dedica-} %optional
+\dedication{A tutti quelli che hanno fatto di me\\ quel che sono oggi e quel che sarò domani} %optional
 \openepigraph{``Gutta cavat lapidem.'' \\ lat. «la goccia scava la pietra»}
 %optional
 
@@ -201,14 +201,13 @@ morecomment=[l]{//s},
 \begin{titlepage}
 	
 	\noindent
-	\begin{minipage}[t]{0.18\textwidth}
-		\vspace{-4.5mm}{\includegraphics[scale=0.2]{images/logo_unimib.png}}
+	\begin{minipage}[t]{0.23\textwidth}
+		\vspace{-4.5mm}{\includegraphics[scale=0.18]{images/logo_unimib.png}}
 	\end{minipage}
 	\begin{minipage}[t]{0.82\textwidth}
 		{
-			\setstretch{1.42}
+			\setstretch{1.5}
 			{\textsc{Università degli Studi di Milano - Bicocca}} \\
-			\textbf{Scuola di Scienze} \\
 			\textbf{Dipartimento di Informatica, Sistemistica e Comunicazione} \\
 			\textbf{Corso di Laurea Magistrale in Informatica} \\
 			\par
@@ -300,13 +299,12 @@ morecomment=[l]{//s},
 \input{contents/literature}
 \input{contents/background}
 \input{contents/tools}
-\input{contents/methodologies}
+\input{contents/methods}
 \input{contents/evaluation}
 \input{contents/conclusion}
 \endgroup
 
 \appendix %optional, use only if you have an appendix
-
 \begingroup
 \chapter{List of Acronyms}
 \label{chp:acronyms}
