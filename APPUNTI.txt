@@ -1,5 +1,3 @@
-
-APPUNTI
 Quando installi tensorflow su win7 il comando di cmd "tar -xf protoc-3.15.6-win64.zip" non funziona, perciò estrai noramlmente. 
 
 Quando installi tensorflow su win7, non farlo se la dir ha un path troppo lungo
@@ -14,98 +12,25 @@ https://mediapipe.dev/
 hand-gesture-recognition-using-mediapipe:
 https://awesomeopensource.com/project/Kazuhito00/hand-gesture-recognition-using-mediapipe
 
-
-i dati in ingresso devono essere maneggiati in modo tale che non soffrano dello scale e della posizione
-
-il pugno come gesture non è buono
-
-https://www.tecnobabele.com/android-non-si-connette-a-windows-tramite-adb-risolvilo-in-3-semplici-passaggi/2019-11-19/
-
-
-
-moduloPrincipale = fullControll.py
-	composto da:
-	- def getKeyboardInput(me)
-		che sfrutta keyPressModule con il quale ho un interfaccia di test per comandare il drone
-
-	- main
-
-		per eseguire il tracking:
-			c'è una coda queue di lunghezza lenMaxQueue, + è grande + è chiaro il punto di partenza della sequenza di azioni, di contro + tempo nel partire a eseguire il tracciamento
-
-			Quando la coda queue è piena dove a ogni cella troviamo (per ora...***) la somma delle coordinate x e y del palmo (key 0: WRIST) di lmList, ovvero la lista che contiene tutti gli hand landmark (mostrare immagine), allora si passa dallo stato INIZIALIZATION allo stato START. Si esegue la media m su tutti i valori della coda queue. Se m non è troppo lontano dal nuovo valore del palmo (tolleranceSTART) allora si passa allo stato TRACKING. 
-
-			Nella fase di tracking eseguo la media m2, ma questa volta non su tutti gli elementi della coda, ma solo sugli ultimi n elementi (nlastMovements, attualmente settato a 5). Il perché è dovuto al fatto che ci stiamo muovendo e vogliamo che il movimento sia fatto piano di una certa tolleranza (tolleranceTRACKING), se così non fosse ritorniamo allo stato START. 
-
-			Stavo pensando di implementare uno stato in caso di una momentanea perdita del tracciamento, di recuperare il tracking + velocemente. Attualmente ho come l'impressione che certe volte lo faccia, presumo per via dei punti vicini.
-
-			***Penso di migliorare tale sistema facendolo per tutti o quasi tutti i riferimenti della mano, ed eventualmente fare media x e media y, non media della somma delle coordinate. 
-
-		riconoscimento gesture:
-			getDataHandGesture.py, modulo dinamico per poter creare modelli con cui riconoscere più gesti
-				gesti attualmente riconosciuti = ['stop', 'onefingerup', 'twofingerup', 'thumbsup']
-
-			number_imgs = 50, + è grande + dati per ogni categoria
-
-			possiamo recuperare i dati sia con il tello che tramite webcam. Il tello però ha un problema, in quanto si spegne dopo un utilizzo solo di camera senza decollo. Ho gestito tale problema con un state.json
-
-			se individuata una mano si recuperano i punti di riferimento, 42 (21 per le coordinate x e altri 21 per le coordinate y). Questi vengono poi traslati all'origine, (mediando sui punti e sottraendo tale media a ciascun riferimento rispettivamente per coordinate x e y). Ho intenzione anche di mediare tutto su 1, attualmente non viene fatto, ma funziona bene lo stesso. 
-
-			handgesturerecognition.ipynb
-			qui viene passato il csv che ho generato al passo precedente. Viene creato un classificatore DNN (quindi, deep neural network). Mi sono limitato a due layer nascosti di 30 e 10 nodi rispettivamente, con 4 classi
-
-			Con 10 imgs di training per categoria mi era uscito 0.85 di accurancy. Spostando a 50 imgs accurancy = 1.
-				global step 5000: accuracy = 1.0, average_loss = 0.018036956, global_step = 5000, loss = 0.018036956
-
-
-			con handGestureRecognition.py recupero il modello sviluppato nel passo precedente e lo uso in fullControll.py.
-			eseguo anche il drawHandGesture() che si adatta alla mano e riporta il nome del gesto visualmente.
-
-
 Approfondimenti:
 - in traininganddetection.ipynb ho creato un modulo per eseguire object_detection in real time. Sfrutto un pretrained model: ssd_mobilenet_v2. Allo stato attuale potrebbe non servire.
 
 -numba: Python code 1000x Faster
 
-handTrackingBasics.py, test.py, tello.py, main.py sono moduli di test da sistemare/cancellare
-
-
-Sviluppi futuri:
-- testare il tutto sul drone
-
 - unreal engine o unity per creare applicazione? oppure kivy? Preferirei forse unity perché ho già esperienza, e magari chissà riesco a collegarci google arcore per creare un ambiente virtuale. Creazione di un server o calcolo computazionale su smartphone?
 
-- prelevare le traettorie tramite app
-
-- aggiungere più gesti di cattura
-
-Step:
-1) specifica/documento di quello che voglio ottenere. 
-2) acquisizione traettorie limitata 2d e/o 3d (forse si può ottenere un coefficiente di scalatura dal frame A al frame B)
-3) disegnare la trajectory, con un certo profilo di velocità (colori a indicare la variazione della velocità nel tempo t). 
-4) Raggiungere il risultato di almeno una simulazione (persona e drone) su Gazebo. Racconto una traettoria. 
-TELLO ha i suoi nodi su ros. Verificare che queste repo per il tello in ros siano validi. http://wiki.ros.org/tello_driver
-Col franca abbiamo più esperienza. Una via di mezzo tra algoritmo di controllo standard e algo di trajectory? Non mi aspetto che venga seguita alla perfezione la traettoria.
-
-Impo:
-Iniziare a scrivere le implementazioni.
-Questa parte della generazione delle traettorie 3d, mediapipe e riconoscimento dei gesti si può iniziare a scrivere.
-E' più interessante fare una buona simulazione (ed eventalmente una presentazione pratica) che tante cose a metà.
-
-
-FATTO:
+DONE:
 - dive opportunity to create or not the log3dtrajectory
 - fix timer duration trajectory
--non tutte le palle su ros si eliminano
+- non tutte le palle su ros si eliminano
 
 DA FARE:
--mgliorare framerate su ubuntu
-
+-mIgliorare framerate su ubuntu
 
 Per oggi:
 8/1
 -[DONE]stabilire un titolo e inviarlo ai prof per conferma
--[DONE] aggiungere battery nel display
+-[DONE]aggiungere battery nel display
 -[DONE]sistemare abstract e altre parti e inviare pdf ai prof
 -[DONE]contattare il prof ciocca, aggiornandolo sulla data di quando mi voglio laureare, informarlo degli avanzamenti e chiedere anche a lui una lettura/consigli della tesi nei prossimi giorni.
 -[DONE]informare anche i prof giusti e loris che ho risentito il mio relatore della bicocca
@@ -140,10 +65,9 @@ Per oggi:
 4.	Non e’ chiaro se nell’acquisire la traiettoria consideri anche la componente temporale, o se e’ solo un path che poi segui a velocita’ costante.
 5.	Idem per lo yaw del drone.  Guarda sempre nella stessa direzione?
 
-
 nell'evaluation mettiamo i risultati della rete neurale, come mappa l'univariate spline. Che metrica invece per il mappaggio della traiettoria nel real?
 
-diegnare la rete neurale con qualche tool
+diSegnare la rete neurale con qualche tool
 https://playground.tensorflow.org/#activation=tanh&batchSize=10&dataset=circle&regDataset=reg-plane&learningRate=0.03&regularizationRate=0&noise=0&networkShape=4,2&seed=0.70351&showTestData=false&discretize=false&percTrainData=50&x=true&y=true&xTimesY=false&xSquared=false&ySquared=false&cosX=false&sinX=false&cosY=false&sinY=false&collectStats=false&problem=classification&initZero=false&hideText=false
 
 23/01/2022
@@ -154,20 +78,8 @@ https://playground.tensorflow.org/#activation=tanh&batchSize=10&dataset=circle&r
 [DONE] aggiunto stima depth sfruttando stima orientamento. ATTENZIONE bisogna assolutamente iniziare con la mano perfettamente perpendicolare rispetto alla camera, altrimenti al momento problemi.
 the rotation matrix: testare con le generiche matrici di rotazione.
 
-
-quando specifici:
-was 
-had
-
-in passsato sei stato
-I have been at the university
-
-to estimate = sia nome che verbo
-
 30/01
 [done] implementato ridge regression. Spline interpolation also avoids the problem of Runge's phenomenon, in which oscillation can occur between points when interpolating using high-degree polynomials. Stesso discorso riguarda la ridge regression
-
-
 
 05/02/2021
 [done] salvare immagine prima e dopo traiettoria smussata
@@ -175,95 +87,9 @@ to estimate = sia nome che verbo
 
 catturare solo il primo frame della mano quando questa è simbolo detect (serve per il roll, pitch and yaw)
 
-
 #https://www.pluralsight.com/guides/linear-lasso-ridge-regression-scikit-learn
 #https://www.statology.org/adjusted-r-squared-in-python/
 #https://towardsdatascience.com/what-are-the-best-metrics-to-evaluate-your-regression-model-418ca481755b
 #https://towardsdatascience.com/20-popular-machine-learning-metrics-part-1-classification-regression-evaluation-metrics-1ca3e282a2ce
 #https://www.kaggle.com/residentmario/model-fit-metrics/notebook
 # for 1 gesto con k gradi diversi e salvare r^2, MSE e RMSE
-
-fixare immagine output, da vettorizzare possibilmente e scritte ben visibili
-fare recall, precision roc con grafici, mostrare che pca è migliore (prendere 20 componenti anche)
-
-
-
-introduzione
-per raggiungere questo obiettivo, prima di tutto si è fatta una ricerca nella letteratura per vedere se esistesse un sistema di hand tracking. Esistono diverse soluzioni come [Efficient Model-based 3D Tracking of Hand Articulations using Kinect] where with extensive experiments with a prototype GPU-based implementation of the proposed method demonstrates that accurate and robust 3D tracking of hand articulations can be achieved in near real-time (15Hz), using a kinect sensor. Un lavoro più recente [Hand Tracking on Oculus Quest]  marking another important VR input milestone in the evolution of VR input with the announcement of hand tracking on Oculus Quest—enabling natural interaction in VR using your own hands on an all-in-one standalone device, no extra hardware required. All without the need for a controller, external sensors, gloves, or a PC to power it. E infine, uno delle ultime ricerche [MEDIAPIPE] solution that does not require any additional hardware and performs in real-time on mobile devices (quello usato effettivamente in questo progetto e ampiamente parlato nel capitolo letteratura).
-
-
-Grazie a questo sistema è stato possibile costruire una rete neurale profonda per riconoscere dei specifici gesti della mano. è stata inoltre stimata l'orientamento di uno gesto specifico "detect gesture" col fine di ottenere informazioni anche sulla depth. Attraverso l'hand gesture recognition e la stima dell'orientamento, una pipeline per rilevare una traiettoria 3d è stata definita. Tale traiettoria g però è perturbata dalgli errori di stima. Pertanto si è applicato un algoritmo di data fitting sulla traiettoria g per ottenerne una g_smooth smussata. 
-
- 
-As a proof of concept (POC), the captured trajectory was launched first on a drone, in simulation, implemented in the ROS framework. After carrying out the simulation experiments in the Gazebo environment, the DJI Ryze Tello drone (see Sec. \ref{subsec:tello}) was used to test the application in real life. DJITelloPy is the DJI Tello drone python interface, used in the project to make the application communicating with the drone. The trajectory veracity is visible to the naked eye. The correctness of the fixed dimension of the trajectory was extremely important for the project’s purpose since, if the range of action in which the drone operates is uncontrolled, then it could get dangerous for those around it. 
-
-
-L'obiettivo del progetto è stato raggiunto con successo e l'intera pipeline per l'acquisizione della traiettoria può essere sfruttata in scenari di ar e vr in quanto consentirebbe di poter interagire con oggetti virtuali e/o eseguire azioni.
-
-
-conclusione
-Stabilità drone perchè se no è un problema.
-
-Il nostro contributo dà spazio a innumerevoli sviluppi: potrebbe essere interessante pensare a un sistema di combinazioni di gesti, instaurando così un vero e proprio linguaggio. Ovviamente, questo renderebbe più complessa l'interazione utente - drone. I benefici però sono che porterebbero a tipi di applicazioni ancora più interessanti in cui i task potrebbe essere combinazioni di azioni programmate parametrizzabili. Infatti, se ad esempio compio con la stessa mano due gesti diversi, in tempi diversi, allora vengono eseguite due azioni le cui intensità potrebbero essere determinate dalla velocità di passaggio da un gesto all'altro o dalla direzione con cui viene eseguito tale passaggio. Inoltre, essendo che viene eseguita la stima dell'orientamento, si può fare in modo che questa informazione venga effettiamente usata per fare delle riprese in cui il drone rispetta non solo la posizione ma anche l'orientamento. Nel caso del tello è possibile gestire solo lo yaw, ma con alcuni bracci meccanici si ha un totale controllo anche sul row e pitch. Mediapipe dà modo di individuare più di una mano nella scena. Questo significa che potrebbe essere possibile combinare non solo diversi gesti nella stessa mano nello scorrere del tempo, ma anche diversi gesti nello stesso istante e nello scorrere del tempo. 
-
-Da qualcosa di "plug and play" a costruire un sistema molto più complesso: costruire combinazioni di gesti, cioè un linguaggio. Utilizzare l'interazione di due mani per esempio per definire una scala. Migliorare la sicurezza, ad esempio inserendo un face recognition, così che non tutti necesseriamente possono interagire con il drone. Costruire un'applicazione smartphone e/o desktop user friendly. Esecuzione della traiettoria senza un gesto di chiusura, in qualche modo capire in automatico quando termina (per esempio si potrebbe tenere conto della velocità). Salvare delle traiettorie prima e rieseguirle, eseguirle anche su multipli droni, magari effettuando dei mirror delle traiettorie (da gestire la distribuzione).
-
-
-la ricerca ha portato fin qui, noi cosa abbiamo aggiunto?
-
-sono state valide le metodologie applicate? C'è stata qualche difficoltà? Dalle valutazioni cosa si è riscontrato generalmente parlando? QUali sono gli attuali limiti del sistema? Si possono superare? Siamo soddisfatti del lavoro?
-
-
-
-
-Q:
-Dove hai fatto i test real? é stato pericoloso?
-R:
-attenzione qui bisogna tenere molto a mente questo:
-	Before you start using your drone in public, it’s important to spend some time learning how to fly your drone in a safe and capable manner! You’ll need to practice the craft of taking off, keeping your drone steady, manoeuvring through the air, before landing safely. Once you’ve got the basics mastered, you can start to introduce the tricky task of filming whilst flying.
-
-	Calibrating your drone’s inertial measurement unit (IMU) is vital as it will ensure that you will always know where your drone is, which direction that it’s flying in, and the velocity at which it’s flying at.
-
-	Modern drones have the capacity to fly for a maximum of 30 minutes. It’s quite easy to get caught up in the task at hand, and completely lose track of your flight time. Some drones (such as DJI) will begin automatically landing when the battery begins to get low, however there are still a lot of other drones that don’t have this intelligence and will literally crash out of the sky when you run out of battery! If you don’t moderate your flight time, and keep a close eye on your battery levels, that’s an accident waiting to happen.
-
-Q:
-è vero che si potrebbe utilizzare per le riprese, ma non avresti problemi nell'essere preciso?
-R:
-Sì, infatti, on top, sarebbe ideale introdurre un sistema di tracking della persona. così che il drone esegue la traiettoria, ma inoltre mette in focus chi ha davanti a sè. Ma dipende sempre che cosa si vuole fare, non necessariamente si vuole seguire qualcosa. Potrebbe essere interessante creare un sistema che focalizza ciò che è interessante in una scena, per esempio seguendo quello che si muove in una scena.
-
-
-
-si decide un menu
-
-
-
-
-
-http://www.100barolo.it/
-18.00
-
-antica osteria
-menu, possiamo farli:
-menu più bassi, 
-
-menu' base: 
-30neuro almeno
-
-20 max persone:
-comprende acqua w oni 4 oers 1 litro vino + caffe. 
-torta: posso portarla o chiedere 
-
-
-for exampl -> e.g.
-"detect gesture" or "detect" gesture?
-
-
-2116
-2209 - 93
-2304 - 95
-2401 - 97
-2500 - 99
-
-
-If you can't explain something simply, you don't know it well enough
-It's not a lie if you believe it

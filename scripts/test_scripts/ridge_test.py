@@ -1,3 +1,4 @@
+from email import header
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
@@ -161,6 +162,7 @@ def Ridge3D():
     ax.scatter3D(data.x, data.y, data.z, cmap='black')
     ax.plot3D(out[0].T[0], out[1].T[0], out[2].T[0], 'orange')
     plt.show()
+
 
 def main():
 

@@ -14,7 +14,7 @@ print(df.head())
 thisLegend = []
 
 plt.ylabel("Adjusted R-Squared")
-plt.xlabel("Degree")
+plt.xlabel("Fitting Polynomial Degree")
 
 plt.plot(df["degree"], df["adj_r2_score_x"], 'r-', marker='<')
 thisLegend.append(f"Adjusted R-Squared x")
@@ -33,7 +33,7 @@ plt.show()
 #R-Squared
 thisLegend = []
 plt.ylabel("R-Squared")
-plt.xlabel("Degree")
+plt.xlabel("Fitting Polynomial Degree")
 
 plt.plot(df["degree"], df["r2_score_x"], 'r-.', marker='v')
 thisLegend.append(f"R-Squared x")
@@ -51,7 +51,7 @@ plt.show()
 #MSE
 thisLegend = []
 plt.ylabel("RMSE")
-plt.xlabel("Degree")
+plt.xlabel("Fitting Polynomial Degree")
 
 plt.plot(df["degree"], df["RMSE_x"], 'r--', marker='^')
 thisLegend.append(f"RMSE x")
