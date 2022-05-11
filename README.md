@@ -6,6 +6,9 @@ state-of-the-art hand tracking system can be acquired, estimating the orientatio
 Regression. To evaluate the proposed remote control approach, a captured trajectory is tested in a simulation environment to control the motion of a drone. In addition, experiments are
 provided using the DJI Ryze Tello drone to prove the feasibility of the approach in real conditions.
 
+### [Video Demo](https://www.youtube.com/watch?v=OOT3UIXZztE) by Umberto Cocca.
+[![Video demo](assets/demo1.gif)](https://youtu.be/YH4Ef1KsU24)
+[![Video demo](assets/demo2.gif)](https://youtu.be/YH4Ef1KsU24)
 
 ## Setup
 * `pip install -r requirements.txt`
@@ -14,24 +17,21 @@ provided using the DJI Ryze Tello drone to prove the feasibility of the approach
 ## Usage
 Edit main.py according to your preferences:
 
-- The Webcam=True, DRONE DOESN'T FLY (BUT YOUR PC WHERE YOU LAUNCH THE SCRIPTS MUST BE CONNECTED ON DJI RYZE TELLO DRONE), VIDEO RECORDED FROME DRONE AND FROM WEBCAM
-- 3D TRAJECTORY Reconstruction FROM WEBCAM
+- 3D trajectory reconstruction from the webcam. The drone doesn't fly (but your pc where you launch the scripts must be connected to the dji ryze tello drone), and video is recorded frome the drone and from the webcam.
 ```python
 def main():
     kc = keyboardControl()
     kc.test()
 ```
 
-- IS ALWAYS isWebcam=True, DRONE FLIES, VIDEO RECORDED FROM DRONE AND FROM WEBCAM,
-- 3D TRAJECTORY Reconstruction FROM WEBCAM
+- 3D trajectory reconstruction from the webcam. Drone flies, video recorded from the drone and from the webcam.
 ```python
 def main():
     kc.runDroneWebcam()
     kc.test()
 ```
 
-- IS ALWAYS isWebcam=False, DRONE FLIES, VIDEO RECORDED FROM DRONE
-- 3D TRAJECTORY Reconstruction FROM DRONE
+- 3D trajectory reconstruction from the drone. Drone flies, video recorded from the drone.
 ```python
 def main():
     kc.runJustDrone()
