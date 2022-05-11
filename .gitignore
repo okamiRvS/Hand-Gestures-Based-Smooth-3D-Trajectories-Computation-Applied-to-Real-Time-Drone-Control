@@ -13,6 +13,7 @@ scripts/test.py
 tfod
 
 document/images/*
+document/Rissunto.pdf
 
 Tensorflow/labelimg
 Tensorflow/models/*
