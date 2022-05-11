@@ -11,6 +11,33 @@ provided using the DJI Ryze Tello drone to prove the feasibility of the approach
 * `pip install -r requirements.txt`
 * Open `scripts` folder in visual studio code, or set it as main directory
 
+## Usage
+Edit main.py according to your preferences:
+
+- The Webcam=True, DRONE DOESN'T FLY (BUT YOUR PC WHERE YOU LAUNCH THE SCRIPTS MUST BE CONNECTED ON DJI RYZE TELLO DRONE), VIDEO RECORDED FROME DRONE AND FROM WEBCAM
+- 3D TRAJECTORY Reconstruction FROM WEBCAM
+```python
+def main():
+    kc = keyboardControl()
+    kc.test()
+```
+
+- IS ALWAYS isWebcam=True, DRONE FLIES, VIDEO RECORDED FROM DRONE AND FROM WEBCAM,
+- 3D TRAJECTORY Reconstruction FROM WEBCAM
+```python
+def main():
+    kc.runDroneWebcam()
+    kc.test()
+```
+
+- IS ALWAYS isWebcam=False, DRONE FLIES, VIDEO RECORDED FROM DRONE
+- 3D TRAJECTORY Reconstruction FROM DRONE
+```python
+def main():
+    kc.runJustDrone()
+    kc.test()
+```
+
 ## Acknowledgements
 Working on this thesis was an experience that enriched me. I was able to work on a big
 project that allowed me to put into practice most of the skills acquired in these years of
