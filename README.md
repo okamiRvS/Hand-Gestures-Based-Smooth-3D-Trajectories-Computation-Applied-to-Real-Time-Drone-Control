@@ -6,7 +6,7 @@ state-of-the-art hand tracking system can be acquired, estimating the orientatio
 Regression. To evaluate the proposed remote control approach, a captured trajectory is tested in a simulation environment to control the motion of a drone. In addition, experiments are
 provided using the DJI Ryze Tello drone to prove the feasibility of the approach in real conditions.
 
-### [Video Demo](https://www.youtube.com/watch?v=OOT3UIXZztE) by Umberto Cocca.
+### [Video Demo](https://youtu.be/YH4Ef1KsU24) by Umberto Cocca.
 [![Video demo](assets/demo1.gif)](https://youtu.be/YH4Ef1KsU24)
 [![Video demo](assets/demo2.gif)](https://youtu.be/YH4Ef1KsU24)
 
