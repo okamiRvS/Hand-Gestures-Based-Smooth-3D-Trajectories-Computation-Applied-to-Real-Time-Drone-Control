@@ -1,0 +1,1 @@
+Su visual studio aprire cartella "Tesi Magistrale", non questa "scripts"
